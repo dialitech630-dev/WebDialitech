@@ -1,0 +1,209 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root,
+:root.theme-light,
+:root[data-theme="light"] {
+  --color-bg: #f8f9fa;
+  --color-bg-card: #ffffff;
+  --color-bg-secondary: #f9fafb;
+  --color-bg-hover: #f3f4f6;
+  --color-bg-active: #eff6ff;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6b7280;
+  --color-text-muted: #9ca3af;
+  --color-border: #e5e7eb;
+  --color-border-light: #f3f4f6;
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-sidebar-bg: #ffffff;
+  --color-sidebar-border: #e5e7eb;
+  --color-input-bg: #ffffff;
+  --color-select-bg: #ffffff;
+  --font-size-base: 14px;
+  --font-size-sm: 12px;
+  --font-size-lg: 16px;
+  --font-size-xl: 26px;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+}
+
+:root.theme-dark,
+:root[data-theme="dark"] {
+  --color-bg: #0f172a;
+  --color-bg-card: #1e293b;
+  --color-bg-secondary: #1e293b;
+  --color-bg-hover: #334155;
+  --color-bg-active: #1e3a5f;
+  --color-text-primary: #f1f5f9;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
+  --color-border: #334155;
+  --color-border-light: #1e293b;
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-sidebar-bg: #1e293b;
+  --color-sidebar-border: #334155;
+  --color-input-bg: #334155;
+  --color-select-bg: #334155;
+}
+
+:root.font-small {
+  --font-size-base: 12px;
+  --font-size-sm: 10px;
+  --font-size-lg: 14px;
+  --font-size-xl: 22px;
+}
+
+:root.font-large {
+  --font-size-base: 16px;
+  --font-size-sm: 14px;
+  --font-size-lg: 18px;
+  --font-size-xl: 30px;
+}
+
+:root.compact-mode {
+  --spacing-xs: 2px;
+  --spacing-sm: 4px;
+  --spacing-md: 8px;
+  --spacing-lg: 16px;
+  --spacing-xl: 20px;
+}
+
+/* ---------------------------------------------------------------------------
+ * BREAKPOINT SYSTEM (unica fuente de verdad)
+ * Usar SIEMPRE estos valores en los media queries de los componentes:
+ *   xs  <480px  (phones)          -> @media (max-width: 479px)
+ *   sm  480-767 (phones landscape) -> @media (max-width: 767px)
+ *   md  768-1023 (tablets)        -> @media (min-width: 768px) y (max-width: 1023px)
+ *   lg  1024-1279 (laptops)       -> @media (min-width: 1024px)
+ *   xl  1280-1535 (desktop)       -> @media (min-width: 1280px)
+ *   2xl >=1536 (2K/4K/UltraWide)  -> @media (min-width: 1536px)
+ * ------------------------------------------------------------------------ */
+
+html {
+  font-size: clamp(15px, 0.35vw + 14px, 17px);
+}
+
+@media (min-width: 1536px) {
+  html {
+    font-size: clamp(16px, 0.3vw + 15px, 18px);
+  }
+}
+
+@media (max-width: 767px) {
+  html {
+    font-size: 15px;
+  }
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background 0.2s, color 0.2s;
+  overflow-x: hidden;
+}
+
+#app {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Accessibility: foco visible consistente (teclado) */
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Targets tactiles minimos para controles interactivos */
+@media (max-width: 767px) {
+  button,
+  a.nav-btn,
+  .filter-select,
+  .search-input {
+    min-height: 44px;
+  }
+}
+
+/* Scrollbars discretos */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+  background-clip: padding-box;
+}
+
+/* ---------------------------------------------------------------------------
+ * MODALES RESPONSIVOS (aplica a .modal-overlay/.modal-card/.dialog-overlay/.dialog-card)
+ * Reglas base para que ningun modal desborde en pantallas pequenas.
+ * ------------------------------------------------------------------------ */
+
+@media (max-width: 767px) {
+  div.modal-overlay,
+  div.dialog-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  div.modal-overlay > div.modal-card,
+  div.dialog-overlay > div.dialog-card {
+    max-width: 100%;
+    width: 100%;
+    max-height: 92vh;
+    border-radius: 16px 16px 0 0;
+    margin: 0;
+  }
+
+  div.modal-overlay:has(div.plans-comparison) > div.modal-card {
+    max-height: 88vh;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  div.modal-overlay,
+  div.dialog-overlay {
+    padding: 16px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * UTILIDADES RESPONSIVAS
+ * ------------------------------------------------------------------------ */
+
+.hide-mobile {
+  display: none !important;
+}
+
+@media (min-width: 768px) {
+  .hide-mobile {
+    display: initial !important;
+  }
+}
