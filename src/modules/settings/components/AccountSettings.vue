@@ -70,10 +70,16 @@ import DeleteAccountModal from './DeleteAccountModal.vue';
 import RoleBadge from '../../user-management/components/RoleBadge.vue';
 import UserStatusBadge from '../../user-management/components/UserStatusBadge.vue';
 
-const { account, loading, error, deleting, deleteError, fetch, deleteAccount } = useAccount();
+const { account, loading, error, deleting, deleteError, fetch, deleteAccount, hasValidSession } = useAccount();
 const showDeleteModal = ref(false);
 
 async function confirmDelete() {
+  if (deleting.value) return;
+  if (!hasValidSession()) {
+    showDeleteModal.value = false;
+    if (window.__toast) window.__toast.error('Your session has expired. Please sign in again.');
+    return;
+  }
   const { success } = await deleteAccount();
   if (success) showDeleteModal.value = false;
 }

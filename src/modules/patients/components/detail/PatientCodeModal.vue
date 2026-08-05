@@ -1,6 +1,6 @@
 <template>
   <Teleport to="body">
-    <div class="code-modal-overlay" @click.self="$emit('close')">
+    <div v-if="visible" class="code-modal-overlay" @click.self="$emit('close')">
       <div class="code-modal-card">
         <div class="code-modal-header">
           <h3 class="code-modal-title">{{ title }}</h3>

@@ -71,9 +71,18 @@ export const usePatientStore = defineStore('patients', () => {
     fieldErrors.value = {};
   }
 
+  function clear() {
+    patients.value = [];
+    currentPatient.value = null;
+    error.value = '';
+    fieldErrors.value = {};
+    loading.value = false;
+    loadingDetail.value = false;
+  }
+
   return {
     patients, currentPatient, loading, loadingDetail, error, fieldErrors,
-    fetchAll, fetchById, create, remove, clearErrors,
+    fetchAll, fetchById, create, remove, clearErrors, clear,
   };
 });
 

@@ -49,7 +49,13 @@ export const useAlertStore = defineStore('alerts', () => {
     return count;
   }
 
-  return { alerts, loading, error, fetchAll, remove, markAllRead };
+  function clear() {
+    alerts.value = [];
+    error.value = '';
+    loading.value = false;
+  }
+
+  return { alerts, loading, error, fetchAll, remove, markAllRead, clear };
 });
 
 function mapApiAlertToFrontend(apiAlert) {

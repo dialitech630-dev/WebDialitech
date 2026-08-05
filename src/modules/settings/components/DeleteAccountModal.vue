@@ -1,6 +1,6 @@
 <template>
   <Teleport to="body">
-    <div class="delete-overlay" @click.self="handleClose">
+    <div v-if="visible" class="delete-overlay" @click.self="handleClose">
       <div class="delete-card">
         <div class="delete-icon">
           <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
