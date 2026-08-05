@@ -1,0 +1,18 @@
+# Deploy settings
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Proxy API calls to the Render backend via the same origin,
+# so the browser never makes a cross-origin request and CORS is bypassed.
+[[redirects]]
+  from = "/api/v1/*"
+  to = "https://api-dialitech-core-v2.onrender.com/api/v1/:splat"
+  status = 200
+  force = true
+
+# SPA fallback for history-mode routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
