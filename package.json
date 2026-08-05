@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "axios": "^1.18.1",
-    "lightningcss-win32-x64-msvc": "^1.33.0",
     "pinia": "4.0.2",
     "vue": "^3.5.39",
     "vue-router": "^5.2.0"
