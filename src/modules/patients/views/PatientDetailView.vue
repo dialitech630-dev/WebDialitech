@@ -147,7 +147,7 @@
               </div>
               <div class="patient-alert-meta">
                 <PriorityBadge :priority="alert.priority" />
-                <button class="dismiss-btn" title="Resolve alert" @click="resolveAlert(alert.id)">
+                <button class="dismiss-btn" title="Resolve alert" @click="resolveAlert(alert)">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                     <path d="M5.5 8L7.5 10L10.5 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
@@ -171,7 +171,7 @@
     <ResolveAlertModal
       :visible="resolveModalVisible"
       :loading="resolving"
-      :alert-type="resolveAlertType"
+      :alert="resolveAlertTarget"
       @close="resolveModalVisible = false"
       @confirm="confirmResolve"
     />
@@ -212,8 +212,7 @@ const codeModalVisible = ref(false);
 const codeModalKind = ref('mobile');
 const resolveModalVisible = ref(false);
 const resolving = ref(false);
-const resolveAlertType = ref('');
-const resolveAlertId = ref(null);
+const resolveAlertTarget = ref(null);
 
 const readingFilters = [
   { label: 'Today', value: 'today' },
@@ -327,18 +326,24 @@ async function loadPatientAlerts() {
   }
 }
 
-function resolveAlert(id) {
-  const alert = patientAlerts.value.find((a) => a.id === id);
-  resolveAlertType.value = alert?.type || 'Alert';
-  resolveAlertId.value = id;
+function resolveAlert(alert) {
+  resolveAlertTarget.value = alert;
   resolveModalVisible.value = true;
 }
 
 async function confirmResolve() {
+  const alertId = resolveAlertTarget.value?.id;
+  if (!alertId) {
+    resolveModalVisible.value = false;
+    if (window.__toast) window.__toast.error('Unable to resolve alert because the alert ID is invalid.');
+    return;
+  }
+
   resolving.value = true;
   try {
-    await alertService.remove(resolveAlertId.value);
-    patientAlerts.value = patientAlerts.value.filter((a) => a.id !== resolveAlertId.value);
+    await alertService.remove(alertId);
+    patientAlerts.value = patientAlerts.value.filter((a) => a.id !== alertId);
+    resolveAlertTarget.value = null;
     resolveModalVisible.value = false;
     if (window.__toast) window.__toast.success('Alert resolved.');
   } catch (err) {

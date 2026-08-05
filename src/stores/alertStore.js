@@ -21,6 +21,9 @@ export const useAlertStore = defineStore('alerts', () => {
   }
 
   async function remove(alertId) {
+    if (!alertId) {
+      return { success: false, error: 'Unable to resolve alert because the alert ID is invalid.' };
+    }
     loading.value = true;
     error.value = '';
     try {

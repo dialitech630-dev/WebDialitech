@@ -40,8 +40,8 @@
         </div>
         <AlertActions
           :resolved="alert.status === 'Resolved'"
-          @resolve="$emit('resolve', alert.id)"
-          @dismiss="$emit('dismiss', alert.id)"
+          @resolve="$emit('resolve', alert)"
+          @dismiss="$emit('dismiss', alert)"
         />
       </div>
     </div>

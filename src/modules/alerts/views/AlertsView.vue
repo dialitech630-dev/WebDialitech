@@ -32,7 +32,7 @@
     <ResolveAlertModal
       :visible="resolveModalVisible"
       :loading="resolving"
-      :alert-type="pendingResolveType"
+      :alert="selectedAlert"
       @close="resolveModalVisible = false"
       @confirm="confirmResolve"
     />
@@ -59,8 +59,7 @@ const status = ref('All Status');
 const date = ref('All Dates');
 const resolveModalVisible = ref(false);
 const resolving = ref(false);
-const pendingResolveId = ref(null);
-const pendingResolveType = ref('Alert');
+const selectedAlert = ref(null);
 
 const filteredAlerts = computed(() => {
   const query = search.value.trim().toLowerCase();
@@ -102,18 +101,24 @@ function matchesDate(dateStr, filter) {
   return true;
 }
 
-function handleResolve(alertId) {
-  const alert = alertStore.alerts.find((a) => a.id === alertId);
-  pendingResolveType.value = alert?.type || 'Alert';
-  pendingResolveId.value = alertId;
+function handleResolve(alert) {
+  selectedAlert.value = alert;
   resolveModalVisible.value = true;
 }
 
 async function confirmResolve() {
+  const alertId = selectedAlert.value?.id;
+  if (!alertId) {
+    resolveModalVisible.value = false;
+    if (window.__toast) window.__toast.error('Unable to resolve alert because the alert ID is invalid.');
+    return;
+  }
+
   resolving.value = true;
-  const result = await alertStore.remove(pendingResolveId.value);
+  const result = await alertStore.remove(alertId);
   resolving.value = false;
   if (result.success) {
+    selectedAlert.value = null;
     resolveModalVisible.value = false;
     if (window.__toast) window.__toast.success('Alert resolved.');
     refreshNotifications();
@@ -122,7 +127,12 @@ async function confirmResolve() {
   }
 }
 
-async function handleDismiss(alertId) {
+async function handleDismiss(alert) {
+  const alertId = alert?.id;
+  if (!alertId) {
+    if (window.__toast) window.__toast.error('Unable to resolve alert because the alert ID is invalid.');
+    return;
+  }
   const result = await alertStore.remove(alertId);
   if (result.success) {
     if (window.__toast) window.__toast.success('Alert dismissed.');

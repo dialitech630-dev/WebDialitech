@@ -10,6 +10,9 @@ export const alertService = {
   },
 
   remove(alertId) {
+    if (!alertId) {
+      return Promise.reject(new Error('Unable to resolve alert because the alert ID is invalid.'));
+    }
     return api.delete(`/alerts/${alertId}`);
   },
 };

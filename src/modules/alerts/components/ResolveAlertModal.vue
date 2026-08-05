@@ -1,6 +1,6 @@
 <template>
   <Teleport to="body">
-    <div class="resolve-modal-overlay" @click.self="handleClose">
+    <div v-if="visible" class="resolve-modal-overlay" @click.self="handleClose">
       <div class="resolve-modal-card">
         <div class="resolve-modal-header">
           <h3 class="resolve-modal-title">Resolve Alert</h3>
@@ -13,7 +13,9 @@
 
         <div class="resolve-modal-body">
           <p class="resolve-modal-text">
-            Are you sure you want to resolve the <strong>{{ alertType }}</strong> alert? This will remove it from the alert list.
+            Are you sure you want to resolve the <strong>{{ displayType }}</strong> alert
+            <template v-if="alert?.patientName"> for <strong>{{ alert.patientName }}</strong></template>?
+            This will remove it from the alert list.
           </p>
         </div>
 
@@ -32,13 +34,18 @@
 </template>
 
 <script setup>
+import { computed } from 'vue';
+
 const props = defineProps({
   visible: { type: Boolean, default: false },
   loading: { type: Boolean, default: false },
+  alert: { type: Object, default: null },
   alertType: { type: String, default: 'Alert' },
 });
 
 const emit = defineEmits(['close', 'confirm']);
+
+const displayType = computed(() => props.alert?.type || props.alertType || 'Alert');
 
 function handleClose() {
   if (!props.loading) emit('close');
