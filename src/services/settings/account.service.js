@@ -1,7 +1,7 @@
-import api from '../api';
+import { authService } from '../auth/auth.service';
 
 export const accountService = {
   get() {
-    return api.get('/auth/me');
+    return authService.me();
   },
 };

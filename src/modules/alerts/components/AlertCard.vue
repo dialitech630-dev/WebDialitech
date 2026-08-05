@@ -38,7 +38,11 @@
           <PriorityBadge :priority="alert.priority" />
           <StatusBadge :status="alert.status" />
         </div>
-        <AlertActions />
+        <AlertActions
+          :resolved="alert.status === 'Resolved'"
+          @resolve="$emit('resolve', alert.id)"
+          @dismiss="$emit('dismiss', alert.id)"
+        />
       </div>
     </div>
   </div>
@@ -52,6 +56,8 @@ import AlertActions from './AlertActions.vue';
 defineProps({
   alert: { type: Object, required: true },
 });
+
+defineEmits(['resolve', 'dismiss']);
 </script>
 
 <style scoped>

@@ -37,9 +37,21 @@ const avatarColors = ['#2563eb', '#7c3aed', '#db2777', '#dc2626', '#d97706', '#0
 const initials = computed(() =>
   props.patient.name.split(' ').map(n => n[0]).join('').toUpperCase()
 );
-const avatarColor = computed(() =>
-  avatarColors[Number(props.patient.id) % avatarColors.length]
-);
+const avatarColor = computed(() => {
+  const idNum = Number(props.patient.id);
+  const index = Number.isFinite(idNum) && idNum >= 0
+    ? idNum % avatarColors.length
+    : hashString(props.patient.name || String(props.patient.id || ''));
+  return avatarColors[index];
+});
+
+function hashString(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash * 31 + str.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash) % avatarColors.length;
+}
 </script>
 
 <style scoped>

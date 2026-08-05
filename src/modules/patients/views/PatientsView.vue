@@ -7,8 +7,13 @@
     />
 
     <div class="toolbar">
-      <PatientsSearchBar />
-      <PatientsFilters />
+      <PatientsSearchBar v-model:search="search" />
+      <PatientsFilters
+        v-model:status="status"
+        v-model:age="age"
+        v-model:doctor="doctor"
+        :patients="store.patients"
+      />
     </div>
 
     <div v-if="store.loading" class="loading-state">
@@ -48,9 +53,20 @@
     </div>
 
     <template v-else>
-      <PatientsTable :patients="store.patients" @delete="confirmDelete" />
-      <div class="pagination-wrapper">
-        <Pagination :total-items="store.patients.length" />
+      <PatientsTable :patients="paginatedPatients" @delete="confirmDelete" />
+
+      <div v-if="filteredPatients.length === 0" class="empty-state">
+        <p class="empty-title">No results</p>
+        <p class="empty-subtitle">No patients match your search or filters</p>
+      </div>
+
+      <div v-else class="pagination-wrapper">
+        <Pagination
+          :total-items="filteredPatients.length"
+          :current-page="currentPage"
+          :page-size="PAGE_SIZE"
+          @update:current-page="currentPage = $event"
+        />
       </div>
     </template>
 
@@ -70,7 +86,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { usePatientStore } from '../../../stores/patientStore';
 import PatientsHeader from '../components/PatientsHeader.vue';
 import PatientsSearchBar from '../components/PatientsSearchBar.vue';
@@ -84,6 +100,47 @@ const store = usePatientStore();
 const showAddModal = ref(false);
 const showDeleteDialog = ref(false);
 const deleteTargetId = ref('');
+
+const search = ref('');
+const status = ref('All Status');
+const age = ref('All Ages');
+const doctor = ref('All Doctors');
+const currentPage = ref(1);
+const PAGE_SIZE = 8;
+
+const filteredPatients = computed(() => {
+  const query = search.value.trim().toLowerCase();
+  return store.patients.filter((p) => {
+    if (status.value !== 'All Status' && p.status !== status.value) return false;
+    if (doctor.value !== 'All Doctors' && p.doctor !== doctor.value) return false;
+    if (!matchesAge(p.age, age.value)) return false;
+    if (query) {
+      const haystack = `${p.name} ${p.doctor} ${p.gender}`.toLowerCase();
+      if (!haystack.includes(query)) return false;
+    }
+    return true;
+  });
+});
+
+const paginatedPatients = computed(() => {
+  const start = (currentPage.value - 1) * PAGE_SIZE;
+  return filteredPatients.value.slice(start, start + PAGE_SIZE);
+});
+
+function matchesAge(patientAge, filter) {
+  if (filter === 'All Ages') return true;
+  const value = Number(patientAge);
+  if (!Number.isFinite(value)) return false;
+  if (filter === '18-30') return value >= 18 && value <= 30;
+  if (filter === '31-45') return value >= 31 && value <= 45;
+  if (filter === '46-60') return value >= 46 && value <= 60;
+  if (filter === '60+') return value >= 60;
+  return true;
+}
+
+watch([search, status, age, doctor], () => {
+  currentPage.value = 1;
+});
 
 function confirmDelete(id) {
   deleteTargetId.value = id;

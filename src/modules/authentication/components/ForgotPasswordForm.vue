@@ -1,32 +1,32 @@
 <template>
-  <form class="forgot-form" @submit.prevent="$emit('submit')">
+  <form class="forgot-form" novalidate @submit.prevent="$emit('submit')">
     <div class="field">
-      <label class="field-label">Email Address</label>
+      <label class="field-label">Email or Phone</label>
       <input
-        v-model="email"
-        type="email"
+        v-model="identifier"
+        type="text"
         class="field-input"
-        placeholder="you@example.com"
-        required
-        autocomplete="email"
+        :class="{ 'input-error': fieldError }"
+        placeholder="you@example.com or +1 (555) 000-0000"
+        maxlength="254"
+        autocomplete="username"
+        @input="clearFieldError"
       />
+      <p v-if="fieldError" class="error-msg">{{ fieldError }}</p>
     </div>
 
     <p v-if="error" class="error-msg">{{ error }}</p>
 
-    <button
-      type="submit"
-      class="submit-btn"
-      :disabled="!email || loading"
-    >
-      {{ loading ? 'Sending...' : 'Send Recovery Code' }}
-    </button>
+    <LoadingButton type="submit" :loading="loading" loading-text="Checking...">
+      Continue
+    </LoadingButton>
   </form>
 </template>
 
 <script setup>
 import { ref } from 'vue';
-import { sanitizeEmail, isEmail } from '../../../utils/validators';
+import LoadingButton from '../../../components/LoadingButton.vue';
+import { isEmailOrPhone, sanitizeIdentifier } from '../../../utils/validators';
 
 defineProps({
   loading: { type: Boolean, default: false },
@@ -35,16 +35,27 @@ defineProps({
 
 const emit = defineEmits(['submit']);
 
-const email = ref('');
+const identifier = ref('');
+const fieldError = ref('');
 
-function getPayload() {
-  if (!email.value) return null;
-  const clean = sanitizeEmail(email.value);
-  if (!isEmail(clean)) return null;
-  return { email: clean };
+function clearFieldError() {
+  if (fieldError.value) fieldError.value = '';
 }
 
-defineExpose({ email, getPayload });
+function getPayload() {
+  const clean = sanitizeIdentifier(identifier.value);
+  if (!clean) {
+    fieldError.value = 'Enter your email or phone number.';
+    return null;
+  }
+  if (!isEmailOrPhone(clean)) {
+    fieldError.value = 'Enter a valid email address or phone number.';
+    return null;
+  }
+  return { identifier: clean };
+}
+
+defineExpose({ identifier, getPayload, clearFieldError });
 </script>
 
 <style scoped>
@@ -84,31 +95,14 @@ defineExpose({ email, getPayload });
   background: #ffffff;
 }
 
+.field-input.input-error {
+  border-color: #dc2626;
+  background: #fef2f2;
+}
+
 .error-msg {
   color: #ef4444;
   font-size: 13px;
   margin: 0;
-}
-
-.submit-btn {
-  padding: 12px;
-  background: #2563eb;
-  color: #ffffff;
-  border: none;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s;
-  margin-top: 4px;
-}
-
-.submit-btn:hover:not(:disabled) {
-  background: #1d4ed8;
-}
-
-.submit-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
 </style>

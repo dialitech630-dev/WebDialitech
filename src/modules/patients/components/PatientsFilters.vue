@@ -2,34 +2,41 @@
   <div class="filters">
     <div class="filter-group">
       <label class="filter-label">Status</label>
-      <select class="filter-select">
-        <option>All Status</option>
-        <option>Normal</option>
-        <option>Warning</option>
-        <option>Critical</option>
+      <select v-model="status" class="filter-select">
+        <option v-for="s in statusOptions" :key="s">{{ s }}</option>
       </select>
     </div>
     <div class="filter-group">
       <label class="filter-label">Age</label>
-      <select class="filter-select">
-        <option>All Ages</option>
-        <option>18-30</option>
-        <option>31-45</option>
-        <option>46-60</option>
-        <option>60+</option>
+      <select v-model="age" class="filter-select">
+        <option v-for="a in ageOptions" :key="a">{{ a }}</option>
       </select>
     </div>
     <div class="filter-group">
       <label class="filter-label">Doctor</label>
-      <select class="filter-select">
-        <option>All Doctors</option>
-        <option>Dr. Sarah Wilson</option>
-        <option>Dr. James Brown</option>
-        <option>Dr. Emily Chen</option>
+      <select v-model="doctor" class="filter-select">
+        <option v-for="d in doctorOptions" :key="d">{{ d }}</option>
       </select>
     </div>
   </div>
 </template>
+
+<script setup>
+import { computed } from 'vue';
+
+const props = defineProps({
+  patients: { type: Array, default: () => [] },
+});
+
+const status = defineModel('status', { type: String, default: 'All Status' });
+const age = defineModel('age', { type: String, default: 'All Ages' });
+const doctor = defineModel('doctor', { type: String, default: 'All Doctors' });
+
+const statusOptions = computed(() => ['All Status', ...new Set(props.patients.map((p) => p.status).filter(Boolean))]);
+const doctorOptions = computed(() => ['All Doctors', ...new Set(props.patients.map((p) => p.doctor).filter(Boolean))]);
+
+const ageOptions = ['All Ages', '18-30', '31-45', '46-60', '60+'];
+</script>
 
 <style scoped>
 .filters {

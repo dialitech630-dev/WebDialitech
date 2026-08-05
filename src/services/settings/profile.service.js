@@ -1,8 +1,9 @@
 import api from '../api';
+import { authService } from '../auth/auth.service';
 
 export const profileService = {
   get() {
-    return api.get('/auth/me');
+    return authService.me();
   },
 
   update(data) {

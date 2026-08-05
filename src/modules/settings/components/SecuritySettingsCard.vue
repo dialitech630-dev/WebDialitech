@@ -29,7 +29,7 @@
             type="password"
             class="field-input"
             required
-            minlength="8"
+            :minlength="minLength"
             placeholder="••••••••"
           />
         </div>
@@ -40,7 +40,7 @@
             type="password"
             class="field-input"
             required
-            minlength="8"
+            :minlength="minLength"
             placeholder="••••••••"
           />
         </div>
@@ -72,7 +72,9 @@ import { ref, reactive, computed } from 'vue';
 import SettingsSection from './SettingsSection.vue';
 import { authService } from '../../../services/auth/auth.service';
 import { isStrongPassword } from '../../../utils/validators';
+import { PASSWORD_POLICY } from '../../../config/security';
 
+const minLength = PASSWORD_POLICY.MIN_LENGTH;
 const showForm = ref(false);
 const saving = ref(false);
 const formError = ref('');
@@ -84,7 +86,7 @@ const form = reactive({
 });
 
 const passwordError = computed(() => {
-  if (form.newPassword && !isStrongPassword(form.newPassword)) return 'Password must be 8-128 characters without spaces';
+  if (form.newPassword && !isStrongPassword(form.newPassword)) return `Password must be ${PASSWORD_POLICY.MIN_LENGTH}-${PASSWORD_POLICY.MAX_LENGTH} characters without spaces`;
   if (form.confirmPassword && form.newPassword !== form.confirmPassword) return 'Passwords do not match';
   return '';
 });

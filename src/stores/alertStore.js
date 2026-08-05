@@ -35,7 +35,25 @@ export const useAlertStore = defineStore('alerts', () => {
     }
   }
 
-  return { alerts, loading, error, fetchAll, remove };
+  function resolve(alertId) {
+    const alert = alerts.value.find((a) => a.id === alertId);
+    if (!alert) return { success: false, error: 'Alert not found' };
+    alert.status = 'Resolved';
+    return { success: true };
+  }
+
+  function markAllRead() {
+    let count = 0;
+    alerts.value.forEach((a) => {
+      if (a.status !== 'Resolved') {
+        a.status = 'Resolved';
+        count += 1;
+      }
+    });
+    return count;
+  }
+
+  return { alerts, loading, error, fetchAll, remove, resolve, markAllRead };
 });
 
 function mapApiAlertToFrontend(apiAlert) {

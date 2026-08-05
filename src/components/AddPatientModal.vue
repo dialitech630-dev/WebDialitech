@@ -63,6 +63,7 @@
 import { reactive, ref, computed } from 'vue';
 import { usePatientStore } from '../stores/patientStore';
 import LoadingButton from './LoadingButton.vue';
+import { sanitizeString, sanitizeText } from '../utils/validators';
 
 const props = defineProps({
   visible: Boolean,
@@ -84,24 +85,43 @@ const form = reactive({
 });
 
 async function submit() {
-  if (!form.name || form.age === null || !form.gender) return;
+  if (submitting.value) return;
+
+  const name = sanitizeString(form.name);
+  const age = Number(form.age);
+  if (!name) {
+    if (window.__toast) window.__toast.error('Patient name is required.');
+    return;
+  }
+  if (!form.gender) {
+    if (window.__toast) window.__toast.error('Select a gender.');
+    return;
+  }
+  if (!Number.isFinite(age) || age < 0 || age > 150) {
+    if (window.__toast) window.__toast.error('Enter a valid age between 0 and 150.');
+    return;
+  }
+
   submitting.value = true;
   patientStore.clearErrors();
-  const result = await patientStore.create({
-    name: form.name,
-    age: form.age,
-    gender: form.gender,
-    notes: form.notes,
-  });
-  submitting.value = false;
-  if (result.success) {
-    window.__toast?.success('Patient created successfully', '');
-    emit('created');
-    emit('close');
-    form.name = '';
-    form.age = null;
-    form.gender = '';
-    form.notes = '';
+  try {
+    const result = await patientStore.create({
+      name,
+      age,
+      gender: form.gender,
+      notes: sanitizeText(form.notes),
+    });
+    if (result.success) {
+      window.__toast?.success('Patient created successfully', '');
+      emit('created');
+      emit('close');
+      form.name = '';
+      form.age = null;
+      form.gender = '';
+      form.notes = '';
+    }
+  } finally {
+    submitting.value = false;
   }
 }
 </script>

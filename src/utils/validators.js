@@ -58,6 +58,20 @@ export function sanitizePhone(value) {
   return value.replace(/\s+/g, ' ').trim().slice(0, FIELD_LIMITS.PHONE_MAX);
 }
 
+export function isEmailOrPhone(value) {
+  if (!required(value)) return false;
+  if (isEmail(value)) return true;
+  return isPhone(value);
+}
+
+export function sanitizeIdentifier(value) {
+  if (typeof value !== 'string') return '';
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+  if (trimmed.includes('@')) return sanitizeEmail(trimmed);
+  return sanitizePhone(trimmed);
+}
+
 export function sanitizeText(value, max = 500) {
   if (typeof value !== 'string') return '';
   return value.trim().slice(0, max);

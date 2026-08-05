@@ -44,6 +44,8 @@ export function useProfile() {
   }
 
   async function save() {
+    if (saving.value) return false;
+
     const payload = {
       name: sanitizeString(form.name),
       lastname: sanitizeString(form.lastname),

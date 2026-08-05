@@ -15,6 +15,8 @@
 <script setup>
 import { ref } from 'vue';
 const checked = ref(false);
+
+defineExpose({ checked });
 </script>
 
 <style scoped>

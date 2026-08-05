@@ -33,7 +33,7 @@
           </svg>
         </div>
         <h2 class="left-title">Secure Password<br />Recovery</h2>
-        <p class="left-desc">We'll help you regain access to your account quickly and securely. Choose your preferred recovery method to continue.</p>
+        <p class="left-desc">Enter your email or phone number. If the account exists, you can set a new password right away — no code required.</p>
       </div>
     </div>
 
@@ -49,20 +49,36 @@
           <span class="forgot-brand-name">DiaMonitor</span>
         </div>
 
-        <h1 class="forgot-title">Forgot Password</h1>
-        <p class="forgot-subtitle">Enter the email address associated with your account and we'll send you a recovery code.</p>
+        <h1 class="forgot-title">{{ step === 'reset' ? 'Set New Password' : 'Forgot Password' }}</h1>
+        <p v-if="step === 'identify'" class="forgot-subtitle">Enter the email address or phone number associated with your account.</p>
+        <p v-else class="forgot-subtitle">Create a new password for <strong class="identifier-inline">{{ identifier }}</strong>.</p>
 
-        <p v-if="error" class="error-msg">{{ error }}</p>
         <p v-if="successMsg" class="success-msg">{{ successMsg }}</p>
 
         <ForgotPasswordForm
-          ref="formRef"
+          v-if="step === 'identify'"
+          ref="identifierFormRef"
           :loading="loading"
           :error="error"
-          @submit="handleSubmit"
+          @submit="handleIdentify"
         />
 
+        <template v-else>
+          <RecoveryPasswordForm
+            ref="passwordFormRef"
+            :loading="loading"
+            :error="error"
+            @submit="handleReset"
+          />
+        </template>
+
         <div class="forgot-footer">
+          <button v-if="step === 'reset'" type="button" class="link-btn" :disabled="loading" @click="goBack">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M10 3L5 8L10 13" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            Use a different account
+          </button>
           <router-link to="/login" class="back-link">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M10 3L5 8L10 13" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
@@ -78,32 +94,72 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { authService } from '../../../services/auth/auth.service';
+import { recoveryService } from '../../../services/auth/recovery.service';
 import ForgotPasswordForm from '../components/ForgotPasswordForm.vue';
+import RecoveryPasswordForm from '../components/RecoveryPasswordForm.vue';
 
 const router = useRouter();
-const formRef = ref(null);
+const step = ref('identify');
+const identifier = ref('');
 const loading = ref(false);
 const error = ref('');
 const successMsg = ref('');
 
-async function handleSubmit() {
-  const payload = formRef.value?.getPayload();
-  if (!payload) return;
+const identifierFormRef = ref(null);
+const passwordFormRef = ref(null);
+
+function showError(message) {
+  error.value = message;
+  if (message && window.__toast) window.__toast.error(message);
+}
+
+async function handleIdentify() {
+  const payload = identifierFormRef.value?.getPayload();
+  if (!payload || loading.value) return;
 
   loading.value = true;
   error.value = '';
   successMsg.value = '';
 
   try {
-    await authService.sendRecoveryCode(payload);
-    successMsg.value = 'Recovery code sent successfully. Redirecting...';
-    setTimeout(() => router.push('/reset-password'), 1500);
+    await recoveryService.verifyIdentifier(payload);
+    identifier.value = payload.identifier;
+    if (window.__toast) window.__toast.success('Account found. Choose your new password.');
+    step.value = 'reset';
   } catch (err) {
-    error.value = err.response?.data?.message || err.message || 'Failed to send recovery code. Please try again.';
+    showError(recoveryService.extractError(err).message);
   } finally {
     loading.value = false;
   }
+}
+
+async function handleReset() {
+  const payload = passwordFormRef.value?.getPayload();
+  if (!payload || loading.value) return;
+
+  loading.value = true;
+  error.value = '';
+  successMsg.value = '';
+
+  try {
+    await recoveryService.resetPassword({
+      identifier: identifier.value,
+      newPassword: payload.newPassword,
+    });
+    successMsg.value = 'Password updated successfully. Redirecting to login...';
+    if (window.__toast) window.__toast.success('Password updated successfully.');
+    setTimeout(() => router.push('/login'), 1800);
+  } catch (err) {
+    showError(recoveryService.extractError(err).message);
+  } finally {
+    loading.value = false;
+  }
+}
+
+function goBack() {
+  error.value = '';
+  successMsg.value = '';
+  step.value = 'identify';
 }
 </script>
 
@@ -234,6 +290,12 @@ async function handleSubmit() {
   line-height: 1.5;
 }
 
+.identifier-inline {
+  color: #374151;
+  font-weight: 600;
+  word-break: break-all;
+}
+
 .error-msg {
   color: #ef4444;
   font-size: 13px;
@@ -254,6 +316,32 @@ async function handleSubmit() {
 
 .forgot-footer {
   margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 13px;
+  color: #6b7280;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.link-btn:hover:not(:disabled) {
+  color: #374151;
+}
+
+.link-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .back-link {

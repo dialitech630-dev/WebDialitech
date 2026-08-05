@@ -6,7 +6,6 @@ import Login from '../pages/Login.vue';
 import RegisterView from '../modules/register/views/RegisterView.vue';
 import PlansView from '../modules/plans/views/PlansView.vue';
 import ForgotPasswordView from '../modules/authentication/views/ForgotPasswordView.vue';
-import ResetPasswordView from '../modules/authentication/views/ResetPasswordView.vue';
 import DashboardView from '../pages/DashboardView.vue';
 import PatientsView from '../modules/patients/views/PatientsView.vue';
 import PatientDetailView from '../modules/patients/views/PatientDetailView.vue';
@@ -31,7 +30,6 @@ const routes = [
       { path: 'register', name: 'register', component: RegisterView, meta: { public: true } },
       { path: 'plans', name: 'plans', component: PlansView, meta: { public: true } },
       { path: 'forgot-password', name: 'forgot-password', component: ForgotPasswordView, meta: { public: true } },
-      { path: 'reset-password', name: 'reset-password', component: ResetPasswordView, meta: { public: true } },
     ],
   },
   {

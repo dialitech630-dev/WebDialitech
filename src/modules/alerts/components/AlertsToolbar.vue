@@ -6,32 +6,29 @@
         <path d="M11.5 11.5L16 16" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round" />
       </svg>
       <input
+        v-model="search"
         type="text"
         class="search-input"
         placeholder="Search alerts by patient or type..."
-        readonly
       />
     </div>
     <div class="filters">
       <div class="filter-group">
         <label class="filter-label">Priority</label>
-        <select class="filter-select">
+        <select v-model="priority" class="filter-select">
           <option v-for="p in priorities" :key="p">{{ p }}</option>
         </select>
       </div>
       <div class="filter-group">
         <label class="filter-label">Status</label>
-        <select class="filter-select">
+        <select v-model="status" class="filter-select">
           <option v-for="s in alertStatuses" :key="s">{{ s }}</option>
         </select>
       </div>
       <div class="filter-group">
         <label class="filter-label">Date</label>
-        <select class="filter-select">
-          <option>All Dates</option>
-          <option>Today</option>
-          <option>This Week</option>
-          <option>This Month</option>
+        <select v-model="date" class="filter-select">
+          <option v-for="d in dateOptions" :key="d">{{ d }}</option>
         </select>
       </div>
     </div>
@@ -40,6 +37,13 @@
 
 <script setup>
 import { priorities, alertStatuses } from '../data/alerts.js';
+
+const search = defineModel('search', { type: String, default: '' });
+const priority = defineModel('priority', { type: String, default: 'All Priorities' });
+const status = defineModel('status', { type: String, default: 'All Status' });
+const date = defineModel('date', { type: String, default: 'All Dates' });
+
+const dateOptions = ['All Dates', 'Today', 'This Week', 'This Month'];
 </script>
 
 <style scoped>
@@ -76,7 +80,6 @@ import { priorities, alertStatuses } from '../data/alerts.js';
   background: #ffffff;
   outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
-  cursor: default;
 }
 
 .search-input::placeholder {

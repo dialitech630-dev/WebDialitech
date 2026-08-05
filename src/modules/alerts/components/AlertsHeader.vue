@@ -11,7 +11,7 @@
         <span class="breadcrumb-current">Alerts</span>
       </nav>
     </div>
-    <button class="mark-btn">
+    <button class="mark-btn" @click="$emit('mark-all-read')">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <path d="M1 8H3L5 3L8 13L11 6L13 10H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
@@ -19,6 +19,10 @@
     </button>
   </header>
 </template>
+
+<script setup>
+defineEmits(['mark-all-read']);
+</script>
 
 <style scoped>
 .alerts-header {

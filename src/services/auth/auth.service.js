@@ -62,19 +62,5 @@ export const authService = {
     return api.post('/auth/change-password', data);
   },
 
-  /**
-   * @param {{ email: string }} data
-   */
-  sendRecoveryCode(data) {
-    return api.post('/auth/forgot-password', data);
-  },
-
-  /**
-   * @param {{ email: string, code: string, newPassword: string }} data
-   */
-  resetPassword(data) {
-    return api.post('/auth/reset-password', data);
-  },
-
   extractError,
 };

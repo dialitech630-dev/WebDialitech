@@ -25,7 +25,7 @@ api.interceptors.request.use((config) => {
 
 function isAuthRequiredRequest(config) {
   const url = config.url || '';
-  return !/\/auth\/(login|register|forgot-password|reset-password)/.test(url);
+  return !/\/auth\/(login|register|forgot-password|reset-password|recovery)/.test(url);
 }
 
 function isAuthLoginRequest(config) {

@@ -27,7 +27,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import api from '../services/api';
+import { patientService } from '../services/patients/patient.service';
 import PatientMonitoringCard from './PatientMonitoringCard.vue';
 
 const patients = ref([]);
@@ -38,7 +38,7 @@ async function loadPatients() {
   loading.value = true;
   loadError.value = false;
   try {
-    const { data } = await api.get('/patients');
+    const { data } = await patientService.getAll();
     patients.value = (data || []).map((p) => ({
       id: p.id,
       name: p.name || '',

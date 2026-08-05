@@ -5,13 +5,17 @@
       <path d="M11.5 11.5L16 16" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round" />
     </svg>
     <input
+      v-model="search"
       type="text"
       class="search-input"
       placeholder="Search patients by name, doctor..."
-      readonly
     />
   </div>
 </template>
+
+<script setup>
+const search = defineModel('search', { type: String, default: '' });
+</script>
 
 <style scoped>
 .search-bar {
@@ -38,7 +42,6 @@
   background: #ffffff;
   outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
-  cursor: default;
 }
 
 .search-input::placeholder {

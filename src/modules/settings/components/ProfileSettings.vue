@@ -83,9 +83,21 @@ import SettingsSection from './SettingsSection.vue';
 const { form, fieldErrors, loading, saving, error, fetch, save } = useProfile();
 const avatarInput = ref(null);
 
+const MAX_AVATAR_SIZE = 1024 * 1024;
+
 function onAvatarSelected(e) {
   const file = e.target.files?.[0];
   if (!file) return;
+  if (!file.type.startsWith('image/')) {
+    if (window.__toast) window.__toast.error('Please select a valid image file.');
+    e.target.value = '';
+    return;
+  }
+  if (file.size > MAX_AVATAR_SIZE) {
+    if (window.__toast) window.__toast.error('Image is too large. Maximum size is 1 MB.');
+    e.target.value = '';
+    return;
+  }
   const reader = new FileReader();
   reader.onload = (ev) => {
     form.imageUrl = ev.target.result;

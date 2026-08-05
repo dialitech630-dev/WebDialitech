@@ -1,6 +1,12 @@
 <template>
   <div class="alerts-list">
-    <AlertCard v-for="alert in alerts" :key="alert.id" :alert="alert" />
+    <AlertCard
+      v-for="alert in alerts"
+      :key="alert.id"
+      :alert="alert"
+      @resolve="$emit('resolve', $event)"
+      @dismiss="$emit('dismiss', $event)"
+    />
   </div>
 </template>
 
@@ -10,6 +16,8 @@ import AlertCard from './AlertCard.vue';
 defineProps({
   alerts: { type: Array, required: true },
 });
+
+defineEmits(['resolve', 'dismiss']);
 </script>
 
 <style scoped>

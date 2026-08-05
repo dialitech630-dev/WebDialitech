@@ -32,6 +32,7 @@ const emit = defineEmits(['update:imageUrl']);
 
 const previewUrl = ref(props.imageUrl);
 const fileInput = ref(null);
+const MAX_AVATAR_SIZE = 1024 * 1024;
 
 function triggerUpload() {
   fileInput.value?.click();
@@ -40,6 +41,16 @@ function triggerUpload() {
 function onFileSelected(e) {
   const file = e.target.files?.[0];
   if (!file) return;
+  if (!file.type.startsWith('image/')) {
+    if (window.__toast) window.__toast.error('Please select a valid image file.');
+    e.target.value = '';
+    return;
+  }
+  if (file.size > MAX_AVATAR_SIZE) {
+    if (window.__toast) window.__toast.error('Image is too large. Maximum size is 1 MB.');
+    e.target.value = '';
+    return;
+  }
   const reader = new FileReader();
   reader.onload = (ev) => {
     previewUrl.value = ev.target.result;

@@ -41,7 +41,9 @@
       <RegisterCard>
         <CaregiverRegisterForm ref="caregiverForm" />
 
-        <TermsCheckbox />
+        <TermsCheckbox ref="termsCheckbox" />
+
+        <p v-if="termsError" class="terms-error">{{ termsError }}</p>
 
         <div v-if="authStore.error" class="error-banner">
           <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
@@ -80,14 +82,26 @@ import TermsCheckbox from '../components/TermsCheckbox.vue';
 const router = useRouter();
 const authStore = useAuthStore();
 const caregiverForm = ref(null);
+const termsCheckbox = ref(null);
+const termsError = ref('');
 
 async function submitRegistration() {
+  if (authStore.loading) return;
   if (!caregiverForm.value) return;
   authStore.clearErrors();
+
+  if (!termsCheckbox.value?.checked) {
+    termsError.value = 'Please accept the Terms and Conditions to continue.';
+    if (window.__toast) window.__toast.error(termsError.value);
+    return;
+  }
+  termsError.value = '';
+
   const payload = caregiverForm.value.getPayload();
   if (!payload) return;
   const result = await authStore.register(payload);
   if (result.success) {
+    if (window.__toast) window.__toast.success('Account created successfully. Please sign in.');
     router.push('/login');
   }
 }
@@ -180,6 +194,13 @@ async function submitRegistration() {
   justify-content: center;
   padding: 40px;
   overflow-y: auto;
+}
+
+.terms-error {
+  font-size: 12px;
+  color: #dc2626;
+  margin: 12px 0 0;
+  text-align: left;
 }
 
 .error-banner {
