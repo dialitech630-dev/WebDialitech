@@ -1,19 +1,18 @@
 <template>
   <form class="recovery-form" novalidate @submit.prevent="$emit('submit')">
     <div class="field">
-      <label class="field-label">Verification Code</label>
+      <label class="field-label">Email</label>
       <input
-        v-model="code"
-        type="text"
+        v-model="email"
+        type="email"
         class="field-input"
-        :class="{ 'input-error': fieldErrors.code }"
-        placeholder="6-digit code"
-        maxlength="6"
-        inputmode="numeric"
-        autocomplete="one-time-code"
-        @input="clearFieldError('code')"
+        :class="{ 'input-error': fieldErrors.email }"
+        placeholder="you@example.com"
+        maxlength="254"
+        autocomplete="email"
+        @input="clearFieldError('email')"
       />
-      <p v-if="fieldErrors.code" class="error-msg">{{ fieldErrors.code }}</p>
+      <p v-if="fieldErrors.email" class="error-msg">{{ fieldErrors.email }}</p>
     </div>
 
     <div class="field">
@@ -50,8 +49,8 @@
 
     <p v-if="error" class="error-msg">{{ error }}</p>
 
-    <LoadingButton type="submit" :loading="loading" loading-text="Updating...">
-      Update Password
+    <LoadingButton type="submit" :loading="loading" loading-text="Changing...">
+      Change Password
     </LoadingButton>
   </form>
 </template>
@@ -59,8 +58,8 @@
 <script setup>
 import { ref } from 'vue';
 import LoadingButton from '../../../components/LoadingButton.vue';
-import { PASSWORD_POLICY } from '../../../config/security';
-import { isStrongPassword, matches, required } from '../../../utils/validators';
+import { PASSWORD_POLICY, FIELD_LIMITS } from '../../../config/security';
+import { isEmail, sanitizeEmail, isStrongPassword, matches, required } from '../../../utils/validators';
 
 defineProps({
   loading: { type: Boolean, default: false },
@@ -72,10 +71,10 @@ const emit = defineEmits(['submit']);
 const minLength = PASSWORD_POLICY.MIN_LENGTH;
 const maxLength = PASSWORD_POLICY.MAX_LENGTH;
 
+const email = ref('');
 const newPassword = ref('');
 const confirmPassword = ref('');
-const code = ref('');
-const fieldErrors = ref({ code: '', newPassword: '', confirmPassword: '' });
+const fieldErrors = ref({ email: '', newPassword: '', confirmPassword: '' });
 
 function clearFieldError(field) {
   if (fieldErrors.value[field]) fieldErrors.value[field] = '';
@@ -84,11 +83,11 @@ function clearFieldError(field) {
 function getPayload() {
   const errors = {};
 
-  const cleanCode = code.value.trim();
-  if (!required(cleanCode)) {
-    errors.code = 'Enter the verification code.';
-  } else if (!/^\d{6}$/.test(cleanCode)) {
-    errors.code = 'The code must be 6 digits.';
+  const cleanEmail = sanitizeEmail(email.value);
+  if (!required(cleanEmail)) {
+    errors.email = 'Email is required.';
+  } else if (!isEmail(cleanEmail)) {
+    errors.email = 'Enter a valid email address.';
   }
 
   if (!required(newPassword.value)) {
@@ -105,12 +104,12 @@ function getPayload() {
 
   fieldErrors.value = errors;
 
-  if (errors.code || errors.newPassword || errors.confirmPassword) return null;
+  if (errors.email || errors.newPassword || errors.confirmPassword) return null;
 
-  return { code: cleanCode, newPassword: newPassword.value };
+  return { email: cleanEmail, newPassword: newPassword.value };
 }
 
-defineExpose({ code, newPassword, confirmPassword, getPayload, clearFieldError });
+defineExpose({ email, newPassword, confirmPassword, getPayload, clearFieldError });
 </script>
 
 <style scoped>
