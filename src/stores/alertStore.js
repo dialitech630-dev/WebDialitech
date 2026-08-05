@@ -35,13 +35,6 @@ export const useAlertStore = defineStore('alerts', () => {
     }
   }
 
-  function resolve(alertId) {
-    const alert = alerts.value.find((a) => a.id === alertId);
-    if (!alert) return { success: false, error: 'Alert not found' };
-    alert.status = 'Resolved';
-    return { success: true };
-  }
-
   function markAllRead() {
     let count = 0;
     alerts.value.forEach((a) => {
@@ -53,7 +46,7 @@ export const useAlertStore = defineStore('alerts', () => {
     return count;
   }
 
-  return { alerts, loading, error, fetchAll, remove, resolve, markAllRead };
+  return { alerts, loading, error, fetchAll, remove, markAllRead };
 });
 
 function mapApiAlertToFrontend(apiAlert) {

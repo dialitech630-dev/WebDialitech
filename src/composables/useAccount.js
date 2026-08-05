@@ -9,6 +9,7 @@ export function useAccount() {
   const loading = ref(true);
   const error = ref('');
   const deleting = ref(false);
+  const deleteError = ref('');
 
   async function fetch() {
     loading.value = true;
@@ -22,8 +23,8 @@ export function useAccount() {
         email: data.email,
         phone: data.phone,
         plan: data.plan,
-        role: 'Caregiver',
-        status: 'Active',
+        role: data.role || 'caregiver',
+        status: data.status || 'Active',
       };
     } catch (err) {
       const msg = err.response?.data?.message || err.response?.data?.title || 'Failed to load account';
@@ -36,7 +37,7 @@ export function useAccount() {
 
   async function deleteAccount() {
     deleting.value = true;
-    error.value = '';
+    deleteError.value = '';
     try {
       await authService.deleteAccount();
       authStore.logout();
@@ -44,7 +45,7 @@ export function useAccount() {
       return { success: true };
     } catch (err) {
       const msg = err.response?.data?.message || err.response?.data?.title || 'Failed to delete account';
-      error.value = msg;
+      deleteError.value = msg;
       if (window.__toast) window.__toast.error(msg);
       return { success: false, error: msg };
     } finally {
@@ -54,5 +55,5 @@ export function useAccount() {
 
   onMounted(fetch);
 
-  return { account, loading, error, deleting, fetch, deleteAccount };
+  return { account, loading, error, deleting, deleteError, fetch, deleteAccount };
 }

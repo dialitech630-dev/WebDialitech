@@ -28,6 +28,14 @@
     <div v-else-if="!alertStore.loading && !alertStore.error" class="empty-banner">
       No alerts yet.
     </div>
+
+    <ResolveAlertModal
+      :visible="resolveModalVisible"
+      :loading="resolving"
+      :alert-type="pendingResolveType"
+      @close="resolveModalVisible = false"
+      @confirm="confirmResolve"
+    />
   </div>
 </template>
 
@@ -35,17 +43,24 @@
 import { ref, computed, onMounted } from 'vue';
 import { useAlertStore } from '../../../stores/alertStore';
 import { useAuthStore } from '../../../stores/authStore';
+import { useNotifications } from '../../../composables/useNotifications';
 import AlertsHeader from '../components/AlertsHeader.vue';
 import AlertsToolbar from '../components/AlertsToolbar.vue';
 import AlertsList from '../components/AlertsList.vue';
+import ResolveAlertModal from '../components/ResolveAlertModal.vue';
 
 const alertStore = useAlertStore();
 const authStore = useAuthStore();
+const { fetchAll: refreshNotifications } = useNotifications();
 
 const search = ref('');
 const priority = ref('All Priorities');
 const status = ref('All Status');
 const date = ref('All Dates');
+const resolveModalVisible = ref(false);
+const resolving = ref(false);
+const pendingResolveId = ref(null);
+const pendingResolveType = ref('Alert');
 
 const filteredAlerts = computed(() => {
   const query = search.value.trim().toLowerCase();
@@ -88,14 +103,30 @@ function matchesDate(dateStr, filter) {
 }
 
 function handleResolve(alertId) {
-  const result = alertStore.resolve(alertId);
-  if (result.success && window.__toast) window.__toast.success('Alert marked as resolved.');
+  const alert = alertStore.alerts.find((a) => a.id === alertId);
+  pendingResolveType.value = alert?.type || 'Alert';
+  pendingResolveId.value = alertId;
+  resolveModalVisible.value = true;
+}
+
+async function confirmResolve() {
+  resolving.value = true;
+  const result = await alertStore.remove(pendingResolveId.value);
+  resolving.value = false;
+  if (result.success) {
+    resolveModalVisible.value = false;
+    if (window.__toast) window.__toast.success('Alert resolved.');
+    refreshNotifications();
+  } else if (window.__toast) {
+    window.__toast.error(result.error);
+  }
 }
 
 async function handleDismiss(alertId) {
   const result = await alertStore.remove(alertId);
   if (result.success) {
     if (window.__toast) window.__toast.success('Alert dismissed.');
+    refreshNotifications();
   } else if (window.__toast) {
     window.__toast.error(result.error);
   }

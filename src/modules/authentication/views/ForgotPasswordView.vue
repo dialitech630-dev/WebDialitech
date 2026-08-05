@@ -33,7 +33,7 @@
           </svg>
         </div>
         <h2 class="left-title">Secure Password<br />Recovery</h2>
-        <p class="left-desc">Enter your email or phone number. If the account exists, you can set a new password right away — no code required.</p>
+        <p class="left-desc">Enter your email or phone number. If the account exists, we will send you a verification code to reset your password.</p>
       </div>
     </div>
 
@@ -49,9 +49,9 @@
           <span class="forgot-brand-name">DiaMonitor</span>
         </div>
 
-        <h1 class="forgot-title">{{ step === 'reset' ? 'Set New Password' : 'Forgot Password' }}</h1>
+        <h1 class="forgot-title">{{ step === 'reset' ? 'Enter Verification Code' : 'Forgot Password' }}</h1>
         <p v-if="step === 'identify'" class="forgot-subtitle">Enter the email address or phone number associated with your account.</p>
-        <p v-else class="forgot-subtitle">Create a new password for <strong class="identifier-inline">{{ identifier }}</strong>.</p>
+        <p v-else class="forgot-subtitle">Enter the verification code sent to <strong class="identifier-inline">{{ identifier }}</strong> and choose your new password.</p>
 
         <p v-if="successMsg" class="success-msg">{{ successMsg }}</p>
 
@@ -122,9 +122,10 @@ async function handleIdentify() {
   successMsg.value = '';
 
   try {
-    await recoveryService.verifyIdentifier(payload);
+    await recoveryService.forgotPassword(payload);
     identifier.value = payload.identifier;
-    if (window.__toast) window.__toast.success('Account found. Choose your new password.');
+    successMsg.value = 'If the account exists, a verification code has been sent. Enter it below to continue.';
+    if (window.__toast) window.__toast.success('Verification code sent.');
     step.value = 'reset';
   } catch (err) {
     showError(recoveryService.extractError(err).message);
@@ -144,6 +145,7 @@ async function handleReset() {
   try {
     await recoveryService.resetPassword({
       identifier: identifier.value,
+      code: payload.code,
       newPassword: payload.newPassword,
     });
     successMsg.value = 'Password updated successfully. Redirecting to login...';

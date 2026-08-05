@@ -37,5 +37,13 @@ export const patientService = {
     return api.delete(`/patients/${id}`);
   },
 
+  generateCode(id) {
+    return api.post(`/patients/${id}/generate-code`);
+  },
+
+  generateWearableCode(id) {
+    return api.post(`/patients/${id}/generate-wearable-code`);
+  },
+
   extractError,
 };

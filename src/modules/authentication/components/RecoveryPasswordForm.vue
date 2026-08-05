@@ -1,6 +1,22 @@
 <template>
   <form class="recovery-form" novalidate @submit.prevent="$emit('submit')">
     <div class="field">
+      <label class="field-label">Verification Code</label>
+      <input
+        v-model="code"
+        type="text"
+        class="field-input"
+        :class="{ 'input-error': fieldErrors.code }"
+        placeholder="6-digit code"
+        maxlength="6"
+        inputmode="numeric"
+        autocomplete="one-time-code"
+        @input="clearFieldError('code')"
+      />
+      <p v-if="fieldErrors.code" class="error-msg">{{ fieldErrors.code }}</p>
+    </div>
+
+    <div class="field">
       <label class="field-label">New Password</label>
       <input
         v-model="newPassword"
@@ -58,7 +74,8 @@ const maxLength = PASSWORD_POLICY.MAX_LENGTH;
 
 const newPassword = ref('');
 const confirmPassword = ref('');
-const fieldErrors = ref({ newPassword: '', confirmPassword: '' });
+const code = ref('');
+const fieldErrors = ref({ code: '', newPassword: '', confirmPassword: '' });
 
 function clearFieldError(field) {
   if (fieldErrors.value[field]) fieldErrors.value[field] = '';
@@ -66,6 +83,13 @@ function clearFieldError(field) {
 
 function getPayload() {
   const errors = {};
+
+  const cleanCode = code.value.trim();
+  if (!required(cleanCode)) {
+    errors.code = 'Enter the verification code.';
+  } else if (!/^\d{6}$/.test(cleanCode)) {
+    errors.code = 'The code must be 6 digits.';
+  }
 
   if (!required(newPassword.value)) {
     errors.newPassword = 'Password is required.';
@@ -81,12 +105,12 @@ function getPayload() {
 
   fieldErrors.value = errors;
 
-  if (errors.newPassword || errors.confirmPassword) return null;
+  if (errors.code || errors.newPassword || errors.confirmPassword) return null;
 
-  return { newPassword: newPassword.value };
+  return { code: cleanCode, newPassword: newPassword.value };
 }
 
-defineExpose({ newPassword, confirmPassword, getPayload, clearFieldError });
+defineExpose({ code, newPassword, confirmPassword, getPayload, clearFieldError });
 </script>
 
 <style scoped>

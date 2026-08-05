@@ -2,29 +2,30 @@ import api from '../api';
 import { authService } from './auth.service';
 
 /**
- * Servicio de recuperación de contraseña desacoplado del envío de correos (EmailSender).
+ * Servicio de recuperación de contraseña (flujo con código de verificación).
  *
- * Flujo temporal: el usuario introduce su email o teléfono y, si la cuenta existe,
- * actualiza directamente su contraseña (sin código ni OTP). Este contrato está
- * aislado en `RECOVERY_ENDPOINTS` para que, cuando el backend disponga de OTP/email,
- * solo haya que apuntar estos endpoints al nuevo flujo sin tocar las vistas.
+ * Flujo: el usuario introduce su email o teléfono → `forgotPassword` solicita el
+ * envío de un código de verificación; luego `resetPassword` valida el código y
+ * establece la nueva contraseña. Los endpoints están aislados en `RECOVERY_ENDPOINTS`.
  */
 export const RECOVERY_ENDPOINTS = Object.freeze({
-  VERIFY_IDENTIFIER: '/auth/recovery/verify',
-  RESET_PASSWORD: '/auth/recovery/reset-password',
+  FORGOT_PASSWORD: '/auth/forgot-password',
+  RESET_PASSWORD: '/auth/reset-password',
 });
 
 export const recoveryService = {
   /**
+   * Solicita el envío del código de recuperación al email o teléfono indicado.
    * @param {{ identifier: string }} data - email o teléfono del caregiver.
    * @returns {Promise<import('../types').ApiResponse>}
    */
-  verifyIdentifier(data) {
-    return api.post(RECOVERY_ENDPOINTS.VERIFY_IDENTIFIER, data);
+  forgotPassword(data) {
+    return api.post(RECOVERY_ENDPOINTS.FORGOT_PASSWORD, data);
   },
 
   /**
-   * @param {{ identifier: string, newPassword: string }} data
+   * Valida el código recibido y establece la nueva contraseña.
+   * @param {{ identifier: string, code: string, newPassword: string }} data
    * @returns {Promise<import('../types').ApiResponse>}
    */
   resetPassword(data) {

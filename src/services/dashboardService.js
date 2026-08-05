@@ -8,4 +8,8 @@ export const dashboardService = {
   getPatientStatus(patientId) {
     return api.get(`/dashboard/${patientId}`);
   },
+
+  getPatientReadings(patientId, params) {
+    return api.get(`/dashboard/${patientId}/readings`, { params });
+  },
 };

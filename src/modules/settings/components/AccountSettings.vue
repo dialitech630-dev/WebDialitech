@@ -46,25 +46,36 @@
       <div class="danger-zone">
         <h4 class="danger-title">Danger Zone</h4>
         <p class="danger-desc">Permanently deletes your account and all associated patients, devices and alerts. This action cannot be undone.</p>
-        <button class="danger-btn" :disabled="deleting" @click="confirmDelete">
+        <button class="danger-btn" :disabled="deleting" @click="showDeleteModal = true">
           {{ deleting ? 'Deleting...' : 'Delete Account' }}
         </button>
       </div>
     </div>
+
+    <DeleteAccountModal
+      :visible="showDeleteModal"
+      :deleting="deleting"
+      :error="deleteError"
+      @close="showDeleteModal = false"
+      @confirm="confirmDelete"
+    />
   </SettingsSection>
 </template>
 
 <script setup>
+import { ref } from 'vue';
 import { useAccount } from '../../../composables/useAccount';
 import SettingsSection from './SettingsSection.vue';
+import DeleteAccountModal from './DeleteAccountModal.vue';
 import RoleBadge from '../../user-management/components/RoleBadge.vue';
 import UserStatusBadge from '../../user-management/components/UserStatusBadge.vue';
 
-const { account, loading, error, deleting, fetch, deleteAccount } = useAccount();
+const { account, loading, error, deleting, deleteError, fetch, deleteAccount } = useAccount();
+const showDeleteModal = ref(false);
 
-function confirmDelete() {
-  if (!window.confirm('Are you sure you want to permanently delete your account? This will remove all of your data.')) return;
-  deleteAccount();
+async function confirmDelete() {
+  const { success } = await deleteAccount();
+  if (success) showDeleteModal.value = false;
 }
 </script>
 

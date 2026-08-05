@@ -25,11 +25,11 @@
       </PermissionWrapper>
 
       <PermissionWrapper feature="dashboard" @open-modal="showModal = true">
-        <StatsCard title="Patients Online" value="--" variant="green" />
+        <StatsCard title="Patients Online" :value="String(patientsOnline)" variant="green" />
       </PermissionWrapper>
 
       <PermissionWrapper feature="statistics" @open-modal="showModal = true">
-        <StatsCard title="System Status" value="Stable" variant="blue" />
+        <StatsCard title="System Status" :value="systemStatus" variant="blue" />
       </PermissionWrapper>
     </div>
 
@@ -71,6 +71,8 @@ const alertStore = useAlertStore();
 const showModal = ref(false);
 const patientCount = ref(0);
 const criticalAlertsCount = ref(0);
+const patientsOnline = ref(0);
+const systemStatus = ref('Operational');
 const summaryError = ref(false);
 
 const patientLimit = computed(() => {
@@ -84,8 +86,10 @@ async function loadSummary() {
   summaryError.value = false;
   try {
     const { data } = await dashboardService.getSummary();
-    patientCount.value = data?.totalPatients ?? 0;
-    criticalAlertsCount.value = data?.activeAlerts ?? 0;
+    patientCount.value = data?.totalPatients ?? data?.patientsCount ?? 0;
+    criticalAlertsCount.value = data?.activeAlerts ?? data?.alertsCount ?? 0;
+    patientsOnline.value = data?.patientsWithDevice ?? data?.onlinePatients ?? data?.devicesCount ?? 0;
+    systemStatus.value = data?.systemStatus ?? data?.status ?? 'Operational';
   } catch {
     summaryError.value = true;
   }
