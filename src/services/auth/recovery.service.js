@@ -16,7 +16,7 @@ export const RECOVERY_ENDPOINTS = Object.freeze({
 export const recoveryService = {
   /**
    * Solicita el envío del código de recuperación al email o teléfono indicado.
-   * @param {{ identifier: string }} data - email o teléfono del caregiver.
+   * @param {{ email: string }} data - email o teléfono del caregiver (contrato OpenAPI `ForgotPasswordRequest`).
    * @returns {Promise<import('../types').ApiResponse>}
    */
   forgotPassword(data) {
@@ -25,7 +25,7 @@ export const recoveryService = {
 
   /**
    * Valida el código recibido y establece la nueva contraseña.
-   * @param {{ identifier: string, code: string, newPassword: string }} data
+   * @param {{ email: string, code: string, newPassword: string }} data
    * @returns {Promise<import('../types').ApiResponse>}
    */
   resetPassword(data) {

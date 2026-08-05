@@ -52,7 +52,7 @@ function getPayload() {
     fieldError.value = 'Enter a valid email address or phone number.';
     return null;
   }
-  return { identifier: clean };
+  return { email: clean };
 }
 
 defineExpose({ identifier, getPayload, clearFieldError });

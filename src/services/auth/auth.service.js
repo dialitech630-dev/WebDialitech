@@ -12,6 +12,7 @@ function extractError(err) {
       return { message: data.title || 'Validation failed', fields };
     }
     if (data.message) return { message: data.message, fields: {} };
+    if (data.error) return { message: data.error, fields: {} };
     return { message: data.title || 'Request failed', fields: {} };
   }
   if (err.message === 'Network Error') {

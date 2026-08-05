@@ -123,7 +123,7 @@ async function handleIdentify() {
 
   try {
     await recoveryService.forgotPassword(payload);
-    identifier.value = payload.identifier;
+    identifier.value = payload.email;
     successMsg.value = 'If the account exists, a verification code has been sent. Enter it below to continue.';
     if (window.__toast) window.__toast.success('Verification code sent.');
     step.value = 'reset';
@@ -144,7 +144,7 @@ async function handleReset() {
 
   try {
     await recoveryService.resetPassword({
-      identifier: identifier.value,
+      email: identifier.value,
       code: payload.code,
       newPassword: payload.newPassword,
     });
