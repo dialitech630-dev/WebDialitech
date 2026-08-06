@@ -41,9 +41,11 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { useAlertStore } from '../../../stores/alertStore';
 import { useAuthStore } from '../../../stores/authStore';
 import { useNotifications } from '../../../composables/useNotifications';
+import { priorities } from '../data/alerts';
 import AlertsHeader from '../components/AlertsHeader.vue';
 import AlertsToolbar from '../components/AlertsToolbar.vue';
 import AlertsList from '../components/AlertsList.vue';
@@ -51,10 +53,11 @@ import ResolveAlertModal from '../components/ResolveAlertModal.vue';
 
 const alertStore = useAlertStore();
 const authStore = useAuthStore();
+const route = useRoute();
 const { fetchAll: refreshNotifications } = useNotifications();
 
 const search = ref('');
-const priority = ref('All Priorities');
+const priority = ref(priorities.includes(String(route.query.priority)) ? String(route.query.priority) : 'All Priorities');
 const status = ref('All Status');
 const date = ref('All Dates');
 const resolveModalVisible = ref(false);

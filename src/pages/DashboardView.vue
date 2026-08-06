@@ -33,6 +33,10 @@
       </PermissionWrapper>
     </div>
 
+    <PermissionWrapper feature="advancedMonitoring" @open-modal="showModal = true">
+      <PatientMonitoringSection />
+    </PermissionWrapper>
+
     <div class="dashboard-grid">
       <PermissionWrapper feature="alerts" @open-modal="showModal = true">
         <CriticalAlertsPanel />
@@ -53,7 +57,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, defineAsyncComponent } from 'vue';
 import { useAuthStore } from '../stores/authStore';
 import { useSubscriptionStore } from '../stores/subscriptionStore';
 import { useAlertStore } from '../stores/alertStore';
@@ -64,6 +68,10 @@ import PatientMonitoringPanel from '../components/PatientMonitoringPanel.vue';
 import SubscriptionBanner from '../components/SubscriptionBanner.vue';
 import PermissionWrapper from '../components/PermissionWrapper.vue';
 import UpgradePlanModal from '../components/UpgradePlanModal.vue';
+
+const PatientMonitoringSection = defineAsyncComponent(() =>
+  import('../modules/dashboard/components/PatientMonitoringSection.vue'),
+);
 
 const sub = useSubscriptionStore();
 const authStore = useAuthStore();
