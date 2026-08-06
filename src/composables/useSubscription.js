@@ -1,8 +1,10 @@
 import { ref, computed, onMounted } from 'vue';
 import { useSubscriptionStore } from '../stores/subscriptionStore';
+import { useBillingCycle } from './useBillingCycle';
 
 export function useSubscription() {
   const store = useSubscriptionStore();
+  const billing = useBillingCycle();
   const loading = ref(true);
   const error = ref('');
 
@@ -12,7 +14,7 @@ export function useSubscription() {
     return {
       id: config.id,
       name: config.name,
-      price: config.price === 0 ? 'Free' : `$${config.price}${config.period}`,
+      price: billing.formatPrice(config),
       status: store.status,
       description: config.description,
       benefits: config.features,

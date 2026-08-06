@@ -95,7 +95,10 @@
       </div>
 
       <div class="available-plans-section">
-        <h4 class="section-title">Available Plans</h4>
+        <div class="section-head">
+          <h4 class="section-title">Available Plans</h4>
+          <BillingToggle />
+        </div>
         <div class="plans-grid">
           <div
             v-for="p in availablePlans"
@@ -109,9 +112,8 @@
             <div class="plan-card-header">
               <div>
                 <span class="plan-card-name">{{ p.name }}</span>
-                <span class="plan-card-price">
-                  {{ p.price === 0 ? 'Free' : '$' + p.price + p.period }}
-                </span>
+                <span class="plan-card-price">{{ formatPrice(p) }}</span>
+                <span v-if="showsDiscount(p)" class="plan-card-save">Save {{ p.discount }}% · {{ p.billingNote }}</span>
               </div>
               <span v-if="p.isCurrent" class="current-badge">Current Plan</span>
             </div>
@@ -198,10 +200,13 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useSubscription } from '../../../composables/useSubscription';
+import { useBillingCycle } from '../../../composables/useBillingCycle';
 import SettingsSection from './SettingsSection.vue';
 import ChangePlanModal from './ChangePlanModal.vue';
+import BillingToggle from '../../../components/BillingToggle.vue';
 
 const { plan, loading, error, hasActiveSubscription, availablePlans, changePlan, fetch, isChanging } = useSubscription();
+const { formatPrice, showsDiscount } = useBillingCycle();
 const showChangeModal = ref(false);
 const selectedPlan = ref(null);
 
@@ -395,7 +400,16 @@ function scrollToPlans() {
   font-size: 15px;
   font-weight: 700;
   color: #111827;
-  margin: 0 0 16px 0;
+  margin: 0;
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
 }
 
 .plans-grid {
@@ -448,6 +462,15 @@ function scrollToPlans() {
   display: block;
   font-size: 13px;
   color: #6b7280;
+  margin-top: 4px;
+}
+
+.plan-card-save {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #059669;
+  margin-top: 4px;
 }
 
 .current-badge {

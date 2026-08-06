@@ -30,6 +30,9 @@
         <div v-else class="modal-body">
           <h2 class="modal-title">Choose Your Plan</h2>
           <p class="modal-desc">Compare plans and pick the one that fits your needs.</p>
+          <div class="billing-toggle-wrap">
+            <BillingToggle />
+          </div>
 
           <div class="plans-comparison">
             <div
@@ -42,8 +45,12 @@
               <div v-if="plan.isCurrent" class="popular-badge current-badge">Current</div>
               <h3 class="plan-name">{{ plan.name }}</h3>
               <div class="plan-price">
-                <span class="price">${{ plan.price }}</span>
-                <span class="period">{{ plan.period }}</span>
+                <span class="price">{{ planPriceLabel(plan) }}</span>
+                <span v-if="planPrice(plan) !== 0" class="period">{{ planPeriodLabel(plan) }}</span>
+              </div>
+              <div v-if="showsDiscount(plan)" class="plan-save">
+                <span class="save-badge">Save {{ plan.discount }}%</span>
+                <span class="save-note">{{ plan.billingNote }}</span>
               </div>
               <ul class="plan-features">
                 <li v-for="(feat, i) in plan.features.slice(0, 6)" :key="i" class="feature-item">
@@ -71,6 +78,8 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { PLANS, PLAN_ORDER } from '../config/plans';
+import { useBillingCycle } from '../composables/useBillingCycle';
+import BillingToggle from './BillingToggle.vue';
 import { getUpgradeSuggestion, normalizePlanId } from '../services/permission.service';
 
 const props = defineProps({
@@ -84,6 +93,8 @@ const props = defineProps({
 });
 
 defineEmits(['close', 'select']);
+
+const { planPrice, planPriceLabel, planPeriodLabel, showsDiscount } = useBillingCycle();
 
 const viewingPlans = ref(false);
 
@@ -212,6 +223,12 @@ const upgradePlans = computed(() => {
   text-align: left;
 }
 
+.billing-toggle-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
 .plan-card {
   flex: 1;
   border: 2px solid #e5e7eb;
@@ -271,6 +288,27 @@ const upgradePlans = computed(() => {
 .period {
   font-size: 13px;
   color: #6b7280;
+}
+
+.plan-save {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.save-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #059669;
+  background: #f0fdf4;
+  padding: 3px 10px;
+  border-radius: 6px;
+}
+
+.save-note {
+  font-size: 11px;
+  color: #9ca3af;
 }
 
 .plan-features {

@@ -19,6 +19,7 @@
               <span class="plan-label">Current Plan</span>
               <span class="plan-name">{{ currentPlanName }}</span>
               <span class="plan-price">{{ currentPlanPrice }}</span>
+              <span v-if="showsDiscount(currentPlanConfig)" class="plan-billing-note">{{ currentPlanConfig.billingNote }} · Save {{ currentPlanConfig.discount }}%</span>
             </div>
             <div class="arrow-down">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -28,7 +29,8 @@
             <div class="plan-card new">
               <span class="plan-label">New Plan</span>
               <span class="plan-name">{{ newPlan.name }}</span>
-              <span class="plan-price">{{ newPlan.price === 0 ? 'Free' : '$' + newPlan.price + '/month' }}</span>
+              <span class="plan-price">{{ formatPrice(newPlan) }}</span>
+              <span v-if="showsDiscount(newPlan)" class="plan-billing-note">{{ newPlan.billingNote }} · Save {{ newPlan.discount }}%</span>
             </div>
           </div>
 
@@ -69,6 +71,7 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useSubscriptionStore } from '../../../stores/subscriptionStore';
+import { useBillingCycle } from '../../../composables/useBillingCycle';
 
 const props = defineProps({
   newPlan: { type: Object, required: true },
@@ -77,10 +80,11 @@ const props = defineProps({
 const emit = defineEmits(['close', 'changed']);
 
 const store = useSubscriptionStore();
+const { formatPrice, showsDiscount } = useBillingCycle();
 const saving = ref(false);
 
 const currentPlanName = computed(() => store.planName);
-const currentPlanPrice = computed(() => store.planPrice === 0 ? 'Free' : `$${store.planPrice}/month`);
+const currentPlanPrice = computed(() => formatPrice(store.currentPlan));
 
 const currentFeatures = computed(() => store.currentPlan?.features || []);
 const newFeatures = computed(() => props.newPlan?.features || []);
@@ -254,6 +258,16 @@ async function confirm() {
 .plan-price {
   font-size: 13px;
   color: #6b7280;
+}
+
+.plan-billing-note {
+  font-size: 11px;
+  font-weight: 600;
+  color: #059669;
+  background: #f0fdf4;
+  padding: 2px 8px;
+  border-radius: 6px;
+  width: fit-content;
 }
 
 .arrow-down {

@@ -5,7 +5,6 @@
         v-for="plan in plans"
         :key="plan.id"
         :plan="plan"
-        :annual="annual"
       />
     </div>
   </section>
@@ -16,7 +15,6 @@ import PlanCard from './PlanCard.vue';
 
 defineProps({
   plans: { type: Array, required: true },
-  annual: { type: Boolean, default: false },
 });
 </script>
 

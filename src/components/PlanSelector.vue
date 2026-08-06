@@ -23,7 +23,7 @@
             @click="selectPlan(p)"
           >
             <span class="opt-name">{{ p.name }}</span>
-            <span class="opt-price">{{ priceLabel(p) }}</span>
+            <span class="opt-price">{{ formatPrice(p) }}</span>
             <svg v-if="p.isCurrent" class="opt-check" width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M4 8.5L6.5 11L12 5" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
@@ -44,10 +44,12 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useSubscriptionStore } from '../stores/subscriptionStore';
+import { useBillingCycle } from '../composables/useBillingCycle';
 import PlanBadge from './PlanBadge.vue';
 import ChangePlanModal from '../modules/settings/components/ChangePlanModal.vue';
 
 const sub = useSubscriptionStore();
+const { formatPrice } = useBillingCycle();
 const open = ref(false);
 const wrapperRef = ref(null);
 const selectedPlan = ref(null);
@@ -60,11 +62,6 @@ function selectPlan(plan) {
   if (plan.isCurrent) return;
   open.value = false;
   selectedPlan.value = plan;
-}
-
-function priceLabel(plan) {
-  if (plan.price === 0) return 'Free';
-  return `$${plan.price}${plan.period}`;
 }
 
 function onClickOutside(e) {

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed, watch } from 'vue';
 import { PLANS, PLAN_ORDER } from '../config/plans';
+import { useBillingCycle } from '../composables/useBillingCycle';
 import permissionService, {
   normalizePlanId,
   canAccess,
@@ -11,6 +12,7 @@ import { useAuthStore } from './authStore';
 
 export const useSubscriptionStore = defineStore('subscription', () => {
   const auth = useAuthStore();
+  const billing = useBillingCycle();
 
   const planId = ref(normalizePlanId(auth.plan));
   const role = ref('caregiver');
@@ -32,7 +34,7 @@ export const useSubscriptionStore = defineStore('subscription', () => {
   const isBasePlan = computed(() => planId.value === 'Standard');
   const isPaid = computed(() => !isBasePlan.value);
   const planName = computed(() => currentPlan.value.name);
-  const planPrice = computed(() => currentPlan.value.price);
+  const currentPlanPrice = computed(() => billing.planPrice(currentPlan.value));
 
   const availablePlans = computed(() => {
     return PLAN_ORDER.map((id) => {
@@ -127,7 +129,7 @@ export const useSubscriptionStore = defineStore('subscription', () => {
   });
 
   return {
-    planId, role, status, currentPlan, isBasePlan, isPaid, planName, planPrice, changing,
+    planId, role, status, currentPlan, isBasePlan, isPaid, planName, currentPlanPrice, changing,
     availablePlans,
     setPlan, setRole, setStatus, changePlan, refreshSubscription, syncFromAuth,
     can, isLocked, sidebarModules,

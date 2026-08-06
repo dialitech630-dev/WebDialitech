@@ -18,9 +18,9 @@
       </div>
     </header>
 
-    <PlansHero v-model:annual="annual" />
+    <PlansHero />
 
-    <PricingSection :plans="plans" :annual="annual" />
+    <PricingSection :plans="plans" />
 
     <div class="divider" />
 
@@ -44,13 +44,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
 import { plans, faqs } from '../data/plans.js';
 import PlansHero from '../components/PlansHero.vue';
 import PricingSection from '../components/PricingSection.vue';
 import FAQSection from '../components/FAQSection.vue';
-
-const annual = ref(false);
 </script>
 
 <style scoped>

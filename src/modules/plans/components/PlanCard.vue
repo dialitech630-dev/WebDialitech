@@ -6,8 +6,18 @@
       <p class="plan-desc">{{ plan.description }}</p>
     </div>
     <div class="plan-price">
-      <span class="price-value">${{ displayPrice }}</span>
-      <span class="price-period">{{ plan.period }}</span>
+      <Transition name="price" mode="out-in">
+        <div :key="billingCycle" class="price-inner">
+          <div class="price-row">
+            <span class="price-value">{{ displayPrice }}</span>
+            <span v-if="!isFree" class="price-period">{{ periodLabel }}</span>
+          </div>
+          <div v-if="showsDiscount(plan)" class="price-save">
+            <span class="save-badge">Save {{ plan.discount }}%</span>
+            <span class="save-note">{{ plan.billingNote }}</span>
+          </div>
+        </div>
+      </Transition>
     </div>
     <ul class="plan-features">
       <li v-for="(feature, i) in plan.features" :key="i" class="feature-item">
@@ -26,18 +36,17 @@
 
 <script setup>
 import { computed } from 'vue';
+import { useBillingCycle } from '../../../composables/useBillingCycle';
 
 const props = defineProps({
   plan: { type: Object, required: true },
-  annual: { type: Boolean, default: false },
 });
 
-const displayPrice = computed(() => {
-  if (props.annual) {
-    return Math.round(props.plan.price * 0.8);
-  }
-  return props.plan.price;
-});
+const { billingCycle, planPrice, planPriceLabel, planPeriodLabel, showsDiscount } = useBillingCycle();
+
+const isFree = computed(() => planPrice(props.plan) === 0);
+const displayPrice = computed(() => planPriceLabel(props.plan));
+const periodLabel = computed(() => planPeriodLabel(props.plan));
 </script>
 
 <style scoped>
@@ -106,11 +115,23 @@ const displayPrice = computed(() => {
 
 .plan-price {
   display: flex;
-  align-items: baseline;
-  gap: 4px;
+  flex-direction: column;
+  gap: 8px;
   margin-bottom: 28px;
   padding-bottom: 24px;
   border-bottom: 1px solid #f3f4f6;
+}
+
+.price-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
 }
 
 .price-value {
@@ -124,6 +145,44 @@ const displayPrice = computed(() => {
   font-size: 16px;
   color: #9ca3af;
   font-weight: 500;
+}
+
+.price-save {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.save-badge {
+  font-size: 12px;
+  font-weight: 600;
+  color: #059669;
+  background: #f0fdf4;
+  padding: 3px 10px;
+  border-radius: 6px;
+}
+
+.save-note {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.price-enter-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.price-leave-active {
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+
+.price-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.price-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
 }
 
 .plan-features {

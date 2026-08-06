@@ -1,19 +1,6 @@
-import { PLANS } from '../../../config/plans';
+import { PLANS, PLAN_ORDER } from '../../../data/plans';
 
-const order = ['Standard', 'Pro', 'Premium'];
-
-export const plans = order.map((id) => {
-  const plan = PLANS[id];
-  return {
-    id: plan.id,
-    name: plan.name,
-    price: plan.price,
-    period: plan.period,
-    description: plan.description,
-    featured: plan.featured,
-    features: plan.features,
-  };
-});
+export const plans = PLAN_ORDER.map((id) => PLANS[id]);
 
 export const faqs = [
   {
