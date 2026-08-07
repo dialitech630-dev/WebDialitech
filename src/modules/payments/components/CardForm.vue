@@ -283,7 +283,7 @@ async function submit() {
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
   border: 1px solid #f3f4f6;
-  padding: 24px 28px;
+  padding: var(--card-padding) var(--card-padding-h);
 }
 
 .card-title {

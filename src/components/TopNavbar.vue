@@ -238,7 +238,7 @@ const userRoleLabel = computed(() => {
 <style scoped>
 .topnavbar {
   background: #ffffff;
-  height: 72px;
+  height: var(--navbar-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -724,7 +724,7 @@ const userRoleLabel = computed(() => {
 
 @media (max-width: 767px) {
   .topnavbar {
-    height: 64px;
+    height: var(--navbar-height);
     padding: 0 14px;
     gap: 8px;
   }

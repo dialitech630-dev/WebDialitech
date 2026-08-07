@@ -184,7 +184,7 @@ async function onSelectPlan(planId) {
 
 <style scoped>
 .dashboard-view {
-  padding: 32px;
+  padding: var(--page-padding);
   background: #f8f9fa;
   flex: 1;
 }
@@ -300,7 +300,7 @@ async function onSelectPlan(planId) {
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  gap: var(--grid-gap);
   margin-bottom: 28px;
 }
 
@@ -324,7 +324,7 @@ async function onSelectPlan(planId) {
 .dashboard-grid {
   display: grid;
   grid-template-columns: 1fr 2fr;
-  gap: 20px;
+  gap: var(--grid-gap);
   align-items: start;
   margin-top: 28px;
 }

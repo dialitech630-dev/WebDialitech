@@ -1,4 +1,4 @@
-import { computed } from 'vue';
+import { computed, toRef } from 'vue';
 import { useAppearanceStore } from '../stores/appearanceStore';
 
 export function useAppearance() {
@@ -22,7 +22,14 @@ export function useAppearance() {
   });
 
   return {
-    ...store,
+    theme: toRef(store, 'theme'),
+    language: toRef(store, 'language'),
+    fontSize: toRef(store, 'fontSize'),
+    compactMode: toRef(store, 'compactMode'),
+    setTheme: store.setTheme,
+    setLanguage: store.setLanguage,
+    setFontSize: store.setFontSize,
+    setCompactMode: store.setCompactMode,
     themeOptions,
     languageOptions,
     fontSizeOptions,

@@ -78,7 +78,7 @@
 ## 6. Bugs / observaciones detectadas NO corregidas (requieren backend)
 
 - **Cambio de plan:** el endpoint `PUT /subscription/plan` no existe. El frontend queda preparado; ante 404 aplica modo "offline" local (solo localStorage). Requiere endpoint del backend.
-- **Apariencia:** `PUT /settings/appearance` no existe. El guardado de preferencias se hace local; el `syncToApi` está preparado.
+- **Apariencia:** 100% local (localStorage). No realiza llamadas HTTP.
 - **Recuperación de contraseña:** `POST /auth/forgot-password`, `/auth/verify-code`, `/auth/reset-password` no existen. El frontend queda preparado; las vistas mostrarán error de 404 hasta que el backend las implemente.
 - **Notificaciones:** no hay endpoint para marcar leídas / configurar preferencias (solo se marcan localmente).
 - **Gestión de usuarios:** módulo `user-management` sin API (controlador `Users` eliminado). La vista no está enrutada (dormant).
@@ -131,7 +131,7 @@ src/services/dashboardService.js
 | Profile | ✅ Implementado | Conectado a `PUT /auth/profile`. |
 | Account | ✅ Implementado | Basado en `GET /auth/me`. |
 | Subscription / Planes | ⚠️ Parcialmente implementado | Visual + local; **cambio de plan sin API** (`PUT /subscription/plan`). |
-| Settings / Apariencia | ⚠️ Parcialmente implementado | Local; `PUT /settings/appearance` sin API. |
+| Settings / Apariencia | ✅ Implementado (local) | 100% local en localStorage; sin llamadas HTTP. |
 | Notifications | ⚠️ Parcialmente implementado | Lee `/alerts`; marcar leídas solo local. |
 | Security (password/2FA) | ⚠️ Pendiente | Solo UI deshabilitada; sin API. |
 | Reports | ⚠️ Pendiente | Página sin enrutar; sin API de reportes. |

@@ -47,7 +47,7 @@ const variantClass = computed(() => `variant-${props.variant}`);
 .stats-card {
   background: #ffffff;
   border-radius: 12px;
-  padding: 20px 24px;
+  padding: var(--card-padding-alt);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
   border: 1px solid #f3f4f6;
 }

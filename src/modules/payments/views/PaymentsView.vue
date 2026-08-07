@@ -47,7 +47,7 @@ const paymentMethodLabel = computed(() => {
 
 <style scoped>
 .payments-view {
-  padding: 32px;
+  padding: var(--page-padding);
   background: #f8f9fa;
   flex: 1;
 }
@@ -55,7 +55,7 @@ const paymentMethodLabel = computed(() => {
 .payments-content {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--card-gap);
   max-width: 1200px;
 }
 

@@ -71,7 +71,7 @@ watch(
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--card-gap);
 }
 
 /* Responsive */

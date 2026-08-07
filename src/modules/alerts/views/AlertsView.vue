@@ -163,7 +163,7 @@ onMounted(() => {
 
 <style scoped>
 .alerts-view {
-  padding: 32px;
+  padding: var(--page-padding);
   background: #f8f9fa;
   flex: 1;
 }

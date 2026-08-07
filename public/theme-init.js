@@ -13,11 +13,9 @@
         root.setAttribute('data-theme', theme);
       }
       if (prefs.fontSize) {
-        root.classList.add('font-' + prefs.fontSize);
         root.setAttribute('data-font-size', prefs.fontSize);
       }
       if (prefs.compactMode) {
-        root.classList.add('compact-mode');
         root.setAttribute('data-compact', 'true');
       }
       if (prefs.language) {

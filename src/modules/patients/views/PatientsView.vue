@@ -156,7 +156,7 @@ onMounted(() => {
 
 <style scoped>
 .patients-view {
-  padding: 32px;
+  padding: var(--page-padding);
   background: #f8f9fa;
   flex: 1;
 }

@@ -127,7 +127,7 @@ export default {
   border: 1px solid #f3f4f6;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-  padding: 18px 20px 14px;
+  padding: var(--card-padding-chart);
   overflow: hidden;
 }
 

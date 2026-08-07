@@ -136,7 +136,7 @@ async function onSelectPlan(planId) {
 
 <style scoped>
 .sidebar {
-  width: 250px;
+  width: var(--sidebar-width);
   background: #ffffff;
   border-right: 1px solid #e5e7eb;
   display: flex;
@@ -366,7 +366,7 @@ async function onSelectPlan(planId) {
   }
 
   .sidebar-collapsed {
-    width: 250px;
+    width: var(--sidebar-width);
   }
 
   .sidebar-collapsed .brand {

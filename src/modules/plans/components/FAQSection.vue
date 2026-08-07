@@ -62,7 +62,7 @@ const { t } = useI18n();
   background: #ffffff;
   border-radius: 14px;
   border: 1px solid #f3f4f6;
-  padding: 24px 28px;
+  padding: var(--card-padding) var(--card-padding-h);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   transition: box-shadow 0.2s;
 }

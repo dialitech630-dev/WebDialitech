@@ -88,7 +88,7 @@ onMounted(async () => {
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
   border: 1px solid #f3f4f6;
-  padding: 24px 28px;
+  padding: var(--card-padding) var(--card-padding-h);
 }
 
 .card-title {
@@ -116,7 +116,7 @@ onMounted(async () => {
   grid-template-columns: 2fr 1.4fr 1.2fr 0.8fr 1.6fr;
   gap: 12px;
   align-items: center;
-  padding: 12px 18px;
+  padding: var(--table-row-padding);
 }
 
 .table-head {

@@ -1,15 +1,42 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { appearanceService } from '../services/settings/appearance.service';
 import { setLocale } from '../i18n';
 
+const STORAGE_KEY = 'appearance_preferences';
 const DEFAULT_THEME = 'light';
 const DEFAULT_LANGUAGE = 'es';
 const DEFAULT_FONT_SIZE = 'medium';
 const DEFAULT_COMPACT_MODE = false;
 
+let systemListenerRegistered = false;
+
+function loadPrefs() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function persist(data) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch {
+    /* almacenamiento no disponible */
+  }
+}
+
+function resolveSystemTheme() {
+  try {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  } catch {
+    return 'light';
+  }
+}
+
 export const useAppearanceStore = defineStore('appearance', () => {
-  const saved = appearanceService.load();
+  const saved = loadPrefs();
 
   const theme = ref(saved?.theme || DEFAULT_THEME);
   const language = ref(saved?.language || DEFAULT_LANGUAGE);
@@ -30,30 +57,32 @@ export const useAppearanceStore = defineStore('appearance', () => {
     compactMode.value !== initial.compactMode
   );
 
+  function ensureSystemListener() {
+    if (systemListenerRegistered || typeof window === 'undefined') return;
+    systemListenerRegistered = true;
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      if (theme.value === 'system') {
+        applyTheme('system');
+      }
+    });
+  }
+
   function applyTheme(val) {
     const root = document.documentElement;
     root.classList.remove('theme-light', 'theme-dark');
 
-    if (val === 'system') {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      root.classList.add(prefersDark ? 'theme-dark' : 'theme-light');
-      root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
-    } else {
-      root.classList.add(`theme-${val}`);
-      root.setAttribute('data-theme', val);
-    }
+    const resolved = val === 'system' ? resolveSystemTheme() : val;
+    root.classList.add(`theme-${resolved}`);
+    root.setAttribute('data-theme', resolved);
   }
 
   function applyFontSize(val) {
     const root = document.documentElement;
-    root.classList.remove('font-small', 'font-medium', 'font-large');
-    root.classList.add(`font-${val}`);
     root.setAttribute('data-font-size', val);
   }
 
   function applyCompactMode(val) {
     const root = document.documentElement;
-    root.classList.toggle('compact-mode', val);
     root.setAttribute('data-compact', val ? 'true' : 'false');
   }
 
@@ -67,29 +96,33 @@ export const useAppearanceStore = defineStore('appearance', () => {
     applyFontSize(fontSize.value);
     applyCompactMode(compactMode.value);
     applyLanguage(language.value);
+    ensureSystemListener();
   }
 
-  function setTheme(val) { theme.value = val; applyTheme(val); }
-  function setLanguage(val) { language.value = val; applyLanguage(val); }
-  function setFontSize(val) { fontSize.value = val; applyFontSize(val); }
-  function setCompactMode(val) { compactMode.value = val; applyCompactMode(val); }
-
-  function save() {
-    const data = {
+  function snapshot() {
+    return {
       theme: theme.value,
       language: language.value,
       fontSize: fontSize.value,
       compactMode: compactMode.value,
     };
+  }
 
-    appearanceService.save(data);
+  function persistNow() {
+    persist(snapshot());
+  }
 
+  function setTheme(val) { theme.value = val; applyTheme(val); persistNow(); }
+  function setLanguage(val) { language.value = val; applyLanguage(val); persistNow(); }
+  function setFontSize(val) { fontSize.value = val; applyFontSize(val); persistNow(); }
+  function setCompactMode(val) { compactMode.value = val; applyCompactMode(val); persistNow(); }
+
+  function save() {
+    persist(snapshot());
     initial.theme = theme.value;
     initial.language = language.value;
     initial.fontSize = fontSize.value;
     initial.compactMode = compactMode.value;
-
-    appearanceService.syncToApi(data).catch(() => {});
   }
 
   function reset() {
@@ -97,8 +130,13 @@ export const useAppearanceStore = defineStore('appearance', () => {
     language.value = DEFAULT_LANGUAGE;
     fontSize.value = DEFAULT_FONT_SIZE;
     compactMode.value = DEFAULT_COMPACT_MODE;
-    appearanceService.reset();
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      /* almacenamiento no disponible */
+    }
     applyAll();
+    persistNow();
   }
 
   applyAll();

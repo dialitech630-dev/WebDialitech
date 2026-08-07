@@ -71,7 +71,8 @@ function hashString(str) {
 }
 
 .cell-patient {
-  padding: 14px 16px 14px 24px;
+  padding: var(--table-cell-padding);
+  padding-left: 24px;
 }
 
 .patient-info {
@@ -107,18 +108,19 @@ function hashString(str) {
 }
 
 .cell-data {
-  padding: 14px 16px;
+  padding: var(--table-cell-padding);
   font-size: 14px;
   color: #374151;
   white-space: nowrap;
 }
 
 .cell-status {
-  padding: 14px 16px;
+  padding: var(--table-cell-padding);
 }
 
 .cell-actions {
-  padding: 14px 24px 14px 16px;
+  padding: var(--table-cell-padding);
+  padding-right: 24px;
 }
 
 /* Responsive: filas como tarjetas en movil */

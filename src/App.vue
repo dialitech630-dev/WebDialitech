@@ -91,12 +91,6 @@ onMounted(() => {
   const store = useAppearanceStore();
   store.applyAll();
 
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-    if (store.theme === 'system') {
-      store.applyTheme('system');
-    }
-  });
-
   authEvents.on('session-expired', onSessionExpired);
   authEvents.on('forbidden', onForbidden);
 
