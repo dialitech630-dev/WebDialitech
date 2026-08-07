@@ -71,11 +71,11 @@
                 </div>
                 <div class="status-item">
                   <span class="status-label">Last Reading</span>
-                  <span class="status-value">{{ status.lastReadingAt || '--' }}</span>
+                  <span class="status-value">{{ formatDateTime(status.lastReadingAt) }}</span>
                 </div>
                 <div class="status-item">
                   <span class="status-label">Active Alerts</span>
-                  <span class="status-value">{{ status.activeAlertsCount ?? 0 }}</span>
+                  <span class="status-value">{{ status.activeAlerts ?? 0 }}</span>
                 </div>
                 <div class="status-item">
                   <span class="status-label">Device</span>
@@ -126,9 +126,7 @@
           </div>
           <ReadingsChart
             :readings="readings"
-            label="Heart Rate"
-            unit="bpm"
-            value-key="heartRate"
+            :range="activeFilter"
             :loading="readingsLoading"
             :error="readingsError"
             @retry="loadReadings"
@@ -225,16 +223,21 @@ const patientId = computed(() => route.params.id);
 
 const statusLabel = computed(() => {
   if (!status.value) return 'Normal';
-  if (status.value.state) return status.value.state;
-  if (status.value.activeAlertsCount > 0) return 'Warning';
+  if (status.value.activeAlerts > 0) return 'Warning';
   return status.value.lastHeartRate ? 'Active' : 'Normal';
 });
 
 const deviceStateLabel = computed(() => {
   if (!status.value) return '--';
-  if (status.value.deviceState) return status.value.deviceState;
   return status.value.hasDevice === false ? 'Not linked' : 'Connected';
 });
+
+function formatDateTime(ts) {
+  if (!ts) return '--';
+  const d = new Date(ts);
+  if (Number.isNaN(d.getTime())) return '--';
+  return d.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
 
 function openCodeModal(kind) {
   codeModalKind.value = kind;

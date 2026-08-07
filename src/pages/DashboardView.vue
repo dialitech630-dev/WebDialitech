@@ -6,31 +6,55 @@
     />
 
     <header class="page-header">
-      <h1 class="page-title">Clinical Dashboard</h1>
-      <p class="page-subtitle">Real-time monitoring overview</p>
+      <div class="page-heading">
+        <h1 class="page-title">Clinical Dashboard</h1>
+        <p class="page-subtitle">Live overview of your patients' vitals and alerts</p>
+      </div>
+
+      <div class="page-actions">
+        <span v-if="store.lastUpdated" class="last-updated">
+          Last updated {{ formatTime(store.lastUpdated) }}
+        </span>
+        <label class="auto-refresh" title="Refresh data automatically every 30 seconds">
+          <input v-model="autoRefresh" type="checkbox" />
+          <span>Auto-refresh</span>
+        </label>
+        <button class="refresh-btn" :disabled="store.summaryLoading" @click="refreshAll">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M11.5 7a4.5 4.5 0 1 1-1.4-3.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            <path d="M11.5 1.5V4H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          Refresh
+        </button>
+      </div>
     </header>
 
-    <div v-if="summaryError" class="error-banner">
-      <span>Unable to load dashboard data. The server may be unavailable.</span>
-      <button @click="loadSummary">Retry</button>
+    <div v-if="store.summaryError && !store.summary" class="error-banner">
+      <span>{{ store.summaryError }}</span>
+      <button @click="refreshAll">Retry</button>
     </div>
 
     <div class="kpi-grid">
-      <PermissionWrapper feature="dashboard" @open-modal="showModal = true">
-        <StatsCard title="Patients Monitored" :value="`${patientCount} / ${patientLimit}`" variant="blue" />
-      </PermissionWrapper>
+      <template v-if="store.summaryLoading && !store.summary">
+        <div v-for="i in 4" :key="i" class="kpi-skeleton" />
+      </template>
+      <template v-else>
+        <PermissionWrapper feature="dashboard" @open-modal="showModal = true">
+          <StatsCard title="Total Patients" :value="String(store.totalPatients)" variant="blue" />
+        </PermissionWrapper>
 
-      <PermissionWrapper feature="alerts" @open-modal="showModal = true">
-        <StatsCard title="Critical Alerts" :value="`${criticalAlertsCount} Critical`" variant="red" />
-      </PermissionWrapper>
+        <PermissionWrapper feature="alerts" @open-modal="showModal = true">
+          <StatsCard title="Active Alerts" :value="String(store.activeAlerts)" variant="red" />
+        </PermissionWrapper>
 
-      <PermissionWrapper feature="dashboard" @open-modal="showModal = true">
-        <StatsCard title="Patients Online" :value="String(patientsOnline)" variant="green" />
-      </PermissionWrapper>
+        <PermissionWrapper feature="dashboard" @open-modal="showModal = true">
+          <StatsCard title="Patients With Device" :value="String(store.patientsWithDevice)" variant="green" />
+        </PermissionWrapper>
 
-      <PermissionWrapper feature="statistics" @open-modal="showModal = true">
-        <StatsCard title="System Status" :value="systemStatus" variant="blue" />
-      </PermissionWrapper>
+        <PermissionWrapper feature="statistics" @open-modal="showModal = true">
+          <StatsCard title="Average Heart Rate" :value="avgHrText" variant="blue" />
+        </PermissionWrapper>
+      </template>
     </div>
 
     <PermissionWrapper feature="advancedMonitoring" @open-modal="showModal = true">
@@ -43,9 +67,15 @@
       </PermissionWrapper>
 
       <PermissionWrapper feature="patients" @open-modal="showModal = true">
-        <PatientMonitoringPanel />
+        <PatientMonitoringPanel @add-patient="showAddModal = true" />
       </PermissionWrapper>
     </div>
+
+    <AddPatientModal
+      :visible="showAddModal"
+      @close="showAddModal = false"
+      @created="onPatientCreated"
+    />
 
     <UpgradePlanModal
       :visible="showModal"
@@ -57,61 +87,92 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, defineAsyncComponent } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeUnmount, defineAsyncComponent } from 'vue';
 import { useAuthStore } from '../stores/authStore';
 import { useSubscriptionStore } from '../stores/subscriptionStore';
 import { useAlertStore } from '../stores/alertStore';
-import { dashboardService } from '../services/dashboardService';
+import { useDashboardStore } from '../stores/dashboardStore';
 import StatsCard from '../components/StatsCard.vue';
 import CriticalAlertsPanel from '../components/CriticalAlertsPanel.vue';
 import PatientMonitoringPanel from '../components/PatientMonitoringPanel.vue';
 import SubscriptionBanner from '../components/SubscriptionBanner.vue';
 import PermissionWrapper from '../components/PermissionWrapper.vue';
 import UpgradePlanModal from '../components/UpgradePlanModal.vue';
+import AddPatientModal from '../components/AddPatientModal.vue';
 
 const PatientMonitoringSection = defineAsyncComponent(() =>
   import('../modules/dashboard/components/PatientMonitoringSection.vue'),
 );
 
+const REFRESH_INTERVAL = 30 * 1000;
+
 const sub = useSubscriptionStore();
 const authStore = useAuthStore();
 const alertStore = useAlertStore();
+const store = useDashboardStore();
+
 const showModal = ref(false);
-const patientCount = ref(0);
-const criticalAlertsCount = ref(0);
-const patientsOnline = ref(0);
-const systemStatus = ref('Operational');
-const summaryError = ref(false);
+const showAddModal = ref(false);
+const autoRefresh = ref(true);
+let refreshTimer = null;
 
-const patientLimit = computed(() => {
-  const plan = sub.currentPlan;
-  const mod = plan.modules?.patients;
-  if (mod && typeof mod === 'object' && mod.max) return mod.max;
-  return '--';
-});
+const avgHrText = computed(() => (store.averageHeartRate ? `${store.averageHeartRate} bpm` : '--'));
 
-async function loadSummary() {
-  summaryError.value = false;
-  try {
-    const { data } = await dashboardService.getSummary();
-    patientCount.value = data?.totalPatients ?? data?.patientsCount ?? 0;
-    criticalAlertsCount.value = data?.activeAlerts ?? data?.alertsCount ?? 0;
-    patientsOnline.value = data?.patientsWithDevice ?? data?.onlinePatients ?? data?.devicesCount ?? 0;
-    systemStatus.value = data?.systemStatus ?? data?.status ?? 'Operational';
-  } catch {
-    summaryError.value = true;
+function formatTime(date) {
+  return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
+async function refreshAll() {
+  await store.fetchSummary({ force: true });
+  if (store.selectedPatientId) {
+    store.fetchPatientDetail(store.selectedPatientId, true);
+    store.fetchReadings(store.selectedPatientId, store.range, true);
   }
 }
 
-async function loadAlerts() {
+function startAutoRefresh() {
+  stopAutoRefresh();
+  refreshTimer = setInterval(() => {
+    if (!document.hidden) refreshAll();
+  }, REFRESH_INTERVAL);
+}
+
+function stopAutoRefresh() {
+  if (refreshTimer) {
+    clearInterval(refreshTimer);
+    refreshTimer = null;
+  }
+}
+
+function onVisibilityChange() {
+  if (document.hidden) stopAutoRefresh();
+  else if (autoRefresh.value) startAutoRefresh();
+}
+
+function onPatientCreated() {
+  showAddModal.value = false;
+  refreshAll();
+}
+
+watch(autoRefresh, (enabled) => {
+  if (enabled) startAutoRefresh();
+  else stopAutoRefresh();
+});
+
+onMounted(async () => {
+  await store.fetchSummary();
+  await store.ensureSelectedData();
   if (authStore.userId) {
     await alertStore.fetchAll();
   }
-}
+  startAutoRefresh();
+  document.addEventListener('visibilitychange', onVisibilityChange);
+});
 
-onMounted(() => {
-  loadSummary();
-  loadAlerts();
+onBeforeUnmount(() => {
+  stopAutoRefresh();
+  document.removeEventListener('visibilitychange', onVisibilityChange);
+  store.reset();
 });
 
 async function onSelectPlan(planId) {
@@ -129,7 +190,68 @@ async function onSelectPlan(planId) {
 }
 
 .page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
   margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.page-heading {
+  min-width: 0;
+}
+
+.page-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.last-updated {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.auto-refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  user-select: none;
+}
+
+.auto-refresh input {
+  accent-color: #2563eb;
+}
+
+.refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #374151;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.refresh-btn:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.refresh-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .error-banner {
@@ -182,11 +304,29 @@ async function onSelectPlan(planId) {
   margin-bottom: 28px;
 }
 
+.kpi-skeleton {
+  height: 112px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #e5e7eb 25%, #d1d5db 37%, #e5e7eb 63%);
+  background-size: 400% 100%;
+  animation: kpi-shimmer 1.4s ease infinite;
+}
+
+@keyframes kpi-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
 .dashboard-grid {
   display: grid;
   grid-template-columns: 1fr 2fr;
   gap: 20px;
   align-items: start;
+  margin-top: 28px;
 }
 
 /* Responsive */
@@ -201,6 +341,12 @@ async function onSelectPlan(planId) {
     padding: 16px;
   }
 
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
   .kpi-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
@@ -209,6 +355,7 @@ async function onSelectPlan(planId) {
 
   .dashboard-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 
   .page-title {

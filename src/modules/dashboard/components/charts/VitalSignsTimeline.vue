@@ -1,71 +1,23 @@
 <template>
   <div class="chart-wrap">
     <v-chart v-if="show" ref="chartEl" :option="option" autoresize class="chart" />
+    <div v-else class="chart-message">No readings available for the selected period.</div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { VChart } from '../../echarts';
-import { useChartPresets } from '../../optionPresets';
 import { useChartExportSink } from '../../exportBridge';
-import { useMonitoringData } from '../../../../composables/useMonitoringData';
+import { useVitalsTimeline } from '../../useVitalsTimeline';
+import { useDashboardStore } from '../../../../stores/dashboardStore';
 
-const monitoring = useMonitoringData();
-const { colors, tooltip, grid, legend, valueAxis, categoryAxis, insideZoom, sliderZoom, fontFamily } = useChartPresets();
-
+const store = useDashboardStore();
 const chartEl = ref(null);
 const { register, unregister } = useChartExportSink();
+const { option, csvPayload } = useVitalsTimeline(store.readings, store.range);
 
-const show = computed(() => !monitoring.vitals.loading && !!monitoring.vitals.data);
-
-const option = computed(() => {
-  const d = monitoring.vitals.data;
-  if (!d) return {};
-  const { labels, heartRate, oxygen, temperature } = d;
-
-  return {
-    color: ['#ef4444', '#2563eb', '#f59e0b'],
-    tooltip: { ...tooltip.value, trigger: 'axis' },
-    legend: { ...legend.value, data: ['Heart Rate', 'SpO2', 'Temperature'], bottom: 0 },
-    grid: { ...grid, top: 20, bottom: 28 },
-    xAxis: { ...categoryAxis.value, boundaryGap: false, data: labels },
-    yAxis: [
-      { ...valueAxis.value, name: 'bpm', nameTextStyle: { color: colors.value.textMuted, padding: [0, 0, 0, -4] } },
-      { ...valueAxis.value, name: '%', min: 90, max: 100, nameTextStyle: { color: colors.value.textMuted } },
-      { ...valueAxis.value, name: '°C', min: 35, max: 39, nameTextStyle: { color: colors.value.textMuted } },
-    ],
-    dataZoom: [insideZoom.value, sliderZoom.value],
-    series: [
-      {
-        name: 'Heart Rate', type: 'line', yAxisIndex: 0, data: heartRate,
-        smooth: true, symbol: 'circle', symbolSize: 5,
-        lineStyle: { width: 2 }, itemStyle: { borderRadius: 10 },
-      },
-      {
-        name: 'SpO2', type: 'line', yAxisIndex: 1, data: oxygen,
-        smooth: true, symbol: 'circle', symbolSize: 5, lineStyle: { width: 2 },
-      },
-      {
-        name: 'Temperature', type: 'line', yAxisIndex: 2, data: temperature,
-        smooth: true, symbol: 'circle', symbolSize: 5, lineStyle: { width: 2 },
-      },
-    ],
-    textStyle: { fontFamily },
-  };
-});
-
-const csvPayload = computed(() => {
-  const d = monitoring.vitals.data;
-  const labels = d?.labels || [];
-  const hr = d?.heartRate || [];
-  const ox = d?.oxygen || [];
-  const temp = d?.temperature || [];
-  return {
-    columns: ['Timestamp', 'Heart Rate (bpm)', 'SpO2 (%)', 'Temperature (°C)'],
-    rows: labels.map((label, i) => [label, hr[i], ox[i], temp[i]]),
-  };
-});
+const show = computed(() => store.readings.length > 0);
 
 function getInstance() {
   return chartEl.value?.chart || null;
@@ -86,5 +38,18 @@ onBeforeUnmount(() => unregister(handle));
 .chart {
   width: 100%;
   height: 100%;
+}
+
+.chart-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+:global(:root.theme-dark) .chart-message {
+  color: #64748b;
 }
 </style>

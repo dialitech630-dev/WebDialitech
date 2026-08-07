@@ -9,8 +9,6 @@
       <div class="chart-card__actions">
         <slot name="actions" />
 
-        <span v-if="usingMock" class="mock-pill" title="Currently showing simulated data">Simulated</span>
-
         <button
           class="chart-btn"
           type="button"
@@ -74,7 +72,6 @@ export default {
     height: { type: Number, default: 300 },
     loading: { type: Boolean, default: false },
     error: { type: String, default: '' },
-    usingMock: { type: Boolean, default: false },
   },
   setup(props) {
     const exportHandle = useChartExportProvider();
@@ -165,19 +162,6 @@ export default {
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
-}
-
-.mock-pill {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  color: #b45309;
-  background: #fef3c7;
-  border: 1px solid #fde68a;
-  padding: 3px 8px;
-  border-radius: 999px;
-  white-space: nowrap;
 }
 
 .chart-btn {
@@ -274,11 +258,6 @@ export default {
 :global(:root.theme-dark) .chart-btn:hover:not(:disabled) {
   border-color: #64748b;
   color: #f1f5f9;
-}
-
-:global(:root.theme-dark) .mock-pill {
-  background: rgba(245, 158, 11, 0.15);
-  border-color: rgba(245, 158, 11, 0.35);
 }
 
 :global(:root.theme-dark) .chart-skeleton {

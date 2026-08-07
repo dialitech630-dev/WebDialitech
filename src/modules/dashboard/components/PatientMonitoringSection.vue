@@ -3,160 +3,104 @@
     <header class="monitoring-header">
       <div class="monitoring-heading">
         <h2 class="monitoring-title">Patient Monitoring</h2>
-        <p class="monitoring-subtitle">
-          Real-time clinical trends
-          <span v-if="monitoring.anyMock" class="mock-note" title="Data source is simulated while live endpoints are being integrated">simulated data</span>
-        </p>
+        <p class="monitoring-subtitle">Vital signs from the selected patient's linked device</p>
       </div>
 
-      <div class="range-toggle" role="tablist" aria-label="Monitoring time range">
-        <button
-          v-for="option in ranges"
-          :key="option.value"
-          type="button"
-          role="tab"
-          class="range-btn"
-          :class="{ active: range === option.value }"
-          :aria-selected="range === option.value"
-          @click="setRange(option.value)"
-        >
-          {{ option.label }}
-        </button>
+      <div class="monitoring-controls">
+        <label v-if="store.patients.length > 1" class="patient-select">
+          <select :value="String(store.selectedPatientId)" @change="onPatientChange">
+            <option v-for="p in store.patients" :key="p.patientId" :value="String(p.patientId)">
+              {{ p.name }}
+            </option>
+          </select>
+        </label>
+
+        <div class="range-toggle" role="tablist" aria-label="Monitoring time range">
+          <button
+            v-for="option in ranges"
+            :key="option.value"
+            type="button"
+            role="tab"
+            class="range-btn"
+            :class="{ active: store.range === option.value }"
+            :aria-selected="store.range === option.value"
+            @click="store.setRange(option.value)"
+          >
+            {{ option.label }}
+          </button>
+        </div>
       </div>
     </header>
 
-    <div class="monitoring-grid">
-      <ChartCard
-        class="card-full"
-        title="Vital Signs Timeline"
-        subtitle="Heart rate · SpO₂ · Temperature"
-        :height="340"
-        :loading="monitoring.vitals.loading"
-        :using-mock="monitoring.vitals.usingMock"
-        :error="monitoring.vitals.error ? 'Unable to load vital signs.' : ''"
-      >
-        <VitalSignsTimeline />
-      </ChartCard>
-
-      <ChartCard
-        title="Blood Pressure"
-        subtitle="Systolic & diastolic with normal-range references"
-        :height="300"
-        :loading="monitoring.bloodPressure.loading"
-        :using-mock="monitoring.bloodPressure.usingMock"
-        :error="monitoring.bloodPressure.error ? 'Unable to load blood pressure.' : ''"
-      >
-        <BloodPressureChart />
-      </ChartCard>
-
-      <ChartCard
-        title="Glucose Trend"
-        subtitle="Auto-colored: normal / caution / out of range"
-        :height="300"
-        :loading="monitoring.glucose.loading"
-        :using-mock="monitoring.glucose.usingMock"
-        :error="monitoring.glucose.error ? 'Unable to load glucose data.' : ''"
-      >
-        <GlucoseTrend />
-      </ChartCard>
-
-      <ChartCard
-        title="Weight Evolution"
-        subtitle="Important changes are marked automatically"
-        :height="300"
-        :loading="monitoring.weight.loading"
-        :using-mock="monitoring.weight.usingMock"
-        :error="monitoring.weight.error ? 'Unable to load weight data.' : ''"
-      >
-        <WeightEvolution />
-      </ChartCard>
-
-      <ChartCard
-        title="Dialysis Sessions"
-        subtitle="Sessions completed per week"
-        :height="300"
-        :loading="monitoring.dialysis.loading"
-        :using-mock="monitoring.dialysis.usingMock"
-        :error="monitoring.dialysis.error ? 'Unable to load dialysis sessions.' : ''"
-      >
-        <DialysisSessions />
-      </ChartCard>
-
-      <ChartCard
-        title="Alerts Distribution"
-        subtitle="Click a segment to open filtered alerts"
-        :height="300"
-        :loading="monitoring.alertsDistribution.loading"
-        :using-mock="monitoring.alertsDistribution.usingMock"
-        :error="monitoring.alertsDistribution.error ? 'Unable to load alerts.' : ''"
-      >
-        <AlertsDistribution @select="onAlertSelect" />
-      </ChartCard>
-
-      <ChartCard
-        title="Device Status"
-        subtitle="Connected devices overview"
-        :height="300"
-        :loading="monitoring.deviceStatus.loading"
-        :using-mock="monitoring.deviceStatus.usingMock"
-        :error="monitoring.deviceStatus.error ? 'Unable to load device status.' : ''"
-      >
-        <DeviceStatus />
-      </ChartCard>
-
-      <ChartCard
-        class="card-full"
-        title="Real-Time Monitoring"
-        subtitle="Latest readings · live feed"
-        :height="360"
-        :loading="monitoring.realtime.loading && !monitoring.realtime.data"
-        :using-mock="monitoring.realtime.usingMock"
-        :error="monitoring.realtime.error ? 'Unable to load live readings.' : ''"
-      >
-        <RealTimeMonitoring />
-      </ChartCard>
+    <div class="live-stats">
+      <div v-for="chip in chips" :key="chip.label" class="stat-chip">
+        <span class="stat-chip__label">{{ chip.label }}</span>
+        <span class="stat-chip__value" :style="{ color: chip.color }">{{ chip.value }}</span>
+      </div>
     </div>
+
+    <ChartCard
+      title="Vital Signs Timeline"
+      subtitle="Heart rate · SpO₂ · Activity"
+      :height="340"
+      :loading="store.readingsLoading && !store.readings.length"
+      :error="readingsErrorText"
+    >
+      <div v-if="!store.patients.length" class="no-patients">
+        <p>No patients linked yet.</p>
+        <p>Add a patient to start monitoring vital signs.</p>
+      </div>
+      <VitalSignsTimeline v-else />
+    </ChartCard>
   </section>
 </template>
 
 <script setup>
-import { ref, onMounted, defineAsyncComponent } from 'vue';
-import { useRouter } from 'vue-router';
-import { useMonitoringData } from '../../../composables/useMonitoringData';
+import { computed, defineAsyncComponent } from 'vue';
+import { useDashboardStore } from '../../../stores/dashboardStore';
 import ChartCard from './charts/ChartCard.vue';
 
 const VitalSignsTimeline = defineAsyncComponent(() => import('./charts/VitalSignsTimeline.vue'));
-const BloodPressureChart = defineAsyncComponent(() => import('./charts/BloodPressureChart.vue'));
-const GlucoseTrend = defineAsyncComponent(() => import('./charts/GlucoseTrend.vue'));
-const WeightEvolution = defineAsyncComponent(() => import('./charts/WeightEvolution.vue'));
-const DialysisSessions = defineAsyncComponent(() => import('./charts/DialysisSessions.vue'));
-const AlertsDistribution = defineAsyncComponent(() => import('./charts/AlertsDistribution.vue'));
-const DeviceStatus = defineAsyncComponent(() => import('./charts/DeviceStatus.vue'));
-const RealTimeMonitoring = defineAsyncComponent(() => import('./charts/RealTimeMonitoring.vue'));
 
-const router = useRouter();
-const monitoring = useMonitoringData();
+const store = useDashboardStore();
 
 const ranges = [
-  { value: '24h', label: 'Last 24h' },
-  { value: '7d', label: 'Last 7d' },
-  { value: '30d', label: 'Last 30d' },
+  { value: 'today', label: 'Today' },
+  { value: '24h', label: '24h' },
+  { value: '7d', label: '7d' },
+  { value: '30d', label: '30d' },
 ];
 
-const range = ref('24h');
-
-function setRange(value) {
-  range.value = value;
-  monitoring.vitals.load({ range: value });
-  monitoring.bloodPressure.load({ range: value });
-  monitoring.glucose.load({ range: value });
+function fmt(value, unit = '') {
+  const n = Number(value);
+  return Number.isFinite(n) ? `${Math.round(n)}${unit}` : '--';
 }
 
-function onAlertSelect(priority) {
-  router.push({ name: 'alerts', query: { priority } });
+const chips = computed(() => {
+  const d = store.patientDetail;
+  const alerts = toCount(d?.activeAlerts);
+  return [
+    { label: 'Heart Rate', value: fmt(d?.lastHeartRate, ' bpm'), color: '#ef4444' },
+    { label: 'SpO₂', value: fmt(d?.lastOxygen, '%'), color: '#2563eb' },
+    { label: 'Activity', value: fmt(d?.lastActivity), color: '#f59e0b' },
+    {
+      label: 'Active Alerts',
+      value: String(alerts),
+      color: alerts > 0 ? '#ef4444' : '#22c55e',
+    },
+  ];
+});
+
+const readingsErrorText = computed(() => (store.readingsError ? 'Unable to load readings for this patient.' : ''));
+
+function toCount(value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : 0;
 }
 
-onMounted(() => monitoring.loadAll(range.value));
+function onPatientChange(event) {
+  store.selectPatient(event.target.value);
+}
 </script>
 
 <style scoped>
@@ -173,6 +117,10 @@ onMounted(() => monitoring.loadAll(range.value));
   flex-wrap: wrap;
 }
 
+.monitoring-heading {
+  min-width: 0;
+}
+
 .monitoring-title {
   font-size: 18px;
   font-weight: 700;
@@ -187,18 +135,28 @@ onMounted(() => monitoring.loadAll(range.value));
   margin: 0;
 }
 
-.mock-note {
-  display: inline-block;
-  margin-left: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  color: #b45309;
-  background: #fef3c7;
-  border: 1px solid #fde68a;
-  padding: 2px 8px;
-  border-radius: 999px;
+.monitoring-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.patient-select select {
+  max-width: 220px;
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #374151;
+  font-size: 13px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+}
+
+.patient-select select:focus {
+  border-color: #2563eb;
 }
 
 .range-toggle {
@@ -234,15 +192,53 @@ onMounted(() => monitoring.loadAll(range.value));
   font-weight: 600;
 }
 
-.monitoring-grid {
+.live-stats {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px;
-  align-items: stretch;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
 }
 
-.card-full {
-  grid-column: 1 / -1;
+.stat-chip {
+  background: #ffffff;
+  border: 1px solid #f3f4f6;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.stat-chip__label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.stat-chip__value {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: #111827;
+}
+
+.no-patients {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 100%;
+  color: #9ca3af;
+  font-size: 14px;
+  text-align: center;
+}
+
+.no-patients p {
+  margin: 0;
 }
 
 :global(:root.theme-dark) .monitoring-title {
@@ -253,9 +249,15 @@ onMounted(() => monitoring.loadAll(range.value));
   color: #94a3b8;
 }
 
-:global(:root.theme-dark) .range-toggle {
+:global(:root.theme-dark) .range-toggle,
+:global(:root.theme-dark) .patient-select select,
+:global(:root.theme-dark) .stat-chip {
   background: #1e293b;
   border-color: #334155;
+}
+
+:global(:root.theme-dark) .patient-select select {
+  color: #e2e8f0;
 }
 
 :global(:root.theme-dark) .range-btn {
@@ -271,27 +273,21 @@ onMounted(() => monitoring.loadAll(range.value));
   color: #60a5fa;
 }
 
-:global(:root.theme-dark) .mock-note {
-  background: rgba(245, 158, 11, 0.15);
-  border-color: rgba(245, 158, 11, 0.35);
+:global(:root.theme-dark) .stat-chip__label {
+  color: #64748b;
 }
 
-/* Tablet: keep 2 columns, tighten gaps */
-@media (min-width: 768px) and (max-width: 1023px) {
-  .monitoring-grid {
-    gap: 16px;
-  }
+:global(:root.theme-dark) .stat-chip__value {
+  color: #f1f5f9;
 }
 
-/* Mobile: 1 chart per row, never horizontal scroll */
+:global(:root.theme-dark) .no-patients {
+  color: #64748b;
+}
+
 @media (max-width: 767px) {
   .monitoring-section {
     margin-top: 20px;
-  }
-
-  .monitoring-grid {
-    grid-template-columns: 1fr;
-    gap: 14px;
   }
 
   .monitoring-header {
@@ -300,13 +296,30 @@ onMounted(() => monitoring.loadAll(range.value));
     gap: 12px;
   }
 
-  .range-toggle {
+  .monitoring-controls {
     width: 100%;
+  }
+
+  .range-toggle {
+    flex: 1;
   }
 
   .range-btn {
     flex: 1;
     text-align: center;
+  }
+
+  .patient-select {
+    width: 100%;
+  }
+
+  .patient-select select {
+    width: 100%;
+    max-width: none;
+  }
+
+  .live-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 </style>
