@@ -1,12 +1,12 @@
 <template>
   <section class="alerts-panel">
     <div class="panel-header">
-      <h2 class="panel-title">Critical Alerts</h2>
-      <router-link to="/alerts" class="view-all-btn">View All</router-link>
+      <h2 class="panel-title">Alertas críticas</h2>
+      <router-link to="/alerts" class="view-all-btn">Ver todas</router-link>
     </div>
     <div v-if="alertStore.error && !alerts.length" class="panel-error">
-      <p>Unable to load alerts. The server may be unavailable.</p>
-      <button class="retry-btn" @click="alertStore.fetchAll">Retry</button>
+      <p>No se pudieron cargar las alertas. El servidor puede estar no disponible.</p>
+      <button class="retry-btn" @click="alertStore.fetchAll">Reintentar</button>
     </div>
     <div v-else-if="alerts.length" class="alerts-list">
       <CriticalAlertCard
@@ -19,7 +19,7 @@
       />
     </div>
     <div v-else class="alerts-empty">
-      <p>No critical alerts at this time</p>
+      <p>No hay alertas críticas en este momento</p>
     </div>
   </section>
 </template>

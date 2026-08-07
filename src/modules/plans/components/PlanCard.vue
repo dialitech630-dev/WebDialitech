@@ -1,6 +1,6 @@
 <template>
   <div class="plan-card" :class="{ featured: plan.featured }">
-    <div v-if="plan.featured" class="plan-badge">Recommended</div>
+    <div v-if="plan.featured" class="plan-badge">{{ t('plans.recommended') }}</div>
     <div class="plan-header">
       <h3 class="plan-name">{{ plan.name }}</h3>
       <p class="plan-desc">{{ plan.description }}</p>
@@ -13,7 +13,7 @@
             <span v-if="!isFree" class="price-period">{{ periodLabel }}</span>
           </div>
           <div v-if="showsDiscount(plan)" class="price-save">
-            <span class="save-badge">Save {{ plan.discount }}%</span>
+            <span class="save-badge">{{ t('plans.savePercent', { percent: plan.discount }) }}</span>
             <span class="save-note">{{ plan.billingNote }}</span>
           </div>
         </div>
@@ -29,19 +29,21 @@
       </li>
     </ul>
     <router-link to="/register" class="plan-btn" :class="plan.featured ? 'btn-primary' : 'btn-outline'">
-      {{ plan.featured ? 'Get Started' : 'Choose Plan' }}
+      {{ plan.featured ? t('plans.getStarted') : t('plans.choosePlan') }}
     </router-link>
   </div>
 </template>
 
 <script setup>
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useBillingCycle } from '../../../composables/useBillingCycle';
 
 const props = defineProps({
   plan: { type: Object, required: true },
 });
 
+const { t } = useI18n();
 const { billingCycle, planPrice, planPriceLabel, planPeriodLabel, showsDiscount } = useBillingCycle();
 
 const isFree = computed(() => planPrice(props.plan) === 0);

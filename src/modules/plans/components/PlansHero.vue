@@ -1,13 +1,16 @@
 <template>
   <section class="plans-hero">
-    <h1 class="hero-title">Choose Your Plan</h1>
-    <p class="hero-desc">Flexible pricing designed for clinics of all sizes. Start with a 14-day free trial — no credit card required.</p>
+    <h1 class="hero-title">{{ t('plans.chooseYourPlan') }}</h1>
+    <p class="hero-desc">{{ t('plans.plansHeroSubtitle') }}</p>
     <BillingToggle />
   </section>
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n';
 import BillingToggle from '../../../components/BillingToggle.vue';
+
+const { t } = useI18n();
 </script>
 
 <style scoped>

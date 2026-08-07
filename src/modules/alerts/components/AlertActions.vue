@@ -3,7 +3,7 @@
     <button
       class="action-btn"
       :disabled="resolved"
-      :title="resolved ? 'Already resolved' : 'Mark as resolved'"
+      :title="resolved ? 'Ya resuelta' : 'Marcar como resuelta'"
       @click="$emit('resolve')"
     >
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -11,7 +11,7 @@
         <path d="M5.5 8L7.5 10L10.5 6" stroke="#6b7280" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
     </button>
-    <button class="action-btn danger" title="Dismiss alert" @click="$emit('dismiss')">
+    <button class="action-btn danger" title="Descartar alerta" @click="$emit('dismiss')">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <circle cx="8" cy="8" r="6.5" stroke="#6b7280" stroke-width="1.3" />
         <path d="M5.5 5.5L10.5 10.5M10.5 5.5L5.5 10.5" stroke="#6b7280" stroke-width="1.3" stroke-linecap="round" />

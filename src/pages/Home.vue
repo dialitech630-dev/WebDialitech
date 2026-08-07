@@ -12,33 +12,33 @@
           <span class="brand-name">DiaMonitor</span>
         </div>
         <nav class="header-nav">
-          <router-link to="/plans" class="nav-link-plans">Plans</router-link>
-          <router-link to="/login" class="nav-btn btn-outline">Sign In</router-link>
-          <router-link to="/register" class="nav-btn btn-primary">Register</router-link>
+          <router-link to="/plans" class="nav-link-plans">{{ t('home.plans') }}</router-link>
+          <router-link to="/login" class="nav-btn btn-outline">{{ t('auth.signIn') }}</router-link>
+          <router-link to="/register" class="nav-btn btn-primary">{{ t('auth.register') }}</router-link>
         </nav>
       </div>
     </header>
 
     <section class="hero">
       <div class="hero-content">
-        <h1 class="hero-title">Monitor Your Dialysis<br />Patients in Real Time</h1>
-        <p class="hero-desc">DiaMonitor is a comprehensive platform for managing and monitoring hemodialysis patients. Track vital signs, manage schedules, and receive critical alerts — all in one place.</p>
+        <h1 class="hero-title">{{ t('home.heroTitle1') }}<br />{{ t('home.heroTitle2') }}</h1>
+        <p class="hero-desc">{{ t('home.heroDesc') }}</p>
         <div class="hero-actions">
-          <router-link to="/register" class="hero-btn btn-primary btn-lg">Get Started</router-link>
-          <router-link to="/login" class="hero-btn btn-outline btn-lg">Sign In</router-link>
+          <router-link to="/register" class="hero-btn btn-primary btn-lg">{{ t('home.getStarted') }}</router-link>
+          <router-link to="/login" class="hero-btn btn-outline btn-lg">{{ t('auth.signIn') }}</router-link>
         </div>
         <div class="hero-stats">
           <div class="stat-item">
             <span class="stat-number">24/7</span>
-            <span class="stat-label">Monitoring</span>
+            <span class="stat-label">{{ t('home.monitoring') }}</span>
           </div>
           <div class="stat-item">
             <span class="stat-number">500+</span>
-            <span class="stat-label">Patients Served</span>
+            <span class="stat-label">{{ t('home.patientsServed') }}</span>
           </div>
           <div class="stat-item">
             <span class="stat-number">99.9%</span>
-            <span class="stat-label">Uptime</span>
+            <span class="stat-label">{{ t('home.uptime') }}</span>
           </div>
         </div>
       </div>
@@ -46,15 +46,15 @@
         <div class="hero-card">
           <div class="hero-card-header">
             <div class="pulse" />
-            <span>Live Monitoring</span>
+            <span>{{ t('home.liveMonitoring') }}</span>
           </div>
           <div class="hero-card-body">
             <div class="hero-metric">
-              <span class="metric-label">Heart Rate</span>
+              <span class="metric-label">{{ t('home.heartRate') }}</span>
               <span class="metric-value">72 <small>bpm</small></span>
             </div>
             <div class="hero-metric">
-              <span class="metric-label">Blood Pressure</span>
+              <span class="metric-label">{{ t('home.bloodPressure') }}</span>
               <span class="metric-value">120/80 <small>mmHg</small></span>
             </div>
             <div class="hero-metric">
@@ -68,8 +68,8 @@
 
     <section class="features">
       <div class="features-inner">
-        <h2 class="section-title">Everything You Need to Manage Dialysis Care</h2>
-        <p class="section-desc">Comprehensive tools designed for nephrologists, nurses, and healthcare administrators.</p>
+        <h2 class="section-title">{{ t('home.sectionTitle') }}</h2>
+        <p class="section-desc">{{ t('home.sectionDesc') }}</p>
         <div class="features-grid">
           <div class="feature-card">
             <div class="feature-icon">
@@ -79,8 +79,8 @@
                 <path d="M20 10h6M23 7v6" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round" />
               </svg>
             </div>
-            <h3 class="feature-title">Patient Management</h3>
-            <p class="feature-desc">Easily manage patient profiles, treatment schedules, and medical history in one centralized dashboard.</p>
+            <h3 class="feature-title">{{ t('home.featurePatientTitle') }}</h3>
+            <p class="feature-desc">{{ t('home.featurePatientDesc') }}</p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">
@@ -89,8 +89,8 @@
                 <path d="M3 20C3 24 6 26 14 26C22 26 25 24 25 20" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round" />
               </svg>
             </div>
-            <h3 class="feature-title">Real-time Monitoring</h3>
-            <p class="feature-desc">Track vital signs and patient status in real time with customizable alerts and notifications.</p>
+            <h3 class="feature-title">{{ t('home.featureMonitoringTitle') }}</h3>
+            <p class="feature-desc">{{ t('home.featureMonitoringDesc') }}</p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">
@@ -104,8 +104,8 @@
                 <circle cx="20" cy="20" r="1.5" fill="#2563eb" />
               </svg>
             </div>
-            <h3 class="feature-title">Analytics & Reports</h3>
-            <p class="feature-desc">Generate comprehensive reports on treatment outcomes, patient progress, and clinic performance.</p>
+            <h3 class="feature-title">{{ t('home.featureAnalyticsTitle') }}</h3>
+            <p class="feature-desc">{{ t('home.featureAnalyticsDesc') }}</p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">
@@ -115,8 +115,8 @@
                 <path d="M11 22a3 3 0 0 0 6 0" stroke="#2563eb" stroke-width="1.5" />
               </svg>
             </div>
-            <h3 class="feature-title">Critical Alerts</h3>
-            <p class="feature-desc">Instant notifications for critical events, abnormal vitals, and missed sessions with priority levels.</p>
+            <h3 class="feature-title">{{ t('home.featureAlertsTitle') }}</h3>
+            <p class="feature-desc">{{ t('home.featureAlertsDesc') }}</p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">
@@ -125,8 +125,8 @@
                 <path d="M9 6V4a3 3 0 0 1 6 0v2M11 14l2 2 4-4" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </div>
-            <h3 class="feature-title">Secure & Compliant</h3>
-            <p class="feature-desc">HIPAA-compliant platform with role-based access control and encrypted data storage.</p>
+            <h3 class="feature-title">{{ t('home.featureSecureTitle') }}</h3>
+            <p class="feature-desc">{{ t('home.featureSecureDesc') }}</p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">
@@ -135,8 +135,8 @@
                 <path d="M14 8v6l4 2" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round" />
               </svg>
             </div>
-            <h3 class="feature-title">Schedule Management</h3>
-            <p class="feature-desc">Intelligent scheduling for dialysis sessions with automated reminders for patients and staff.</p>
+            <h3 class="feature-title">{{ t('home.featureScheduleTitle') }}</h3>
+            <p class="feature-desc">{{ t('home.featureScheduleDesc') }}</p>
           </div>
         </div>
       </div>
@@ -144,9 +144,9 @@
 
     <section class="cta">
       <div class="cta-inner">
-        <h2 class="cta-title">Ready to Transform Your Dialysis Care?</h2>
-        <p class="cta-desc">Trusted by healthcare professionals for modern dialysis patient management.</p>
-        <router-link to="/register" class="hero-btn btn-primary btn-lg">Get Started Free</router-link>
+        <h2 class="cta-title">{{ t('home.ctaTitle') }}</h2>
+        <p class="cta-desc">{{ t('home.ctaDesc') }}</p>
+        <router-link to="/register" class="hero-btn btn-primary btn-lg">{{ t('home.getStartedFree') }}</router-link>
       </div>
     </section>
 
@@ -161,13 +161,16 @@
           </svg>
           <span>DiaMonitor</span>
         </div>
-        <p class="footer-copy">&copy; 2026 DiaMonitor. All rights reserved.</p>
+        <p class="footer-copy">&copy; 2026 DiaMonitor. {{ t('home.allRightsReserved') }}</p>
       </div>
     </footer>
   </div>
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 </script>
 
 <style scoped>

@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia';
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import { appearanceService } from '../services/settings/appearance.service';
 import { setLocale } from '../i18n';
 
 const DEFAULT_THEME = 'light';
-const DEFAULT_LANGUAGE = 'en';
+const DEFAULT_LANGUAGE = 'es';
 const DEFAULT_FONT_SIZE = 'medium';
 const DEFAULT_COMPACT_MODE = false;
 

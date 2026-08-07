@@ -65,12 +65,12 @@ export function sanitizeText(value, max = 500) {
 
 export function validateLoginForm({ email, password }) {
   const errors = {};
-  if (!required(email)) errors.email = 'Email is required.';
-  else if (!isEmail(email)) errors.email = 'Enter a valid email address.';
+  if (!required(email)) errors.email = 'El correo electrónico es obligatorio.';
+  else if (!isEmail(email)) errors.email = 'Ingresa un correo electrónico válido.';
 
-  if (!required(password)) errors.password = 'Password is required.';
-  else if (password.length < PASSWORD_POLICY.MIN_LENGTH) errors.password = `Password must be at least ${PASSWORD_POLICY.MIN_LENGTH} characters.`;
-  else if (password.length > PASSWORD_POLICY.MAX_LENGTH) errors.password = `Password must be at most ${PASSWORD_POLICY.MAX_LENGTH} characters.`;
+  if (!required(password)) errors.password = 'La contraseña es obligatoria.';
+  else if (password.length < PASSWORD_POLICY.MIN_LENGTH) errors.password = `La contraseña debe tener al menos ${PASSWORD_POLICY.MIN_LENGTH} caracteres.`;
+  else if (password.length > PASSWORD_POLICY.MAX_LENGTH) errors.password = `La contraseña debe tener como máximo ${PASSWORD_POLICY.MAX_LENGTH} caracteres.`;
 
   return errors;
 }
@@ -78,23 +78,23 @@ export function validateLoginForm({ email, password }) {
 export function validateRegisterForm(form) {
   const errors = {};
 
-  if (!required(form.name)) errors.name = 'First name is required.';
-  else if (!maxLength(form.name, FIELD_LIMITS.NAME_MAX)) errors.name = 'First name is too long.';
+  if (!required(form.name)) errors.name = 'El nombre es obligatorio.';
+  else if (!maxLength(form.name, FIELD_LIMITS.NAME_MAX)) errors.name = 'El nombre es demasiado largo.';
 
-  if (!required(form.lastname)) errors.lastname = 'Last name is required.';
-  else if (!maxLength(form.lastname, FIELD_LIMITS.LASTNAME_MAX)) errors.lastname = 'Last name is too long.';
+  if (!required(form.lastname)) errors.lastname = 'El apellido es obligatorio.';
+  else if (!maxLength(form.lastname, FIELD_LIMITS.LASTNAME_MAX)) errors.lastname = 'El apellido es demasiado largo.';
 
-  if (!required(form.email)) errors.email = 'Email is required.';
-  else if (!isEmail(form.email)) errors.email = 'Enter a valid email address.';
+  if (!required(form.email)) errors.email = 'El correo electrónico es obligatorio.';
+  else if (!isEmail(form.email)) errors.email = 'Ingresa un correo electrónico válido.';
 
-  if (!required(form.phone)) errors.phone = 'Phone number is required.';
-  else if (!isPhone(form.phone)) errors.phone = 'Enter a valid phone number.';
+  if (!required(form.phone)) errors.phone = 'El teléfono es obligatorio.';
+  else if (!isPhone(form.phone)) errors.phone = 'Ingresa un teléfono válido.';
 
-  if (!required(form.password)) errors.password = 'Password is required.';
-  else if (!isStrongPassword(form.password)) errors.password = `Password must be ${PASSWORD_POLICY.MIN_LENGTH}-${PASSWORD_POLICY.MAX_LENGTH} characters without spaces.`;
+  if (!required(form.password)) errors.password = 'La contraseña es obligatoria.';
+  else if (!isStrongPassword(form.password)) errors.password = `La contraseña debe tener entre ${PASSWORD_POLICY.MIN_LENGTH} y ${PASSWORD_POLICY.MAX_LENGTH} caracteres sin espacios.`;
 
-  if (!required(form.confirmPassword)) errors.confirmPassword = 'Please confirm your password.';
-  else if (!matches(form.password, form.confirmPassword)) errors.confirmPassword = 'Passwords do not match.';
+  if (!required(form.confirmPassword)) errors.confirmPassword = 'Confirma tu contraseña.';
+  else if (!matches(form.password, form.confirmPassword)) errors.confirmPassword = 'Las contraseñas no coinciden.';
 
   return errors;
 }
@@ -102,13 +102,13 @@ export function validateRegisterForm(form) {
 export function validateProfileForm(form) {
   const errors = {};
 
-  if (!required(form.name)) errors.name = 'First name is required.';
-  else if (!maxLength(form.name, FIELD_LIMITS.NAME_MAX)) errors.name = 'First name is too long.';
+  if (!required(form.name)) errors.name = 'El nombre es obligatorio.';
+  else if (!maxLength(form.name, FIELD_LIMITS.NAME_MAX)) errors.name = 'El nombre es demasiado largo.';
 
-  if (!required(form.lastname)) errors.lastname = 'Last name is required.';
-  else if (!maxLength(form.lastname, FIELD_LIMITS.LASTNAME_MAX)) errors.lastname = 'Last name is too long.';
+  if (!required(form.lastname)) errors.lastname = 'El apellido es obligatorio.';
+  else if (!maxLength(form.lastname, FIELD_LIMITS.LASTNAME_MAX)) errors.lastname = 'El apellido es demasiado largo.';
 
-  if (form.phone && !isPhone(form.phone)) errors.phone = 'Enter a valid phone number.';
+  if (form.phone && !isPhone(form.phone)) errors.phone = 'Ingresa un teléfono válido.';
 
   return errors;
 }

@@ -4,27 +4,27 @@ export const plans = PLAN_ORDER.map((id) => PLANS[id]);
 
 export const faqs = [
   {
-    question: 'What is DiaMonitor and how does it work?',
-    answer: 'DiaMonitor is a comprehensive platform for managing and monitoring hemodialysis patients. It provides real-time vital sign tracking, session scheduling, alert management, and detailed analytics — all from a single dashboard accessible on any device.',
+    question: '¿Qué es DiaMonitor y cómo funciona?',
+    answer: 'DiaMonitor es una plataforma integral para gestionar y monitorear pacientes de hemodiálisis. Proporciona seguimiento de signos vitales en tiempo real, programación de sesiones, gestión de alertas y analíticas detalladas, todo desde un solo panel accesible en cualquier dispositivo.',
   },
   {
-    question: 'Is my patient data secure?',
-    answer: 'Yes. DiaMonitor is HIPAA-compliant and uses end-to-end encryption for all patient data. We follow industry best practices for security, including regular audits, role-based access control, and secure data centers with high availability.',
+    question: '¿Mis datos de pacientes están seguros?',
+    answer: 'Sí. DiaMonitor es compatible con HIPAA y utiliza cifrado de extremo a extremo para todos los datos de los pacientes. Seguimos las mejores prácticas de seguridad, incluyendo auditorías periódicas, control de acceso basado en roles y centros de datos seguros con alta disponibilidad.',
   },
   {
-    question: 'Can I try DiaMonitor before purchasing?',
-    answer: 'Yes. You can create a free account and start with the Standard plan. You can upgrade to Pro or Premium at any time from your subscription settings.',
+    question: '¿Puedo probar DiaMonitor antes de comprar?',
+    answer: 'Sí. Puedes crear una cuenta gratuita y comenzar con el plan Standard. Puedes actualizar a Pro o Premium en cualquier momento desde la configuración de tu suscripción.',
   },
   {
-    question: 'What kind of support do you offer?',
-    answer: 'All plans include email support. Pro and Premium plans include priority support with faster response times, and Premium customers also receive a dedicated support manager.',
+    question: '¿Qué tipo de soporte ofrecen?',
+    answer: 'Todos los planes incluyen soporte por correo electrónico. Los planes Pro y Premium incluyen soporte prioritario con tiempos de respuesta más rápidos, y los clientes Premium también reciben un administrador de soporte dedicado.',
   },
   {
-    question: 'Can I upgrade or downgrade my plan?',
-    answer: 'Yes, you can change your plan at any time from your subscription settings. Your data is always preserved.',
+    question: '¿Puedo actualizar o degradar mi plan?',
+    answer: 'Sí, puedes cambiar tu plan en cualquier momento desde la configuración de tu suscripción. Tus datos siempre se conservan.',
   },
   {
-    question: 'Do you offer discounts for annual billing?',
-    answer: 'Contact our sales team for more information about customized enterprise pricing and annual billing options.',
+    question: '¿Ofrecen descuentos por facturación anual?',
+    answer: 'Contacta a nuestro equipo de ventas para obtener más información sobre precios empresariales personalizados y opciones de facturación anual.',
   },
 ];

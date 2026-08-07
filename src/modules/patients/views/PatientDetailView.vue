@@ -15,7 +15,7 @@
 
     <div v-else-if="store.error && !store.currentPatient" class="error-detail">
       <p class="error-text">{{ store.error }}</p>
-      <button class="back-btn" @click="$router.push('/patients')">Back to Patients</button>
+      <button class="back-btn" @click="$router.push('/patients')">{{ t('patients.backToPatients') }}</button>
     </div>
 
     <template v-else-if="store.currentPatient">
@@ -27,83 +27,83 @@
             <rect x="3" y="1.5" width="12" height="15" rx="2" stroke="currentColor" stroke-width="1.4" />
             <path d="M7 4h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
           </svg>
-          Generate Mobile Code
+          {{ t('patients.generateMobileCode') }}
         </button>
         <button class="link-btn secondary" @click="openCodeModal('wearable')">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
             <rect x="4.5" y="2" width="9" height="14" rx="2.5" stroke="currentColor" stroke-width="1.4" />
             <path d="M7.5 13.5h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
           </svg>
-          Generate Wearable Code
+          {{ t('patients.generateWearableCode') }}
         </button>
       </div>
 
       <div class="detail-grid">
         <div class="left-column">
-          <PatientInfoCard title="Personal Information">
+          <PatientInfoCard :title="t('patients.personalInformation')">
             <div class="info-grid">
               <div class="info-row">
-                <span class="info-label">Phone</span>
+                <span class="info-label">{{ t('patients.phone') }}</span>
                 <span class="info-value">{{ store.currentPatient.phone || '--' }}</span>
               </div>
               <div class="info-row">
-                <span class="info-label">Email</span>
+                <span class="info-label">{{ t('patients.email') }}</span>
                 <span class="info-value">{{ store.currentPatient.email || '--' }}</span>
               </div>
               <div class="info-row">
-                <span class="info-label">Address</span>
+                <span class="info-label">{{ t('patients.address') }}</span>
                 <span class="info-value">{{ store.currentPatient.address || '--' }}</span>
               </div>
             </div>
           </PatientInfoCard>
 
-          <PatientInfoCard title="Current Status">
-            <div v-if="statusLoading" class="info-loading">Loading live status...</div>
+          <PatientInfoCard :title="t('patients.currentStatus')">
+            <div v-if="statusLoading" class="info-loading">{{ t('patients.loadingStatus') }}</div>
             <div v-else-if="statusError" class="info-error">
-              <p>Unable to load patient status.</p>
-              <button class="retry-btn" @click="loadStatus">Retry</button>
+              <p>{{ t('patients.unableToLoadStatus') }}</p>
+              <button class="retry-btn" @click="loadStatus">{{ t('common.retry') }}</button>
             </div>
             <template v-else-if="status">
               <div class="status-grid">
                 <div class="status-item">
-                  <span class="status-label">State</span>
+                  <span class="status-label">{{ t('patients.state') }}</span>
                   <StatusBadge :status="statusLabel" />
                 </div>
                 <div class="status-item">
-                  <span class="status-label">Last Reading</span>
+                  <span class="status-label">{{ t('patients.lastReading') }}</span>
                   <span class="status-value">{{ formatDateTime(status.lastReadingAt) }}</span>
                 </div>
                 <div class="status-item">
-                  <span class="status-label">Active Alerts</span>
+                  <span class="status-label">{{ t('patients.activeAlerts') }}</span>
                   <span class="status-value">{{ status.activeAlerts ?? 0 }}</span>
                 </div>
                 <div class="status-item">
-                  <span class="status-label">Device</span>
+                  <span class="status-label">{{ t('patients.device') }}</span>
                   <span class="status-value">{{ deviceStateLabel }}</span>
                 </div>
               </div>
               <div class="vitals-grid">
                 <div class="vital-item">
-                  <span class="vital-label">Heart Rate</span>
+                  <span class="vital-label">{{ t('patients.heartRate') }}</span>
                   <span class="vital-value">{{ status.lastHeartRate ?? '--' }} bpm</span>
                 </div>
                 <div class="vital-item">
-                  <span class="vital-label">SpO2</span>
+                  <span class="vital-label">{{ t('patients.spO2') }}</span>
                   <span class="vital-value">{{ status.lastOxygen ?? '--' }}%</span>
                 </div>
                 <div class="vital-item">
-                  <span class="vital-label">Activity</span>
+                  <span class="vital-label">{{ t('patients.activity') }}</span>
                   <span class="vital-value">{{ status.lastActivity ?? '--' }}</span>
                 </div>
               </div>
             </template>
-            <div v-else class="info-loading">No status available.</div>
+            <div v-else class="info-loading">{{ t('patients.noStatus') }}</div>
           </PatientInfoCard>
         </div>
       </div>
 
       <div class="full-width-section">
-        <PatientInfoCard title="Readings History">
+        <PatientInfoCard :title="t('patients.readingsHistory')">
           <div class="filter-tabs">
             <button
               v-for="f in readingFilters"
@@ -116,13 +116,13 @@
             </button>
           </div>
           <div v-if="activeFilter === 'custom'" class="custom-range">
-            <label class="range-label">From
+            <label class="range-label">{{ t('patients.from') }}
               <input v-model="customFrom" type="date" class="range-input" />
             </label>
-            <label class="range-label">To
+            <label class="range-label">{{ t('patients.to') }}
               <input v-model="customTo" type="date" class="range-input" />
             </label>
-            <button class="apply-btn" @click="loadReadings">Apply</button>
+            <button class="apply-btn" @click="loadReadings">{{ t('common.apply') }}</button>
           </div>
           <ReadingsChart
             :readings="readings"
@@ -135,8 +135,8 @@
       </div>
 
       <div class="full-width-section">
-        <PatientInfoCard title="Patient Alerts">
-          <div v-if="alertsLoading" class="info-loading">Loading alerts...</div>
+        <PatientInfoCard :title="t('patients.patientAlerts')">
+          <div v-if="alertsLoading" class="info-loading">{{ t('patients.loadingAlerts') }}</div>
           <div v-else-if="patientAlerts.length" class="patient-alerts">
             <div v-for="alert in patientAlerts" :key="alert.id" class="patient-alert-row">
               <div class="patient-alert-info">
@@ -145,7 +145,7 @@
               </div>
               <div class="patient-alert-meta">
                 <PriorityBadge :priority="alert.priority" />
-                <button class="dismiss-btn" title="Resolve alert" @click="resolveAlert(alert)">
+                <button class="dismiss-btn" :title="t('alerts.resolveAlert')" @click="resolveAlert(alert)">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                     <path d="M5.5 8L7.5 10L10.5 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
@@ -153,7 +153,7 @@
               </div>
             </div>
           </div>
-          <div v-else class="info-loading">No alerts for this patient.</div>
+          <div v-else class="info-loading">{{ t('patients.noAlerts') }}</div>
         </PatientInfoCard>
       </div>
     </template>
@@ -178,6 +178,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { usePatientStore } from '../../../stores/patientStore';
 import { dashboardService } from '../../../services/dashboardService';
@@ -192,6 +193,7 @@ import StatusBadge from '../../../components/StatusBadge.vue';
 import PriorityBadge from '../../alerts/components/PriorityBadge.vue';
 import ResolveAlertModal from '../../alerts/components/ResolveAlertModal.vue';
 
+const { t } = useI18n();
 const route = useRoute();
 const store = usePatientStore();
 
@@ -213,10 +215,10 @@ const resolving = ref(false);
 const resolveAlertTarget = ref(null);
 
 const readingFilters = [
-  { label: 'Today', value: 'today' },
-  { label: '7 days', value: '7d' },
-  { label: '30 days', value: '30d' },
-  { label: 'Custom', value: 'custom' },
+  { label: t('patients.filterToday'), value: 'today' },
+  { label: t('patients.filter7d'), value: '7d' },
+  { label: t('patients.filter30d'), value: '30d' },
+  { label: t('patients.filterCustom'), value: 'custom' },
 ];
 
 const patientId = computed(() => route.params.id);
@@ -229,7 +231,7 @@ const statusLabel = computed(() => {
 
 const deviceStateLabel = computed(() => {
   if (!status.value) return '--';
-  return status.value.hasDevice === false ? 'Not linked' : 'Connected';
+  return status.value.hasDevice === false ? t('patients.notLinked') : t('patients.connected');
 });
 
 function formatDateTime(ts) {
@@ -283,7 +285,7 @@ async function loadReadings() {
   if (activeFilter.value === 'custom') {
     if (!customFrom.value || !customTo.value) {
       readingsLoading.value = false;
-      readingsError.value = 'Select both dates for a custom range.';
+      readingsError.value = t('patients.selectDates');
       return;
     }
     range = { from: new Date(customFrom.value).toISOString(), to: new Date(customTo.value).toISOString() };
@@ -298,7 +300,7 @@ async function loadReadings() {
     });
     readings.value = data || [];
   } catch (err) {
-    readingsError.value = 'Unable to load readings.';
+    readingsError.value = t('patients.unableToLoadReadings');
   } finally {
     readingsLoading.value = false;
   }
@@ -317,7 +319,7 @@ async function loadPatientAlerts() {
     const { data } = await alertService.getByPatient(patientId.value);
     patientAlerts.value = (data || []).map((a) => ({
       id: a.id,
-      type: a.type || 'Alert',
+      type: a.type || t('patients.alert'),
       description: a.message || '',
       priority: a.severity >= 3 ? 'Critical' : a.severity >= 2 ? 'High' : a.severity >= 1 ? 'Medium' : 'Low',
       status: a.isRead ? 'Resolved' : 'Active',
@@ -338,7 +340,7 @@ async function confirmResolve() {
   const alertId = resolveAlertTarget.value?.id;
   if (!alertId) {
     resolveModalVisible.value = false;
-    if (window.__toast) window.__toast.error('Unable to resolve alert because the alert ID is invalid.');
+    if (window.__toast) window.__toast.error(t('patients.unableToResolveInvalidId'));
     return;
   }
 
@@ -348,9 +350,9 @@ async function confirmResolve() {
     patientAlerts.value = patientAlerts.value.filter((a) => a.id !== alertId);
     resolveAlertTarget.value = null;
     resolveModalVisible.value = false;
-    if (window.__toast) window.__toast.success('Alert resolved.');
+    if (window.__toast) window.__toast.success(t('alerts.alertResolved'));
   } catch (err) {
-    const msg = err.response?.data?.message || err.response?.data?.title || 'Failed to resolve alert';
+    const msg = err.response?.data?.message || err.response?.data?.title || t('patients.failedToResolveAlert');
     if (window.__toast) window.__toast.error(msg);
   } finally {
     resolving.value = false;

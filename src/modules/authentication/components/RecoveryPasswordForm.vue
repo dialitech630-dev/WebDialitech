@@ -1,13 +1,13 @@
 <template>
   <form class="recovery-form" novalidate @submit.prevent="$emit('submit')">
     <div class="field">
-      <label class="field-label">Email</label>
+      <label class="field-label">{{ t('auth.email') }}</label>
       <input
         v-model="email"
         type="email"
         class="field-input"
         :class="{ 'input-error': fieldErrors.email }"
-        placeholder="you@example.com"
+        :placeholder="t('auth.emailPlaceholder')"
         maxlength="254"
         autocomplete="email"
         @input="clearFieldError('email')"
@@ -16,7 +16,7 @@
     </div>
 
     <div class="field">
-      <label class="field-label">New Password</label>
+      <label class="field-label">{{ t('auth.newPassword') }}</label>
       <input
         v-model="newPassword"
         type="password"
@@ -31,7 +31,7 @@
     </div>
 
     <div class="field">
-      <label class="field-label">Confirm New Password</label>
+      <label class="field-label">{{ t('auth.confirmNewPassword') }}</label>
       <input
         v-model="confirmPassword"
         type="password"
@@ -45,18 +45,19 @@
       <p v-if="fieldErrors.confirmPassword" class="error-msg">{{ fieldErrors.confirmPassword }}</p>
     </div>
 
-    <p class="hint">Must be at least {{ minLength }} characters without spaces.</p>
+    <p class="hint">{{ t('form.passwordLengthHint', { length: minLength }) }}</p>
 
     <p v-if="error" class="error-msg">{{ error }}</p>
 
-    <LoadingButton type="submit" :loading="loading" loading-text="Changing...">
-      Change Password
+    <LoadingButton type="submit" :loading="loading" :loading-text="t('settings.changing')">
+      {{ t('settings.changePassword') }}
     </LoadingButton>
   </form>
 </template>
 
 <script setup>
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import LoadingButton from '../../../components/LoadingButton.vue';
 import { PASSWORD_POLICY, FIELD_LIMITS } from '../../../config/security';
 import { isEmail, sanitizeEmail, isStrongPassword, matches, required } from '../../../utils/validators';
@@ -67,6 +68,8 @@ defineProps({
 });
 
 const emit = defineEmits(['submit']);
+
+const { t } = useI18n();
 
 const minLength = PASSWORD_POLICY.MIN_LENGTH;
 const maxLength = PASSWORD_POLICY.MAX_LENGTH;
@@ -85,21 +88,21 @@ function getPayload() {
 
   const cleanEmail = sanitizeEmail(email.value);
   if (!required(cleanEmail)) {
-    errors.email = 'Email is required.';
+    errors.email = t('form.emailRequired');
   } else if (!isEmail(cleanEmail)) {
-    errors.email = 'Enter a valid email address.';
+    errors.email = t('form.validEmail');
   }
 
   if (!required(newPassword.value)) {
-    errors.newPassword = 'Password is required.';
+    errors.newPassword = t('form.passwordRequired');
   } else if (!isStrongPassword(newPassword.value)) {
-    errors.newPassword = `Password must be ${minLength}-${maxLength} characters without spaces.`;
+    errors.newPassword = t('form.passwordPolicy', { min: minLength, max: maxLength });
   }
 
   if (!required(confirmPassword.value)) {
-    errors.confirmPassword = 'Please confirm your password.';
+    errors.confirmPassword = t('form.confirmPasswordRequired');
   } else if (!matches(newPassword.value, confirmPassword.value)) {
-    errors.confirmPassword = 'Passwords do not match.';
+    errors.confirmPassword = t('form.passwordsDoNotMatch');
   }
 
   fieldErrors.value = errors;

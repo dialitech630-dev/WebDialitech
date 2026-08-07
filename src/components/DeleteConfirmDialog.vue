@@ -9,13 +9,13 @@
             <path d="M14 18c0-3.3 2.7-6 6-6s6 2.7 6 6v8c0 2.2-1.8 4-4 4h-4c-2.2 0-4-1.8-4-4v-8z" stroke="#dc2626" stroke-width="1.5" />
           </svg>
         </div>
-        <h2 class="dialog-title">Delete Patient</h2>
-        <p class="dialog-message">Are you sure you want to delete this patient? This action cannot be undone.</p>
+        <h2 class="dialog-title">Eliminar paciente</h2>
+        <p class="dialog-message">¿Estás seguro de que deseas eliminar a este paciente? Esta acción no se puede deshacer.</p>
         <div class="dialog-actions">
-          <button class="btn-cancel" @click="$emit('close')">Cancel</button>
+          <button class="btn-cancel" @click="$emit('close')">Cancelar</button>
           <button class="btn-delete" :disabled="deleting" @click="confirm">
             <span v-if="deleting" class="spinner-sm" />
-            {{ deleting ? 'Deleting...' : 'Delete' }}
+            {{ deleting ? 'Eliminando...' : 'Eliminar' }}
           </button>
         </div>
       </div>
@@ -41,7 +41,7 @@ async function confirm() {
   const result = await patientStore.remove(props.patientId);
   deleting.value = false;
   if (result.success) {
-    window.__toast?.success('Patient deleted successfully', '');
+    window.__toast?.success('Paciente eliminado exitosamente', '');
     emit('deleted');
     emit('close');
   }

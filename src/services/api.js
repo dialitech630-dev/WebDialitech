@@ -78,9 +78,9 @@ function showServerUnavailableToast() {
 
   if (!window.__toast) return;
 
-  window.__toast.error('Server not available', 'Unable to reach the server. Check your connection and try again.', {
+  window.__toast.error('Servidor no disponible', 'No se pudo conectar con el servidor. Verifica tu conexión e inténtalo de nuevo.', {
     action: {
-      label: 'Retry',
+      label: 'Reintentar',
       onClick() {
         if (lastFailedConfig) {
           api(lastFailedConfig);
@@ -119,7 +119,7 @@ api.interceptors.response.use(
       }
 
       if (status === 404) {
-        showToast('error', 'Not found', 'The requested resource could not be found.');
+        showToast('error', 'No encontrado', 'El recurso solicitado no existe.');
         return Promise.reject(error);
       }
 

@@ -6,14 +6,17 @@
       </svg>
     </div>
     <span class="terms-text">
-      I agree to the
-      <a href="#" class="terms-link" @click.prevent>Terms and Conditions</a>
+      {{ t('auth.agreeToTerms') }}
+      <a href="#" class="terms-link" @click.prevent>{{ t('auth.termsAndConditions') }}</a>
     </span>
   </label>
 </template>
 
 <script setup>
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 const checked = ref(false);
 
 defineExpose({ checked });

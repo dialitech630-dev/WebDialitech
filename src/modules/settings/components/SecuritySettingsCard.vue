@@ -1,19 +1,19 @@
 <template>
-  <SettingsSection title="Security" description="Manage your security and authentication settings">
+  <SettingsSection title="Seguridad" description="Administra tu seguridad y autenticación">
     <div class="security-list">
       <div class="security-row">
         <div class="security-info">
-          <span class="security-label">Change Password</span>
-          <span class="security-desc">Update your current password</span>
+          <span class="security-label">Cambiar contraseña</span>
+          <span class="security-desc">Actualiza tu contraseña actual</span>
         </div>
         <button class="action-btn" @click="showForm = !showForm">
-          {{ showForm ? 'Close' : 'Change' }}
+          {{ showForm ? 'Cerrar' : 'Cambiar' }}
         </button>
       </div>
 
       <form v-if="showForm" class="password-form" @submit.prevent="submit">
         <div class="field">
-          <label class="field-label">Current Password</label>
+          <label class="field-label">Contraseña actual</label>
           <input
             v-model="form.currentPassword"
             type="password"
@@ -23,7 +23,7 @@
           />
         </div>
         <div class="field">
-          <label class="field-label">New Password</label>
+          <label class="field-label">Nueva contraseña</label>
           <input
             v-model="form.newPassword"
             type="password"
@@ -34,7 +34,7 @@
           />
         </div>
         <div class="field">
-          <label class="field-label">Confirm New Password</label>
+          <label class="field-label">Confirmar nueva contraseña</label>
           <input
             v-model="form.confirmPassword"
             type="password"
@@ -52,16 +52,16 @@
           <svg v-if="saving" class="spinner" width="16" height="16" viewBox="0 0 16 16" fill="none">
             <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5" stroke-dasharray="28" stroke-linecap="round"/>
           </svg>
-          {{ saving ? 'Updating...' : 'Update Password' }}
+          {{ saving ? 'Actualizando...' : 'Actualizar contraseña' }}
         </button>
       </form>
 
       <div class="security-row">
         <div class="security-info">
-          <span class="security-label">Two-Factor Authentication</span>
-          <span class="security-desc">Add an extra layer of security</span>
+          <span class="security-label">Autenticación de dos factores</span>
+          <span class="security-desc">Agrega una capa extra de seguridad</span>
         </div>
-        <span class="unavailable-badge">Coming soon</span>
+        <span class="unavailable-badge">Próximamente</span>
       </div>
     </div>
   </SettingsSection>
@@ -86,8 +86,8 @@ const form = reactive({
 });
 
 const passwordError = computed(() => {
-  if (form.newPassword && !isStrongPassword(form.newPassword)) return `Password must be ${PASSWORD_POLICY.MIN_LENGTH}-${PASSWORD_POLICY.MAX_LENGTH} characters without spaces`;
-  if (form.confirmPassword && form.newPassword !== form.confirmPassword) return 'Passwords do not match';
+  if (form.newPassword && !isStrongPassword(form.newPassword)) return `La contraseña debe tener entre ${PASSWORD_POLICY.MIN_LENGTH} y ${PASSWORD_POLICY.MAX_LENGTH} caracteres sin espacios`;
+  if (form.confirmPassword && form.newPassword !== form.confirmPassword) return 'Las contraseñas no coinciden';
   return '';
 });
 
@@ -110,9 +110,9 @@ async function submit() {
     form.newPassword = '';
     form.confirmPassword = '';
     showForm.value = false;
-    if (window.__toast) window.__toast.success('Password updated successfully.');
+    if (window.__toast) window.__toast.success('Contraseña actualizada exitosamente.');
   } catch (err) {
-    const msg = err.response?.data?.message || err.response?.data?.title || err.response?.data?.error?.message || 'Failed to update password.';
+    const msg = err.response?.data?.message || err.response?.data?.title || err.response?.data?.error?.message || 'No se pudo actualizar la contraseña.';
     formError.value = msg;
     if (window.__toast) window.__toast.error(msg);
   } finally {

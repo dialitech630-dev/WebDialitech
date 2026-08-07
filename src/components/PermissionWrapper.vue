@@ -26,16 +26,16 @@ const sub = useSubscriptionStore();
 const allowed = computed(() => sub.can(props.feature));
 
 const featureLabels = {
-  dashboard: 'Dashboard',
-  patients: 'Patients',
-  alerts: 'Alerts',
-  reports: 'Reports',
-  statistics: 'Analytics',
-  settings: 'Settings',
-  administration: 'User Management',
-  advancedMonitoring: 'Advanced Monitoring',
-  apiAccess: 'API Access',
+  dashboard: 'Inicio',
+  patients: 'Pacientes',
+  alerts: 'Alertas',
+  reports: 'Reportes',
+  statistics: 'Analíticas',
+  settings: 'Configuración',
+  administration: 'Gestión de usuarios',
+  advancedMonitoring: 'Monitoreo avanzado',
+  apiAccess: 'Acceso a la API',
 };
 
-const resolvedLockTitle = computed(() => props.lockTitle || `${featureLabels[props.feature] || 'This feature'} is locked`);
+const resolvedLockTitle = computed(() => props.lockTitle || `${featureLabels[props.feature] || 'Esta función'} está bloqueada`);
 </script>

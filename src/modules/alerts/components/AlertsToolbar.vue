@@ -9,24 +9,24 @@
         v-model="search"
         type="text"
         class="search-input"
-        placeholder="Search alerts by patient or type..."
+        placeholder="Buscar alertas por paciente o tipo..."
       />
     </div>
     <div class="filters">
       <div class="filter-group">
-        <label class="filter-label">Priority</label>
+        <label class="filter-label">Prioridad</label>
         <select v-model="priority" class="filter-select">
           <option v-for="p in priorities" :key="p">{{ p }}</option>
         </select>
       </div>
       <div class="filter-group">
-        <label class="filter-label">Status</label>
+        <label class="filter-label">Estado</label>
         <select v-model="status" class="filter-select">
           <option v-for="s in alertStatuses" :key="s">{{ s }}</option>
         </select>
       </div>
       <div class="filter-group">
-        <label class="filter-label">Date</label>
+        <label class="filter-label">Fecha</label>
         <select v-model="date" class="filter-select">
           <option v-for="d in dateOptions" :key="d">{{ d }}</option>
         </select>
@@ -39,11 +39,11 @@
 import { priorities, alertStatuses } from '../data/alerts.js';
 
 const search = defineModel('search', { type: String, default: '' });
-const priority = defineModel('priority', { type: String, default: 'All Priorities' });
-const status = defineModel('status', { type: String, default: 'All Status' });
-const date = defineModel('date', { type: String, default: 'All Dates' });
+const priority = defineModel('priority', { type: String, default: 'Todas las prioridades' });
+const status = defineModel('status', { type: String, default: 'Todos los estados' });
+const date = defineModel('date', { type: String, default: 'Todas las fechas' });
 
-const dateOptions = ['All Dates', 'Today', 'This Week', 'This Month'];
+const dateOptions = ['Todas las fechas', 'Hoy', 'Esta semana', 'Este mes'];
 </script>
 
 <style scoped>

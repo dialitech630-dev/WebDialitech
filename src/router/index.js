@@ -11,6 +11,7 @@ import PatientsView from '../modules/patients/views/PatientsView.vue';
 import PatientDetailView from '../modules/patients/views/PatientDetailView.vue';
 import AlertsView from '../modules/alerts/views/AlertsView.vue';
 import SettingsView from '../modules/settings/views/SettingsView.vue';
+import PaymentsView from '../modules/payments/views/PaymentsView.vue';
 import ForbiddenView from '../pages/ForbiddenView.vue';
 import UpgradeRequiredView from '../pages/UpgradeRequiredView.vue';
 import NotFoundView from '../pages/NotFoundView.vue';
@@ -63,6 +64,14 @@ const routes = [
     meta: { requiresAuth: true },
     children: [
       { path: '', name: 'settings', component: SettingsView, meta: { requiresAuth: true, module: 'settings' } },
+    ],
+  },
+  {
+    path: '/pagos',
+    component: DashboardLayout,
+    meta: { requiresAuth: true },
+    children: [
+      { path: '', name: 'payments', component: PaymentsView, meta: { requiresAuth: true, module: 'settings' } },
     ],
   },
   {

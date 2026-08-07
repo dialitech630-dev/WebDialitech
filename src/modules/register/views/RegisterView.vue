@@ -32,8 +32,8 @@
             <rect x="114" y="220" width="20" height="20" rx="4" fill="#2563eb" fill-opacity="0.08" />
           </svg>
         </div>
-        <h2 class="left-title">Start Monitoring<br />Your Patients Today</h2>
-        <p class="left-desc">Create your caregiver account and get access to real-time patient monitoring, intelligent alerts, and comprehensive care management tools.</p>
+        <h2 class="left-title">{{ t('auth.registerLeftTitle') }}</h2>
+        <p class="left-desc">{{ t('auth.registerLeftDesc') }}</p>
       </div>
     </div>
 
@@ -55,15 +55,15 @@
 
         <LoadingButton
           :loading="authStore.loading"
-          loading-text="Creating account..."
+          :loading-text="t('auth.creatingAccount')"
           @click="submitRegistration"
         >
-          Create Account
+          {{ t('auth.createAccount') }}
         </LoadingButton>
 
         <p class="register-footer">
-          Already have an account?
-          <router-link to="/login" class="footer-link">Sign In</router-link>
+          {{ t('auth.alreadyHaveAccount') }}
+          <router-link to="/login" class="footer-link">{{ t('auth.signIn') }}</router-link>
         </p>
       </RegisterCard>
     </div>
@@ -73,12 +73,14 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '../../../stores/authStore';
 import LoadingButton from '../../../components/LoadingButton.vue';
 import RegisterCard from '../components/RegisterCard.vue';
 import CaregiverRegisterForm from '../components/CaregiverRegisterForm.vue';
 import TermsCheckbox from '../components/TermsCheckbox.vue';
 
+const { t } = useI18n();
 const router = useRouter();
 const authStore = useAuthStore();
 const caregiverForm = ref(null);
@@ -91,7 +93,7 @@ async function submitRegistration() {
   authStore.clearErrors();
 
   if (!termsCheckbox.value?.checked) {
-    termsError.value = 'Please accept the Terms and Conditions to continue.';
+    termsError.value = t('auth.termsError');
     if (window.__toast) window.__toast.error(termsError.value);
     return;
   }
@@ -101,7 +103,7 @@ async function submitRegistration() {
   if (!payload) return;
   const result = await authStore.register(payload);
   if (result.success) {
-    if (window.__toast) window.__toast.success('Account created successfully. Please sign in.');
+    if (window.__toast) window.__toast.success(t('auth.accountCreated'));
     router.push('/login');
   }
 }

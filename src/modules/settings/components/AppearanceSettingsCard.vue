@@ -1,19 +1,19 @@
 <template>
-  <SettingsSection title="Appearance" description="Customize how the application looks and feels">
+  <SettingsSection :title="t('settings.appearanceTitle')" :description="t('settings.appearanceDescription')">
     <div class="appearance-list">
       <div class="appearance-row">
         <div class="appearance-info">
-          <span class="appearance-label">Theme</span>
-          <span class="appearance-desc">Choose between light, dark, or system theme</span>
+          <span class="appearance-label">{{ t('settings.theme') }}</span>
+          <span class="appearance-desc">{{ t('settings.themeDesc') }}</span>
         </div>
         <select class="field-select" :value="theme" @change="setTheme($event.target.value)">
-          <option v-for="t in themeOptions" :key="t" :value="t">{{ t.charAt(0).toUpperCase() + t.slice(1) }}</option>
+          <option v-for="topt in themeOptions" :key="topt" :value="topt">{{ t(`settings.${topt}`) }}</option>
         </select>
       </div>
       <div class="appearance-row">
         <div class="appearance-info">
-          <span class="appearance-label">Language</span>
-          <span class="appearance-desc">Select your preferred language</span>
+          <span class="appearance-label">{{ t('settings.language') }}</span>
+          <span class="appearance-desc">{{ t('settings.languageDesc') }}</span>
         </div>
         <select class="field-select" :value="language" @change="setLanguage($event.target.value)">
           <option v-for="opt in languageOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
@@ -21,17 +21,17 @@
       </div>
       <div class="appearance-row">
         <div class="appearance-info">
-          <span class="appearance-label">Font Size</span>
-          <span class="appearance-desc">Adjust the text size across the application</span>
+          <span class="appearance-label">{{ t('settings.fontSize') }}</span>
+          <span class="appearance-desc">{{ t('settings.fontSizeDesc') }}</span>
         </div>
         <select class="field-select" :value="fontSize" @change="setFontSize($event.target.value)">
-          <option v-for="f in fontSizeOptions" :key="f" :value="f">{{ f.charAt(0).toUpperCase() + f.slice(1) }}</option>
+          <option v-for="f in fontSizeOptions" :key="f" :value="f">{{ t(`settings.${f}`) }}</option>
         </select>
       </div>
       <div class="appearance-row">
         <div class="appearance-info">
-          <span class="appearance-label">Compact Mode</span>
-          <span class="appearance-desc">Reduce spacing for a denser layout</span>
+          <span class="appearance-label">{{ t('settings.compactMode') }}</span>
+          <span class="appearance-desc">{{ t('settings.compactModeDesc') }}</span>
         </div>
         <label class="toggle" :class="{ active: compactMode }" @click="setCompactMode(!compactMode)">
           <input type="checkbox" :checked="compactMode" />
@@ -43,8 +43,11 @@
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n';
 import { useAppearance } from '../../../composables/useAppearance';
 import SettingsSection from './SettingsSection.vue';
+
+const { t } = useI18n();
 
 const {
   theme, setTheme, themeOptions,

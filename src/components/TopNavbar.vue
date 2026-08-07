@@ -4,7 +4,7 @@
       <button
         class="hamburger-btn"
         :aria-expanded="layout.sidebarOpen.value"
-        aria-label="Toggle navigation menu"
+        :aria-label="t('sidebar.toggleMenu')"
         @click="layout.toggleSidebar()"
       >
         <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
@@ -20,7 +20,7 @@
         <input
           type="text"
           class="search-input"
-          placeholder="Search patients, alerts, reports..."
+          :placeholder="t('navBar.searchPlaceholder')"
         />
       </div>
     </div>
@@ -43,13 +43,13 @@
         <Transition name="dropdown">
           <div v-if="showDropdown" class="notification-dropdown">
             <div class="dropdown-header">
-              <h3 class="dropdown-title">Notifications</h3>
-              <button v-if="hasUnread" class="mark-read-btn" @click="markAllAsRead">Mark all as read</button>
+              <h3 class="dropdown-title">{{ t('navBar.notifications') }}</h3>
+              <button v-if="hasUnread" class="mark-read-btn" @click="markAllAsRead">{{ t('navBar.markAllAsRead') }}</button>
             </div>
 
             <div class="dropdown-body">
               <div v-if="loading" class="empty-state">
-                <p class="empty-title">Loading notifications...</p>
+                <p class="empty-title">{{ t('navBar.loadingNotifications') }}</p>
               </div>
               <div v-else-if="!notifications.length" class="empty-state">
                 <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
@@ -57,8 +57,8 @@
                   <circle cx="20" cy="18" r="5" stroke="#d1d5db" stroke-width="1.5" />
                   <path d="M14 30c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="#d1d5db" stroke-width="1.5" stroke-linecap="round" />
                 </svg>
-                <p class="empty-title">No new notifications</p>
-                <p class="empty-subtitle">You&apos;re all caught up</p>
+                <p class="empty-title">{{ t('navBar.noNewNotifications') }}</p>
+                <p class="empty-subtitle">{{ t('navBar.allCaughtUp') }}</p>
               </div>
 
               <div v-else class="notifications-list">
@@ -94,7 +94,7 @@
             </div>
 
             <div class="dropdown-footer">
-              <router-link to="/alerts" class="view-all-link" @click="showDropdown = false">View all alerts</router-link>
+              <router-link to="/alerts" class="view-all-link" @click="showDropdown = false">{{ t('navBar.viewAllAlerts') }}</router-link>
             </div>
           </div>
         </Transition>
@@ -129,22 +129,22 @@
                   <circle cx="9" cy="6.5" r="3" stroke="currentColor" stroke-width="1.5" />
                   <path d="M3 15.5C3 12.463 5.686 10 9 10s6 2.463 6 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                 </svg>
-                My Profile
+                {{ t('navBar.myProfile') }}
               </button>
               <button class="menu-item" role="menuitem" @click="goTo('appearance')">
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                   <circle cx="9" cy="9" r="3" stroke="currentColor" stroke-width="1.5" />
                   <path d="M9 1.5v2M9 14.5v2M16.5 9h-2M3.5 9h-2M14.03 3.97l-1.42 1.42M5.39 12.61l-1.42 1.42M14.03 14.03l-1.42-1.42M5.39 5.39L3.97 3.97" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                 </svg>
-                Settings
+                {{ t('navBar.settings') }}
               </button>
-              <button class="menu-item" role="menuitem" @click="goTo('subscription')">
+              <button class="menu-item" role="menuitem" @click="goToPayments">
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                   <rect x="2" y="3" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.5" />
                   <path d="M2 7h14" stroke="currentColor" stroke-width="1.5" />
                   <circle cx="13" cy="13" r="1" fill="currentColor" />
                 </svg>
-                My Subscription
+                {{ t('navBar.payments') }}
               </button>
               <div class="menu-divider" />
               <button class="menu-item danger" role="menuitem" @click="logout">
@@ -152,7 +152,7 @@
                   <path d="M11 3H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                   <path d="M13.5 12.5L16 9l-2.5-3.5M16 9H7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
-                Sign Out
+                {{ t('auth.signOut') }}
               </button>
             </div>
           </div>
@@ -165,6 +165,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '../stores/authStore';
 import { useSubscriptionStore } from '../stores/subscriptionStore';
 import { useNotifications } from '../composables/useNotifications';
@@ -173,6 +174,7 @@ import PlanBadge from './PlanBadge.vue';
 import PlanSelector from './PlanSelector.vue';
 import UserAvatar from './UserAvatar.vue';
 
+const { t } = useI18n();
 const router = useRouter();
 const authStore = useAuthStore();
 const sub = useSubscriptionStore();
@@ -200,6 +202,11 @@ function goTo(section) {
   router.push({ path: '/settings', query: section ? { section } : {} });
 }
 
+function goToPayments() {
+  userMenuOpen.value = false;
+  router.push('/pagos');
+}
+
 function logout() {
   userMenuOpen.value = false;
   authStore.logout();
@@ -224,8 +231,7 @@ onUnmounted(() => {
 });
 
 const userRoleLabel = computed(() => {
-  const labels = { patient: 'Patient', caregiver: 'Caregiver', admin: 'Administrator' };
-  return labels[sub.role] || 'Caregiver';
+  return t(`roles.${sub.role}`) || 'Cuidador';
 });
 </script>
 

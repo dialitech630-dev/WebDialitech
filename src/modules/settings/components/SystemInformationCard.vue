@@ -1,35 +1,35 @@
 <template>
-  <SettingsSection title="System Information" description="Current system version and status details">
+  <SettingsSection title="Información del sistema" description="Versión y estado actual del sistema">
     <div class="sys-grid">
       <div class="sys-item">
-        <span class="sys-label">App Version</span>
+        <span class="sys-label">Versión de la aplicación</span>
         <span class="sys-value">{{ settings.system.appVersion }}</span>
       </div>
       <div class="sys-item">
-        <span class="sys-label">API Version</span>
+        <span class="sys-label">Versión de la API</span>
         <span class="sys-value">{{ settings.system.apiVersion }}</span>
       </div>
       <div class="sys-item">
-        <span class="sys-label">Database Version</span>
+        <span class="sys-label">Versión de la base de datos</span>
         <span class="sys-value">{{ settings.system.dbVersion }}</span>
       </div>
       <div class="sys-item">
-        <span class="sys-label">Environment</span>
+        <span class="sys-label">Entorno</span>
         <span class="sys-value">{{ settings.system.environment }}</span>
       </div>
       <div class="sys-item">
-        <span class="sys-label">Server Status</span>
+        <span class="sys-label">Estado del servidor</span>
         <span class="sys-value-row">
           <span class="status-dot online" />
           {{ settings.system.serverStatus }}
         </span>
       </div>
       <div class="sys-item">
-        <span class="sys-label">Uptime</span>
+        <span class="sys-label">Tiempo de actividad</span>
         <span class="sys-value">{{ settings.system.uptime }}</span>
       </div>
       <div class="sys-item">
-        <span class="sys-label">Last Backup</span>
+        <span class="sys-label">Último respaldo</span>
         <span class="sys-value">{{ settings.system.lastBackup }}</span>
       </div>
     </div>

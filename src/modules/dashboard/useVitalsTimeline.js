@@ -13,9 +13,9 @@ export function useVitalsTimeline(readings, range) {
   const { colors, tooltip, grid, legend, valueAxis, fontFamily } = useChartPresets();
 
   const seriesMeta = [
-    { name: 'Heart Rate', key: 'heartRate', unit: 'bpm', color: '#ef4444', axis: 0 },
+    { name: 'Frecuencia cardíaca', key: 'heartRate', unit: 'lpm', color: '#ef4444', axis: 0 },
     { name: 'SpO₂', key: 'oxygen', unit: '%', color: '#2563eb', axis: 1 },
-    { name: 'Activity', key: 'activity', unit: '', color: '#f59e0b', axis: 2 },
+    { name: 'Actividad', key: 'activity', unit: '', color: '#f59e0b', axis: 2 },
   ];
 
   function formatAxisTime(value) {
@@ -51,7 +51,7 @@ export function useVitalsTimeline(readings, range) {
       yAxis: [
         {
           ...valueAxis.value,
-          name: 'bpm',
+          name: 'lpm',
           nameTextStyle: { color: colors.value.textMuted },
           position: 'left',
         },
@@ -65,7 +65,7 @@ export function useVitalsTimeline(readings, range) {
         },
         {
           ...valueAxis.value,
-          name: 'Activity',
+          name: 'Actividad',
           nameTextStyle: { color: colors.value.textMuted },
           position: 'right',
           splitLine: { show: false },
@@ -88,7 +88,7 @@ export function useVitalsTimeline(readings, range) {
   });
 
   const csvPayload = computed(() => ({
-    columns: ['Timestamp', 'Heart Rate (bpm)', 'SpO₂ (%)', 'Activity'],
+    columns: ['Marca de tiempo', 'Frecuencia cardíaca (lpm)', 'SpO₂ (%)', 'Actividad'],
     rows: (readings.value || []).map((r) => [r.timestamp, r.heartRate, r.oxygen, r.activity]),
   }));
 

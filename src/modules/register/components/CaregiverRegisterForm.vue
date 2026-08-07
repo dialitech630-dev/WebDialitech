@@ -1,37 +1,37 @@
 <template>
   <div class="register-form">
-    <h2 class="form-title">Register as Caregiver</h2>
+    <h2 class="form-title">{{ t('auth.registerAsCaregiver') }}</h2>
 
     <RegisterAvatarUploader v-model:image-url="imageUrl" />
 
     <div class="fields-grid">
       <div class="field">
-        <label class="field-label">First Name</label>
-        <input v-model.trim="form.name" class="field-input" :class="{ 'input-error': errors.name }" placeholder="John" maxlength="60" autocomplete="given-name" />
+        <label class="field-label">{{ t('settings.firstName') }}</label>
+        <input v-model.trim="form.name" class="field-input" :class="{ 'input-error': errors.name }" :placeholder="t('form.firstNamePlaceholder')" maxlength="60" autocomplete="given-name" />
         <p v-if="errors.name" class="field-error">{{ errors.name }}</p>
       </div>
       <div class="field">
-        <label class="field-label">Last Name</label>
-        <input v-model.trim="form.lastname" class="field-input" :class="{ 'input-error': errors.lastname }" placeholder="Doe" maxlength="60" autocomplete="family-name" />
+        <label class="field-label">{{ t('settings.lastName') }}</label>
+        <input v-model.trim="form.lastname" class="field-input" :class="{ 'input-error': errors.lastname }" :placeholder="t('form.lastNamePlaceholder')" maxlength="60" autocomplete="family-name" />
         <p v-if="errors.lastname" class="field-error">{{ errors.lastname }}</p>
       </div>
       <div class="field">
-        <label class="field-label">Email</label>
-        <input v-model.trim="form.email" type="email" class="field-input" :class="{ 'input-error': errors.email }" placeholder="you@example.com" maxlength="254" autocomplete="email" />
+        <label class="field-label">{{ t('auth.email') }}</label>
+        <input v-model.trim="form.email" type="email" class="field-input" :class="{ 'input-error': errors.email }" :placeholder="t('auth.emailPlaceholder')" maxlength="254" autocomplete="email" />
         <p v-if="errors.email" class="field-error">{{ errors.email }}</p>
       </div>
       <div class="field">
-        <label class="field-label">Phone</label>
-        <input v-model.trim="form.phone" type="tel" class="field-input" :class="{ 'input-error': errors.phone }" placeholder="+1 (555) 000-0000" maxlength="20" autocomplete="tel" />
+        <label class="field-label">{{ t('settings.phone') }}</label>
+        <input v-model.trim="form.phone" type="tel" class="field-input" :class="{ 'input-error': errors.phone }" :placeholder="t('form.phonePlaceholder')" maxlength="20" autocomplete="tel" />
         <p v-if="errors.phone" class="field-error">{{ errors.phone }}</p>
       </div>
       <div class="field">
-        <label class="field-label">Password</label>
+        <label class="field-label">{{ t('auth.password') }}</label>
         <input v-model="form.password" type="password" class="field-input" :class="{ 'input-error': errors.password }" placeholder="••••••••" maxlength="128" autocomplete="new-password" />
         <p v-if="errors.password" class="field-error">{{ errors.password }}</p>
       </div>
       <div class="field">
-        <label class="field-label">Confirm Password</label>
+        <label class="field-label">{{ t('auth.confirmPassword') }}</label>
         <input v-model="form.confirmPassword" type="password" class="field-input" :class="{ 'input-error': errors.confirmPassword }" placeholder="••••••••" maxlength="128" autocomplete="new-password" />
         <p v-if="errors.confirmPassword" class="field-error">{{ errors.confirmPassword }}</p>
       </div>
@@ -41,10 +41,12 @@
 
 <script setup>
 import { reactive, ref, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '../../../stores/authStore';
 import RegisterAvatarUploader from './RegisterAvatarUploader.vue';
 import { validateRegisterForm, sanitizeString, sanitizeEmail, sanitizePhone } from '../../../utils/validators';
 
+const { t } = useI18n();
 const authStore = useAuthStore();
 const fieldErrors = computed(() => authStore.fieldErrors || {});
 

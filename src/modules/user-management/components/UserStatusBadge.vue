@@ -1,9 +1,12 @@
 <template>
-  <span class="user-status-badge" :class="badgeClass">{{ status }}</span>
+  <span class="user-status-badge" :class="badgeClass">{{ label }}</span>
 </template>
 
 <script setup>
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps({
   status: { type: String, required: true },
@@ -16,6 +19,15 @@ const badgeClass = computed(() => {
   if (s === 'pending') return 'status-pending';
   if (s === 'blocked') return 'status-blocked';
   return 'status-default';
+});
+
+const label = computed(() => {
+  const s = props.status.toLowerCase();
+  if (s === 'active') return t('common.active');
+  if (s === 'inactive') return t('common.inactive');
+  if (s === 'pending') return t('common.pending');
+  if (s === 'blocked') return t('common.blocked');
+  return props.status;
 });
 </script>
 

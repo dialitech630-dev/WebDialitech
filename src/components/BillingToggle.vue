@@ -1,18 +1,20 @@
 <template>
   <div class="hero-toggle">
-    <span class="toggle-label" :class="{ active: !isYearly }">Monthly</span>
+    <span class="toggle-label" :class="{ active: !isYearly }">{{ t('billing.monthly') }}</span>
     <label class="toggle-switch">
       <input type="checkbox" :checked="isYearly" @change="toggle" />
       <span class="toggle-slider" />
     </label>
-    <span class="toggle-label" :class="{ active: isYearly }">Annual</span>
-    <span v-if="isYearly" class="toggle-save">Save {{ annualDiscount }}%</span>
+    <span class="toggle-label" :class="{ active: isYearly }">{{ t('billing.annual') }}</span>
+    <span v-if="isYearly" class="toggle-save">{{ t('billing.savePercent', { percent: annualDiscount }) }}</span>
   </div>
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n';
 import { useBillingCycle } from '../composables/useBillingCycle';
 
+const { t } = useI18n();
 const { isYearly, toggle, annualDiscount } = useBillingCycle();
 </script>
 

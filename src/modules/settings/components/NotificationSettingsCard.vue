@@ -1,10 +1,10 @@
 <template>
-  <SettingsSection title="Notifications" description="Configure your notification preferences">
+  <SettingsSection title="Notificaciones" description="Configura tus preferencias de notificación">
     <div class="switches-list">
       <div class="switch-row">
         <div class="switch-info">
-          <span class="switch-label">Email Notifications</span>
-          <span class="switch-desc">Receive notifications via email</span>
+          <span class="switch-label">Notificaciones por correo</span>
+          <span class="switch-desc">Recibe notificaciones por correo electrónico</span>
         </div>
         <label class="toggle" :class="{ active: settings.notifications.email }">
           <input type="checkbox" checked disabled />
@@ -13,8 +13,8 @@
       </div>
       <div class="switch-row">
         <div class="switch-info">
-          <span class="switch-label">SMS Notifications</span>
-          <span class="switch-desc">Receive notifications via SMS</span>
+          <span class="switch-label">Notificaciones SMS</span>
+          <span class="switch-desc">Recibe notificaciones por SMS</span>
         </div>
         <label class="toggle" :class="{ active: settings.notifications.sms }">
           <input type="checkbox" disabled />
@@ -23,8 +23,8 @@
       </div>
       <div class="switch-row">
         <div class="switch-info">
-          <span class="switch-label">Push Notifications</span>
-          <span class="switch-desc">Receive push notifications on mobile</span>
+          <span class="switch-label">Notificaciones push</span>
+          <span class="switch-desc">Recibe notificaciones push en tu dispositivo móvil</span>
         </div>
         <label class="toggle" :class="{ active: settings.notifications.push }">
           <input type="checkbox" checked disabled />
@@ -33,8 +33,8 @@
       </div>
       <div class="switch-row">
         <div class="switch-info">
-          <span class="switch-label">Critical Alerts</span>
-          <span class="switch-desc">Immediate alerts for critical events</span>
+          <span class="switch-label">Alertas críticas</span>
+          <span class="switch-desc">Alertas inmediatas para eventos críticos</span>
         </div>
         <label class="toggle" :class="{ active: settings.notifications.criticalAlerts }">
           <input type="checkbox" checked disabled />
@@ -43,8 +43,8 @@
       </div>
       <div class="switch-row">
         <div class="switch-info">
-          <span class="switch-label">Weekly Reports</span>
-          <span class="switch-desc">Receive weekly summary reports</span>
+          <span class="switch-label">Reportes semanales</span>
+          <span class="switch-desc">Recibe reportes semanales de resumen</span>
         </div>
         <label class="toggle" :class="{ active: settings.notifications.weeklyReports }">
           <input type="checkbox" disabled />

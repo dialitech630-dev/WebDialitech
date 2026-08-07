@@ -18,14 +18,14 @@ export function useNotifications() {
       notifications.value = (data || []).map((a) => ({
         id: a.id,
         icon: a.severity >= 3 ? 'critical' : a.severity >= 2 ? 'warning' : 'info',
-        title: a.type || 'Alert',
+        title: a.type || 'Alerta',
         description: a.message || '',
         time: a.createdAt ? formatTime(a.createdAt) : '',
         date: a.createdAt ? a.createdAt.split('T')[0] : '',
         read: a.isRead || false,
       }));
     } catch (err) {
-      const msg = err.response?.data?.message || err.response?.data?.title || 'Failed to load notifications';
+      const msg = err.response?.data?.message || err.response?.data?.title || 'No se pudieron cargar las notificaciones';
       if (window.__toast) window.__toast.error(msg);
     } finally {
       loading.value = false;

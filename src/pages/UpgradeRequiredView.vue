@@ -9,17 +9,17 @@
           <path d="M12 15v2" stroke="#7c3aed" stroke-width="1.6" stroke-linecap="round" />
         </svg>
       </div>
-      <h1 class="upgrade-title">Upgrade Required</h1>
+      <h1 class="upgrade-title">Requiere actualización</h1>
       <p class="upgrade-desc">
-        The <strong>{{ featureLabel }}</strong> feature is not included in your current plan.
-        Upgrade to a higher plan to unlock it.
+        La función <strong>{{ featureLabel }}</strong> no está incluida en tu plan actual.
+        Actualiza a un plan superior para desbloquearla.
       </p>
       <p v-if="suggestedPlan" class="upgrade-suggested">
-        Included in the <strong>{{ suggestedPlan.name }}</strong> plan and above.
+        Incluido en el plan <strong>{{ suggestedPlan.name }}</strong> y superiores.
       </p>
       <div class="upgrade-actions">
-        <button class="btn-primary" @click="showPlans = true">View Plans</button>
-        <router-link to="/dashboard" class="btn-outline">Go to Dashboard</router-link>
+        <button class="btn-primary" @click="showPlans = true">Ver planes</button>
+        <router-link to="/dashboard" class="btn-outline">Ir al Inicio</router-link>
       </div>
     </div>
 
@@ -49,7 +49,7 @@ const sub = useSubscriptionStore();
 const showPlans = ref(false);
 
 const feature = computed(() => route.query.feature || '');
-const featureLabel = computed(() => MODULE_LABELS[feature.value] || 'Requested');
+const featureLabel = computed(() => MODULE_LABELS[feature.value] || 'Solicitado');
 const suggestedPlan = computed(() => {
   if (!feature.value) return null;
   return getUpgradeSuggestion(normalizePlanId(auth.plan), feature.value);
@@ -59,7 +59,7 @@ async function onSelectPlan(planId) {
   showPlans.value = false;
   const result = await sub.changePlan(planId);
   if (result.success) {
-    if (window.__toast) window.__toast.success('Subscription updated successfully.');
+    if (window.__toast) window.__toast.success('Suscripción actualizada exitosamente.');
     router.push('/dashboard');
   } else if (window.__toast) {
     window.__toast.error(result.error);

@@ -5,22 +5,22 @@
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
           <path d="M11 3L6 9L11 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
-        Back
+        Volver
       </button>
       <nav class="breadcrumb">
-        <router-link to="/dashboard" class="breadcrumb-link">Dashboard</router-link>
+        <router-link to="/dashboard" class="breadcrumb-link">Inicio</router-link>
         <svg class="breadcrumb-sep" width="12" height="12" viewBox="0 0 12 12" fill="none">
           <path d="M5 3L8 6L5 9" stroke="#9ca3af" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
-        <router-link to="/patients" class="breadcrumb-link">Patients</router-link>
+        <router-link to="/patients" class="breadcrumb-link">Pacientes</router-link>
         <svg class="breadcrumb-sep" width="12" height="12" viewBox="0 0 12 12" fill="none">
           <path d="M5 3L8 6L5 9" stroke="#9ca3af" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
-        <span class="breadcrumb-current">{{ patient?.name || 'Patient Details' }}</span>
+        <span class="breadcrumb-current">{{ patient?.name || 'Detalles del paciente' }}</span>
       </nav>
     </div>
     <div class="header-bottom">
-      <h1 class="page-title">{{ patient?.name || 'Patient Details' }}</h1>
+      <h1 class="page-title">{{ patient?.name || 'Detalles del paciente' }}</h1>
     </div>
   </header>
 </template>

@@ -2,8 +2,8 @@
   <section class="monitoring-section">
     <header class="monitoring-header">
       <div class="monitoring-heading">
-        <h2 class="monitoring-title">Patient Monitoring</h2>
-        <p class="monitoring-subtitle">Vital signs from the selected patient's linked device</p>
+        <h2 class="monitoring-title">Monitoreo de pacientes</h2>
+        <p class="monitoring-subtitle">Signos vitales del dispositivo vinculado del paciente seleccionado</p>
       </div>
 
       <div class="monitoring-controls">
@@ -15,7 +15,7 @@
           </select>
         </label>
 
-        <div class="range-toggle" role="tablist" aria-label="Monitoring time range">
+        <div class="range-toggle" role="tablist" aria-label="Rango de tiempo de monitoreo">
           <button
             v-for="option in ranges"
             :key="option.value"
@@ -40,15 +40,15 @@
     </div>
 
     <ChartCard
-      title="Vital Signs Timeline"
-      subtitle="Heart rate · SpO₂ · Activity"
+      title="Línea de tiempo de signos vitales"
+      subtitle="Frecuencia cardíaca · SpO₂ · Actividad"
       :height="340"
       :loading="store.readingsLoading && !store.readings.length"
       :error="readingsErrorText"
     >
       <div v-if="!store.patients.length" class="no-patients">
-        <p>No patients linked yet.</p>
-        <p>Add a patient to start monitoring vital signs.</p>
+        <p>Aún no hay pacientes vinculados.</p>
+        <p>Agrega un paciente para comenzar a monitorear sus signos vitales.</p>
       </div>
       <VitalSignsTimeline v-else />
     </ChartCard>
@@ -65,7 +65,7 @@ const VitalSignsTimeline = defineAsyncComponent(() => import('./charts/VitalSign
 const store = useDashboardStore();
 
 const ranges = [
-  { value: 'today', label: 'Today' },
+  { value: 'today', label: 'Hoy' },
   { value: '24h', label: '24h' },
   { value: '7d', label: '7d' },
   { value: '30d', label: '30d' },
@@ -80,18 +80,18 @@ const chips = computed(() => {
   const d = store.patientDetail;
   const alerts = toCount(d?.activeAlerts);
   return [
-    { label: 'Heart Rate', value: fmt(d?.lastHeartRate, ' bpm'), color: '#ef4444' },
+    { label: 'Frecuencia cardíaca', value: fmt(d?.lastHeartRate, ' lpm'), color: '#ef4444' },
     { label: 'SpO₂', value: fmt(d?.lastOxygen, '%'), color: '#2563eb' },
-    { label: 'Activity', value: fmt(d?.lastActivity), color: '#f59e0b' },
+    { label: 'Actividad', value: fmt(d?.lastActivity), color: '#f59e0b' },
     {
-      label: 'Active Alerts',
+      label: 'Alertas activas',
       value: String(alerts),
       color: alerts > 0 ? '#ef4444' : '#22c55e',
     },
   ];
 });
 
-const readingsErrorText = computed(() => (store.readingsError ? 'Unable to load readings for this patient.' : ''));
+const readingsErrorText = computed(() => (store.readingsError ? 'No se pudieron cargar las lecturas de este paciente.' : ''));
 
 function toCount(value) {
   const n = Number(value);

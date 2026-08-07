@@ -9,9 +9,9 @@
               <path d="M12 7v5l3 3" stroke="#2563eb" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </div>
-          <h2 class="modal-title">Session Expired</h2>
-          <p class="modal-desc">Your session has expired. Please sign in again to continue.</p>
-          <button class="login-btn" @click="goToLogin">Go to Login</button>
+          <h2 class="modal-title">Sesión expirada</h2>
+          <p class="modal-desc">Tu sesión ha expirado. Inicia sesión nuevamente para continuar.</p>
+          <button class="login-btn" @click="goToLogin">Ir a iniciar sesión</button>
         </div>
       </div>
     </Transition>

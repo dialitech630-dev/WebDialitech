@@ -3,7 +3,7 @@
     <div class="modal-overlay" @click.self="$emit('close')">
       <div class="modal-card">
         <div class="modal-header">
-          <h3 class="modal-title">Change Subscription</h3>
+          <h3 class="modal-title">Cambiar suscripción</h3>
           <button class="modal-close" @click="$emit('close')">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
               <path d="M4 4l10 10M14 4l-10 10" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round" />
@@ -12,14 +12,14 @@
         </div>
 
         <div class="modal-body">
-          <p class="modal-text">Are you sure you want to change your subscription?</p>
+          <p class="modal-text">¿Estás seguro de que deseas cambiar tu suscripción?</p>
 
           <div class="plan-switch">
             <div class="plan-card current">
-              <span class="plan-label">Current Plan</span>
+              <span class="plan-label">Plan actual</span>
               <span class="plan-name">{{ currentPlanName }}</span>
               <span class="plan-price">{{ currentPlanPrice }}</span>
-              <span v-if="showsDiscount(currentPlanConfig)" class="plan-billing-note">{{ currentPlanConfig.billingNote }} · Save {{ currentPlanConfig.discount }}%</span>
+              <span v-if="showsDiscount(currentPlanConfig)" class="plan-billing-note">{{ currentPlanConfig.billingNote }} · Ahorra {{ currentPlanConfig.discount }}%</span>
             </div>
             <div class="arrow-down">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -27,10 +27,10 @@
               </svg>
             </div>
             <div class="plan-card new">
-              <span class="plan-label">New Plan</span>
+              <span class="plan-label">Nuevo plan</span>
               <span class="plan-name">{{ newPlan.name }}</span>
               <span class="plan-price">{{ formatPrice(newPlan) }}</span>
-              <span v-if="showsDiscount(newPlan)" class="plan-billing-note">{{ newPlan.billingNote }} · Save {{ newPlan.discount }}%</span>
+              <span v-if="showsDiscount(newPlan)" class="plan-billing-note">{{ newPlan.billingNote }} · Ahorra {{ newPlan.discount }}%</span>
             </div>
           </div>
 
@@ -55,12 +55,12 @@
         </div>
 
         <div class="modal-footer">
-          <button class="btn-cancel" @click="$emit('close')">Cancel</button>
+          <button class="btn-cancel" @click="$emit('close')">Cancelar</button>
           <button class="btn-confirm" :disabled="saving" @click="confirm">
             <svg v-if="saving" class="spinner" width="16" height="16" viewBox="0 0 16 16" fill="none">
               <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5" stroke-dasharray="28" stroke-linecap="round"/>
             </svg>
-            {{ saving ? 'Changing...' : 'Confirm Change' }}
+            {{ saving ? 'Cambiando...' : 'Confirmar cambio' }}
           </button>
         </div>
       </div>
@@ -103,18 +103,18 @@ const planFeatures = computed(() => {
   const newAccess = props.newPlan?.access || {};
 
   const featureList = [
-    { label: 'Dashboard', key: 'dashboard', type: 'module' },
-    { label: 'Patients', key: 'patients', type: 'module' },
-    { label: 'Alerts', key: 'alerts', type: 'module' },
-    { label: 'Reports', key: 'reports', type: 'module' },
-    { label: 'Analytics', key: 'statistics', type: 'module' },
-    { label: 'Settings', key: 'settings', type: 'module' },
-    { label: 'Administration', key: 'administration', type: 'module' },
-    { label: 'Advanced Monitoring', key: 'advancedMonitoring', type: 'module' },
-    { label: 'API Access', key: 'apiAccess', type: 'module' },
-    { label: 'AI Insights', key: 'ai', type: 'access' },
-    { label: 'Data Exports', key: 'exports', type: 'access' },
-    { label: 'Multi-caregiver', key: 'multiCaregiver', type: 'access' },
+    { label: 'Inicio', key: 'dashboard', type: 'module' },
+    { label: 'Pacientes', key: 'patients', type: 'module' },
+    { label: 'Alertas', key: 'alerts', type: 'module' },
+    { label: 'Reportes', key: 'reports', type: 'module' },
+    { label: 'Analíticas', key: 'statistics', type: 'module' },
+    { label: 'Configuración', key: 'settings', type: 'module' },
+    { label: 'Administración', key: 'administration', type: 'module' },
+    { label: 'Monitoreo avanzado', key: 'advancedMonitoring', type: 'module' },
+    { label: 'Acceso a la API', key: 'apiAccess', type: 'module' },
+    { label: 'Información con IA', key: 'ai', type: 'access' },
+    { label: 'Exportación de datos', key: 'exports', type: 'access' },
+    { label: 'Multi-cuidador', key: 'multiCaregiver', type: 'access' },
   ];
 
   return featureList.map((f) => {
@@ -139,7 +139,7 @@ async function confirm() {
   try {
     const result = await store.changePlan(props.newPlan.id);
     if (result.success) {
-      if (window.__toast) window.__toast.success('Subscription updated successfully.');
+      if (window.__toast) window.__toast.success('Suscripción actualizada exitosamente.');
       emit('changed');
       emit('close');
     } else {

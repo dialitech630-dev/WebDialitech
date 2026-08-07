@@ -1,7 +1,7 @@
 <template>
   <div class="avatar-uploader">
     <div class="avatar-preview">
-      <img v-if="previewUrl" :src="previewUrl" alt="Profile photo" class="avatar-img" />
+      <img v-if="previewUrl" :src="previewUrl" :alt="t('common.profilePhoto')" class="avatar-img" />
       <div v-else class="avatar-placeholder">
         <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
           <circle cx="12" cy="9" r="4" stroke="#9ca3af" stroke-width="1.5" />
@@ -15,7 +15,7 @@
         <path d="M4 6L8 2L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
         <path d="M2 12V13.5C2 14.328 2.672 15 3.5 15H12.5C13.328 15 14 14.328 14 13.5V12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
       </svg>
-      Upload Profile Photo
+      {{ t('auth.uploadProfilePhoto') }}
     </button>
     <input ref="fileInput" type="file" accept="image/*" class="file-input" @change="onFileSelected" />
   </div>
@@ -23,6 +23,9 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps({
   imageUrl: { type: String, default: '' },
@@ -42,12 +45,12 @@ function onFileSelected(e) {
   const file = e.target.files?.[0];
   if (!file) return;
   if (!file.type.startsWith('image/')) {
-    if (window.__toast) window.__toast.error('Please select a valid image file.');
+    if (window.__toast) window.__toast.error(t('settings.validImage'));
     e.target.value = '';
     return;
   }
   if (file.size > MAX_AVATAR_SIZE) {
-    if (window.__toast) window.__toast.error('Image is too large. Maximum size is 1 MB.');
+    if (window.__toast) window.__toast.error(t('settings.imageTooLarge'));
     e.target.value = '';
     return;
   }

@@ -36,7 +36,7 @@ export function useSubscription() {
     try {
       await store.refreshSubscription();
     } catch (err) {
-      const msg = err?.response?.data?.message || err?.response?.data?.title || 'Failed to load subscription';
+      const msg = err?.response?.data?.message || err?.response?.data?.title || 'No se pudo cargar la suscripción';
       error.value = msg;
       if (window.__toast) window.__toast.error(msg);
     } finally {
@@ -47,7 +47,7 @@ export function useSubscription() {
   async function changePlan(newPlanId) {
     const result = await store.changePlan(newPlanId);
     if (result.success) {
-      if (window.__toast) window.__toast.success('Subscription updated successfully.');
+      if (window.__toast) window.__toast.success('Suscripción actualizada exitosamente.');
     } else {
       if (window.__toast) window.__toast.error(result.error);
     }

@@ -10,11 +10,11 @@
         </svg>
       </div>
       <p class="error-code">403</p>
-      <h1 class="error-title">Forbidden</h1>
-      <p class="error-desc">You don&apos;t have permission to access this page. If you believe this is a mistake, contact your administrator.</p>
+      <h1 class="error-title">Acceso denegado</h1>
+      <p class="error-desc">No tienes permiso para acceder a esta página. Si crees que es un error, contacta a tu administrador.</p>
       <div class="error-actions">
-        <router-link to="/dashboard" class="btn-primary">Go to Dashboard</router-link>
-        <router-link to="/" class="btn-outline">Back to Home</router-link>
+        <router-link to="/dashboard" class="btn-primary">Ir al Inicio</router-link>
+        <router-link to="/" class="btn-outline">Volver al inicio</router-link>
       </div>
     </div>
   </div>

@@ -1,14 +1,14 @@
 <template>
   <header class="settings-header">
     <div class="header-left">
-      <h1 class="page-title">Settings</h1>
-      <p class="page-subtitle">Manage the application configuration and preferences</p>
+      <h1 class="page-title">{{ t('settings.title') }}</h1>
+      <p class="page-subtitle">{{ t('settings.subtitle') }}</p>
       <nav class="breadcrumb">
-        <router-link to="/dashboard" class="breadcrumb-link">Dashboard</router-link>
+        <router-link to="/dashboard" class="breadcrumb-link">{{ t('nav.dashboard') }}</router-link>
         <svg class="breadcrumb-sep" width="12" height="12" viewBox="0 0 12 12" fill="none">
           <path d="M5 3L8 6L5 9" stroke="#9ca3af" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
-        <span class="breadcrumb-current">Settings</span>
+        <span class="breadcrumb-current">{{ t('settings.title') }}</span>
       </nav>
     </div>
     <button class="save-btn" :class="{ disabled: !store.hasChanges }" :disabled="!store.hasChanges" @click="handleSave">
@@ -17,19 +17,21 @@
         <path d="M11 1V6H5V1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
         <circle cx="8" cy="10" r="2" stroke="currentColor" stroke-width="1.5" />
       </svg>
-      Save Changes
+      {{ t('settings.saveChanges') }}
     </button>
   </header>
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n';
 import { useAppearanceStore } from '../../../stores/appearanceStore';
 
+const { t } = useI18n();
 const store = useAppearanceStore();
 
 function handleSave() {
   store.save();
-  if (window.__toast) window.__toast.success('Settings updated successfully.');
+  if (window.__toast) window.__toast.success(t('settings.settingsUpdated'));
 }
 </script>
 

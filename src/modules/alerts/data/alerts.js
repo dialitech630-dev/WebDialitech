@@ -1,2 +1,2 @@
-export const priorities = ['All Priorities', 'Critical', 'High', 'Medium', 'Low'];
-export const alertStatuses = ['All Status', 'Active', 'Pending', 'Resolved', 'Dismissed'];
+export const priorities = ['Todas las prioridades', 'Crítico', 'Alta', 'Media', 'Baja'];
+export const alertStatuses = ['Todos los estados', 'Activa', 'Pendiente', 'Resuelta', 'Descartada'];

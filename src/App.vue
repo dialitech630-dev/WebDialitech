@@ -53,7 +53,7 @@ function onSessionExpired() {
 
 function onForbidden() {
   if (window.__toast) {
-    window.__toast.error('Forbidden', 'You do not have permission to perform this action.');
+    window.__toast.error('Acceso denegado', 'No tienes permiso para realizar esta acción.');
   }
 }
 

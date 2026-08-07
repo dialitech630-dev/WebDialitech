@@ -7,31 +7,31 @@
 
     <header class="page-header">
       <div class="page-heading">
-        <h1 class="page-title">Clinical Dashboard</h1>
-        <p class="page-subtitle">Live overview of your patients' vitals and alerts</p>
+        <h1 class="page-title">Panel clínico</h1>
+        <p class="page-subtitle">Resumen en vivo de los signos vitales y alertas de tus pacientes</p>
       </div>
 
       <div class="page-actions">
         <span v-if="store.lastUpdated" class="last-updated">
-          Last updated {{ formatTime(store.lastUpdated) }}
+          Última actualización {{ formatTime(store.lastUpdated) }}
         </span>
-        <label class="auto-refresh" title="Refresh data automatically every 30 seconds">
+        <label class="auto-refresh" title="Actualiza los datos automáticamente cada 30 segundos">
           <input v-model="autoRefresh" type="checkbox" />
-          <span>Auto-refresh</span>
+          <span>Actualización automática</span>
         </label>
         <button class="refresh-btn" :disabled="store.summaryLoading" @click="refreshAll">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path d="M11.5 7a4.5 4.5 0 1 1-1.4-3.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
             <path d="M11.5 1.5V4H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
-          Refresh
+          Actualizar
         </button>
       </div>
     </header>
 
     <div v-if="store.summaryError && !store.summary" class="error-banner">
       <span>{{ store.summaryError }}</span>
-      <button @click="refreshAll">Retry</button>
+      <button @click="refreshAll">Reintentar</button>
     </div>
 
     <div class="kpi-grid">
@@ -40,19 +40,19 @@
       </template>
       <template v-else>
         <PermissionWrapper feature="dashboard" @open-modal="showModal = true">
-          <StatsCard title="Total Patients" :value="String(store.totalPatients)" variant="blue" />
+          <StatsCard title="Total de pacientes" :value="String(store.totalPatients)" variant="blue" />
         </PermissionWrapper>
 
         <PermissionWrapper feature="alerts" @open-modal="showModal = true">
-          <StatsCard title="Active Alerts" :value="String(store.activeAlerts)" variant="red" />
+          <StatsCard title="Alertas activas" :value="String(store.activeAlerts)" variant="red" />
         </PermissionWrapper>
 
         <PermissionWrapper feature="dashboard" @open-modal="showModal = true">
-          <StatsCard title="Patients With Device" :value="String(store.patientsWithDevice)" variant="green" />
+          <StatsCard title="Pacientes con dispositivo" :value="String(store.patientsWithDevice)" variant="green" />
         </PermissionWrapper>
 
         <PermissionWrapper feature="statistics" @open-modal="showModal = true">
-          <StatsCard title="Average Heart Rate" :value="avgHrText" variant="blue" />
+          <StatsCard title="Frecuencia cardíaca promedio" :value="avgHrText" variant="blue" />
         </PermissionWrapper>
       </template>
     </div>
@@ -116,7 +116,7 @@ const showAddModal = ref(false);
 const autoRefresh = ref(true);
 let refreshTimer = null;
 
-const avgHrText = computed(() => (store.averageHeartRate ? `${store.averageHeartRate} bpm` : '--'));
+const avgHrText = computed(() => (store.averageHeartRate ? `${store.averageHeartRate} lpm` : '--'));
 
 function formatTime(date) {
   return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });

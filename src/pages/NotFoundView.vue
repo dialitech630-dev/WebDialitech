@@ -2,11 +2,11 @@
   <div class="error-page">
     <div class="error-card">
       <div class="error-code">404</div>
-      <h1 class="error-title">Page Not Found</h1>
-      <p class="error-desc">The page you are looking for doesn&apos;t exist or has been moved.</p>
+      <h1 class="error-title">Página no encontrada</h1>
+      <p class="error-desc">La página que buscas no existe o ha sido movida.</p>
       <div class="error-actions">
-        <router-link to="/dashboard" class="btn-primary">Go to Dashboard</router-link>
-        <router-link to="/" class="btn-outline">Back to Home</router-link>
+        <router-link to="/dashboard" class="btn-primary">Ir al Inicio</router-link>
+        <router-link to="/" class="btn-outline">Volver al inicio</router-link>
       </div>
     </div>
   </div>

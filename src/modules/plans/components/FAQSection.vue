@@ -1,7 +1,7 @@
 <template>
   <section class="faq-section">
-    <h2 class="faq-title">Frequently Asked Questions</h2>
-    <p class="faq-desc">Have questions? We&apos;ve got answers. If you need further information, contact our support team.</p>
+    <h2 class="faq-title">{{ t('plans.faq') }}</h2>
+    <p class="faq-desc">{{ t('plans.faqSubtitle') }}</p>
     <div class="faq-list">
       <div v-for="(faq, i) in faqs" :key="i" class="faq-item">
         <div class="faq-question">
@@ -19,9 +19,13 @@
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n';
+
 defineProps({
   faqs: { type: Array, required: true },
 });
+
+const { t } = useI18n();
 </script>
 
 <style scoped>

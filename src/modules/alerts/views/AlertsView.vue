@@ -10,8 +10,8 @@
     />
 
     <div v-if="alertStore.error && !alertStore.alerts.length" class="error-banner">
-      <span>Unable to load alerts. The server may be unavailable.</span>
-      <button @click="alertStore.fetchAll">Retry</button>
+      <span>{{ t('alerts.unableToLoad') }}</span>
+      <button @click="alertStore.fetchAll">{{ t('common.retry') }}</button>
     </div>
 
     <AlertsList
@@ -22,11 +22,11 @@
     />
 
     <div v-else-if="alertStore.alerts.length" class="empty-banner">
-      No alerts match your filters.
+      {{ t('alerts.noResultsMatch') }}
     </div>
 
     <div v-else-if="!alertStore.loading && !alertStore.error" class="empty-banner">
-      No alerts yet.
+      {{ t('alerts.noAlertsYet') }}
     </div>
 
     <ResolveAlertModal
@@ -42,6 +42,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { useAlertStore } from '../../../stores/alertStore';
 import { useAuthStore } from '../../../stores/authStore';
 import { useNotifications } from '../../../composables/useNotifications';
@@ -54,12 +55,13 @@ import ResolveAlertModal from '../components/ResolveAlertModal.vue';
 const alertStore = useAlertStore();
 const authStore = useAuthStore();
 const route = useRoute();
+const { t } = useI18n();
 const { fetchAll: refreshNotifications } = useNotifications();
 
 const search = ref('');
-const priority = ref(priorities.includes(String(route.query.priority)) ? String(route.query.priority) : 'All Priorities');
-const status = ref('All Status');
-const date = ref('All Dates');
+const priority = ref(priorities.includes(String(route.query.priority)) ? String(route.query.priority) : t('alerts.allPriorities'));
+const status = ref(t('alerts.allStatus'));
+const date = ref(t('alerts.allDates'));
 const resolveModalVisible = ref(false);
 const resolving = ref(false);
 const selectedAlert = ref(null);
@@ -67,8 +69,8 @@ const selectedAlert = ref(null);
 const filteredAlerts = computed(() => {
   const query = search.value.trim().toLowerCase();
   return alertStore.alerts.filter((alert) => {
-    if (priority.value !== 'All Priorities' && alert.priority !== priority.value) return false;
-    if (status.value !== 'All Status' && alert.status !== status.value) return false;
+    if (priority.value !== t('alerts.allPriorities') && alert.priority !== priority.value) return false;
+    if (status.value !== t('alerts.allStatus') && alert.status !== status.value) return false;
     if (!matchesDate(alert.date, date.value)) return false;
     if (query) {
       const haystack = `${alert.patientName} ${alert.type} ${alert.description}`.toLowerCase();
@@ -79,7 +81,7 @@ const filteredAlerts = computed(() => {
 });
 
 function matchesDate(dateStr, filter) {
-  if (filter === 'All Dates') return true;
+  if (filter === t('alerts.allDates')) return true;
   if (!dateStr || dateStr === 'N/A') return false;
   const d = new Date(`${dateStr}T00:00:00`);
   if (Number.isNaN(d.getTime())) return false;
@@ -87,16 +89,16 @@ function matchesDate(dateStr, filter) {
   const now = new Date();
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-  if (filter === 'Today') return d.getTime() >= startOfToday.getTime();
+  if (filter === t('common.today')) return d.getTime() >= startOfToday.getTime();
 
-  if (filter === 'This Week') {
+  if (filter === t('common.thisWeek')) {
     const day = (startOfToday.getDay() + 6) % 7;
     const startOfWeek = new Date(startOfToday);
     startOfWeek.setDate(startOfToday.getDate() - day);
     return d.getTime() >= startOfWeek.getTime();
   }
 
-  if (filter === 'This Month') {
+  if (filter === t('common.thisMonth')) {
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     return d.getTime() >= startOfMonth.getTime();
   }
@@ -113,7 +115,7 @@ async function confirmResolve() {
   const alertId = selectedAlert.value?.id;
   if (!alertId) {
     resolveModalVisible.value = false;
-    if (window.__toast) window.__toast.error('Unable to resolve alert because the alert ID is invalid.');
+    if (window.__toast) window.__toast.error(t('alerts.invalidAlertId'));
     return;
   }
 
@@ -123,7 +125,7 @@ async function confirmResolve() {
   if (result.success) {
     selectedAlert.value = null;
     resolveModalVisible.value = false;
-    if (window.__toast) window.__toast.success('Alert resolved.');
+    if (window.__toast) window.__toast.success(t('alerts.alertResolved'));
     refreshNotifications();
   } else if (window.__toast) {
     window.__toast.error(result.error);
@@ -133,12 +135,12 @@ async function confirmResolve() {
 async function handleDismiss(alert) {
   const alertId = alert?.id;
   if (!alertId) {
-    if (window.__toast) window.__toast.error('Unable to resolve alert because the alert ID is invalid.');
+    if (window.__toast) window.__toast.error(t('alerts.invalidAlertId'));
     return;
   }
   const result = await alertStore.remove(alertId);
   if (result.success) {
-    if (window.__toast) window.__toast.success('Alert dismissed.');
+    if (window.__toast) window.__toast.success(t('alerts.alertDismissed'));
     refreshNotifications();
   } else if (window.__toast) {
     window.__toast.error(result.error);
@@ -148,8 +150,8 @@ async function handleDismiss(alert) {
 function handleMarkAllRead() {
   const count = alertStore.markAllRead();
   if (!window.__toast) return;
-  if (count > 0) window.__toast.success(`${count} alert(s) marked as read.`);
-  else window.__toast.info('No unread alerts.');
+  if (count > 0) window.__toast.success(t('alerts.markedAsRead', { count }));
+  else window.__toast.info(t('alerts.noUnread'));
 }
 
 onMounted(() => {

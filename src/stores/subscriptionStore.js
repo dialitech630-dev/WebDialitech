@@ -39,7 +39,7 @@ export const useSubscriptionStore = defineStore('subscription', () => {
   const availablePlans = computed(() => {
     return PLAN_ORDER.map((id) => {
       const plan = PLANS[id];
-      const limit = (v) => (v === -1 ? 'Unlimited' : v);
+      const limit = (v) => (v === -1 ? 'Ilimitado' : v);
       return {
         ...plan,
         isCurrent: plan.id === planId.value,
@@ -68,10 +68,6 @@ export const useSubscriptionStore = defineStore('subscription', () => {
     }
   }
 
-  function setStatus(value) {
-    status.value = value || 'Active';
-  }
-
   function setRole(r) {
     role.value = permissionService.normalizeRole(r);
   }
@@ -79,7 +75,7 @@ export const useSubscriptionStore = defineStore('subscription', () => {
   async function changePlan(newPlanId) {
     const normalized = normalizePlanId(newPlanId);
     if (!PLANS[normalized]) {
-      return { success: false, error: 'Invalid plan.' };
+      return { success: false, error: 'Plan inválido.' };
     }
 
     changing.value = true;
@@ -89,7 +85,7 @@ export const useSubscriptionStore = defineStore('subscription', () => {
       syncFromAuth();
       return { success: true };
     } catch (err) {
-      const msg = err.response?.data?.message || err.response?.data?.title || 'Failed to change plan';
+      const msg = err.response?.data?.message || err.response?.data?.title || 'No se pudo cambiar el plan';
       return { success: false, error: msg };
     } finally {
       changing.value = false;
@@ -116,10 +112,10 @@ export const useSubscriptionStore = defineStore('subscription', () => {
 
   const sidebarModules = computed(() => {
     const modules = [
-      { key: 'dashboard', label: 'Dashboard', route: '/dashboard', icon: 'dashboard' },
-      { key: 'patients', label: 'Patients', route: '/patients', icon: 'patients' },
-      { key: 'alerts', label: 'Alerts', route: '/alerts', icon: 'alerts' },
-      { key: 'settings', label: 'Settings', route: '/settings', icon: 'settings' },
+      { key: 'dashboard', route: '/dashboard', icon: 'dashboard' },
+      { key: 'patients', route: '/patients', icon: 'patients' },
+      { key: 'alerts', route: '/alerts', icon: 'alerts' },
+      { key: 'settings', route: '/settings', icon: 'settings' },
     ];
     return modules.map((m) => ({
       ...m,
@@ -131,7 +127,7 @@ export const useSubscriptionStore = defineStore('subscription', () => {
   return {
     planId, role, status, currentPlan, isBasePlan, isPaid, planName, currentPlanPrice, changing,
     availablePlans,
-    setPlan, setRole, setStatus, changePlan, refreshSubscription, syncFromAuth,
+    setPlan, setRole, changePlan, refreshSubscription, syncFromAuth,
     can, isLocked, sidebarModules,
   };
 });

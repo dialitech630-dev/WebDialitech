@@ -12,8 +12,8 @@
           <span class="brand-name">DiaMonitor</span>
         </router-link>
         <nav class="header-nav">
-          <router-link to="/login" class="nav-btn btn-outline">Sign In</router-link>
-          <router-link to="/register" class="nav-btn btn-primary">Register</router-link>
+          <router-link to="/login" class="nav-btn btn-outline">{{ t('auth.signIn') }}</router-link>
+          <router-link to="/register" class="nav-btn btn-primary">{{ t('auth.register') }}</router-link>
         </nav>
       </div>
     </header>
@@ -37,17 +37,20 @@
           </svg>
           <span>DiaMonitor</span>
         </div>
-        <p class="footer-copy">&copy; 2026 DiaMonitor. All rights reserved.</p>
+        <p class="footer-copy">&copy; 2026 DiaMonitor. {{ t('home.allRightsReserved') }}</p>
       </div>
     </footer>
   </div>
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n';
 import { plans, faqs } from '../data/plans.js';
 import PlansHero from '../components/PlansHero.vue';
 import PricingSection from '../components/PricingSection.vue';
 import FAQSection from '../components/FAQSection.vue';
+
+const { t } = useI18n();
 </script>
 
 <style scoped>

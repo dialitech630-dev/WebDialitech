@@ -6,7 +6,7 @@
         <p>{{ description }}</p>
       </div>
       <button v-if="showUpgrade && !isPremium" class="upgrade-btn" @click="$emit('upgrade')">
-        Upgrade Plan
+        Cambiar plan
       </button>
     </div>
   </div>
@@ -25,15 +25,15 @@ defineEmits(['upgrade']);
 const isPremium = computed(() => props.plan === 'Premium');
 
 const title = computed(() => {
-  if (props.plan === 'Standard') return 'You are on the Standard Plan';
-  if (props.plan === 'Pro') return 'You are on the Pro Plan';
-  return 'You are on the Premium Plan';
+  if (props.plan === 'Standard') return 'Estás en el plan Standard';
+  if (props.plan === 'Pro') return 'Estás en el plan Pro';
+  return 'Estás en el plan Premium';
 });
 
 const description = computed(() => {
-  if (props.plan === 'Standard') return 'Upgrade to unlock advanced monitoring, analytics, AI insights and more.';
-  if (props.plan === 'Pro') return 'You have access to advanced features. Upgrade to Premium for unlimited scale and data exports.';
-  return 'You have full access to all features with no practical limits.';
+  if (props.plan === 'Standard') return 'Actualiza para desbloquear monitoreo avanzado, analíticas, información con IA y más.';
+  if (props.plan === 'Pro') return 'Tienes acceso a funciones avanzadas. Actualiza a Premium para escala ilimitada y exportación de datos.';
+  return 'Tienes acceso completo a todas las funciones sin límites prácticos.';
 });
 
 const bannerClass = computed(() => `sub-${String(props.plan).toLowerCase()}`);

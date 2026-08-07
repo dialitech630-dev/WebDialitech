@@ -55,7 +55,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         }
       })
       .catch(() => {
-        summaryError.value = 'Unable to load dashboard data. The server may be unavailable.';
+        summaryError.value = 'No se pudieron cargar los datos del panel. El servidor puede estar no disponible.';
       })
       .finally(() => {
         summaryLoading.value = false;
@@ -82,7 +82,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
       const { data } = await dashboardService.getPatientStatus(id);
       patientDetail.value = data ?? null;
     } catch {
-      patientDetailError.value = 'Unable to load patient status.';
+      patientDetailError.value = 'No se pudo cargar el estado del paciente.';
     } finally {
       patientDetailLoading.value = false;
     }
@@ -111,7 +111,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
       });
       readings.value = data?.readings ?? data ?? [];
     } catch {
-      readingsError.value = 'Unable to load readings.';
+      readingsError.value = 'No se pudieron cargar las lecturas.';
     } finally {
       readingsLoading.value = false;
     }

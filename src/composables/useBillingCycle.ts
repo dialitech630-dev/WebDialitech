@@ -3,10 +3,20 @@ import { PLANS, type BillingCycle, type Plan } from '../data/plans';
 
 const billingCycle = ref<BillingCycle>('monthly');
 
+const currencyFormatter = new Intl.NumberFormat('es-MX', {
+  style: 'currency',
+  currency: 'MXN',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+export function formatMXN(amount) {
+  const formatted = currencyFormatter.format(amount);
+  return formatted.includes('MXN') ? formatted : `${formatted} MXN`;
+}
+
 export function useBillingCycle() {
   const isYearly = computed(() => billingCycle.value === 'yearly');
-
-  const periodLabel = computed(() => (isYearly.value ? '/year' : '/month'));
 
   const annualDiscount = computed(() =>
     Math.max(0, ...Object.values(PLANS).map((plan) => plan.discount)),
@@ -26,7 +36,7 @@ export function useBillingCycle() {
 
   function planPriceLabel(plan: Plan): string {
     const price = planPrice(plan);
-    return price === 0 ? 'Free' : `$${price}`;
+    return price === 0 ? 'Gratis' : formatMXN(price);
   }
 
   function planPeriodLabel(plan: Plan): string {
@@ -35,8 +45,17 @@ export function useBillingCycle() {
 
   function formatPrice(plan: Plan): string {
     const price = planPrice(plan);
-    if (price === 0) return 'Free';
-    return `$${price}${planPeriodLabel(plan)}`;
+    if (price === 0) return 'Gratis';
+    return `${planPriceLabel(plan)} ${planPeriodLabel(plan)}`;
+  }
+
+  function planAnnualSavings(plan: Plan): number {
+    return Math.max(0, plan.monthlyPrice * 12 - plan.yearlyPrice);
+  }
+
+  function planAnnualSavingsLabel(plan: Plan): string {
+    const savings = planAnnualSavings(plan);
+    return savings === 0 ? 'Gratis' : formatMXN(savings);
   }
 
   function showsDiscount(plan: Plan): boolean {
@@ -46,7 +65,6 @@ export function useBillingCycle() {
   return {
     billingCycle,
     isYearly,
-    periodLabel,
     annualDiscount,
     setCycle,
     toggle,
@@ -54,6 +72,9 @@ export function useBillingCycle() {
     planPriceLabel,
     planPeriodLabel,
     formatPrice,
+    planAnnualSavings,
+    planAnnualSavingsLabel,
+    formatMXN,
     showsDiscount,
   };
 }

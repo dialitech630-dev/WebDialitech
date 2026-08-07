@@ -6,7 +6,7 @@
       'sidebar-collapsed': layout.sidebarCollapsed.value,
     }"
   >
-    <button class="sidebar-close" @click="layout.closeSidebar()" aria-label="Close menu">
+    <button class="sidebar-close" @click="layout.closeSidebar()" :aria-label="t('sidebar.closeMenu')">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
         <path d="M5 5L15 15M15 5L5 15" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round" />
       </svg>
@@ -39,7 +39,7 @@
             <circle cx="10" cy="12" r="1" fill="currentColor" />
             <path d="M10 12V14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
           </svg>
-          {{ item.label }}
+          {{ t('nav.' + item.key) }}
         </div>
         <router-link v-else :to="item.route" class="menu-item">
           <svg v-if="item.icon === 'dashboard'" width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -68,7 +68,7 @@
             <circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5" />
             <path d="M10 2V4M10 16V18M18 10H16M4 10H2M15.66 4.34L-1.34 9.66M4.34 4.34L9.66 9.66" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
           </svg>
-          {{ item.label }}
+          {{ t('nav.' + item.key) }}
         </router-link>
       </template>
     </nav>
@@ -79,11 +79,11 @@
         <p class="user-role">{{ userRoleLabel }}</p>
       </div>
     </div>
-    <button class="collapse-toggle" @click="layout.toggleCollapsed()" aria-label="Collapse sidebar">
+    <button class="collapse-toggle" @click="layout.toggleCollapsed()" :aria-label="t('sidebar.collapseSidebar')">
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
         <path d="M11 13L6 9L11 5" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
-      <span class="collapse-label">Collapse</span>
+      <span class="collapse-label">{{ t('sidebar.collapse') }}</span>
     </button>
   </aside>
 
@@ -97,6 +97,7 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '../stores/authStore';
 import { useSubscriptionStore } from '../stores/subscriptionStore';
 import { useLayout } from '../composables/useLayout';
@@ -104,6 +105,7 @@ import PlanBadge from './PlanBadge.vue';
 import UserAvatar from './UserAvatar.vue';
 import UpgradePlanModal from './UpgradePlanModal.vue';
 
+const { t } = useI18n();
 const authStore = useAuthStore();
 const sub = useSubscriptionStore();
 const layout = useLayout();
@@ -114,8 +116,7 @@ const visibleModules = computed(() => {
 });
 
 const userRoleLabel = computed(() => {
-  const labels = { patient: 'Patient', caregiver: 'Caregiver', admin: 'Administrator' };
-  return labels[sub.role] || 'Caregiver';
+  return t(`roles.${sub.role}`) || 'Cuidador';
 });
 
 function onLockedClick() {
@@ -126,7 +127,7 @@ async function onSelectPlan(planId) {
   showUpgradeModal.value = false;
   const result = await sub.changePlan(planId);
   if (result.success) {
-    if (window.__toast) window.__toast.success('Subscription updated successfully.');
+    if (window.__toast) window.__toast.success(t('settings.subscriptionUpdated'));
   } else if (window.__toast) {
     window.__toast.error(result.error);
   }

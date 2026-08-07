@@ -3,14 +3,14 @@
     <div class="lock-icon">🔒</div>
     <h3 class="locked-title">{{ title }}</h3>
     <p class="locked-desc">{{ description }}</p>
-    <button class="view-plans-btn">Upgrade Required</button>
+    <button class="view-plans-btn">Requiere actualización</button>
   </div>
 </template>
 
 <script setup>
 defineProps({
   title: { type: String, required: true },
-  description: { type: String, default: 'This feature is available in a higher subscription plan. Upgrade to unlock it.' },
+  description: { type: String, default: 'Esta función está disponible en un plan de suscripción superior. Actualiza para desbloquearla.' },
 });
 
 defineEmits(['openModal']);

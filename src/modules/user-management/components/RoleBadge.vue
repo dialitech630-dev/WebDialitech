@@ -1,9 +1,12 @@
 <template>
-  <span class="role-badge" :class="badgeClass">{{ role }}</span>
+  <span class="role-badge" :class="badgeClass">{{ label }}</span>
 </template>
 
 <script setup>
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps({
   role: { type: String, required: true },
@@ -18,6 +21,17 @@ const badgeClass = computed(() => {
   if (r === 'receptionist') return 'role-receptionist';
   if (r === 'supervisor') return 'role-supervisor';
   return 'role-default';
+});
+
+const label = computed(() => {
+  const r = props.role.toLowerCase();
+  if (r === 'admin') return t('roles.admin');
+  if (r === 'doctor') return t('roles.doctor');
+  if (r === 'nurse') return t('roles.nurse');
+  if (r === 'caregiver') return t('roles.caregiver');
+  if (r === 'receptionist') return t('roles.receptionist');
+  if (r === 'supervisor') return t('roles.supervisor');
+  return props.role;
 });
 </script>
 

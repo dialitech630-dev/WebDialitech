@@ -7,7 +7,7 @@
           <h2 class="profile-name">{{ patient.name }}</h2>
           <StatusBadge :status="patient.status" />
         </div>
-        <p class="profile-meta">{{ patient.gender }} · {{ patient.age }} years</p>
+        <p class="profile-meta">{{ patient.gender }} · {{ patient.age }} años</p>
         <p class="profile-doctor">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <circle cx="5.5" cy="4.5" r="2.5" stroke="#6b7280" stroke-width="1.2" />
@@ -21,25 +21,25 @@
     <div class="profile-divider" />
     <div class="profile-grid">
       <div class="profile-item">
-        <span class="profile-label">Diagnosis</span>
+        <span class="profile-label">Diagnóstico</span>
         <span class="profile-value">{{ patient.diagnosis }}</span>
       </div>
       <div class="profile-item">
-        <span class="profile-label">Last Session</span>
+        <span class="profile-label">Última sesión</span>
         <span class="profile-value">{{ patient.lastSession }}</span>
       </div>
       <div class="profile-item">
-        <span class="profile-label">Next Session</span>
+        <span class="profile-label">Próxima sesión</span>
         <span class="profile-value">{{ patient.nextSession }}</span>
       </div>
       <div class="profile-item">
-        <span class="profile-label">Blood Type</span>
+        <span class="profile-label">Tipo de sangre</span>
         <span class="profile-value">{{ patient.bloodType }}</span>
       </div>
     </div>
     <div class="profile-divider" />
     <div class="profile-treatment">
-      <span class="profile-label">Current Treatment</span>
+      <span class="profile-label">Tratamiento actual</span>
       <span class="profile-value">{{ patient.treatment }}</span>
     </div>
   </div>

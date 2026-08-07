@@ -1,7 +1,7 @@
 <template>
   <div class="chart-wrap">
     <v-chart v-if="show" ref="chartEl" :option="option" autoresize class="chart" />
-    <div v-else class="chart-message">No readings available for the selected period.</div>
+    <div v-else class="chart-message">No hay lecturas disponibles para el período seleccionado.</div>
   </div>
 </template>
 

@@ -10,12 +10,12 @@ import tokenService from '../services/token.service';
 
 function friendlyError(err) {
   const status = err?.response?.status;
-  if (status === 401) return 'Your session has expired.';
-  if (status === 403) return 'You are not authorized to delete this account.';
-  if (status === 404) return 'Account not found.';
-  if (status === 409) return 'Account cannot be deleted because dependent resources still exist.';
-  if (status === 500) return 'Server error. Please try again later.';
-  return 'Failed to delete account. Please try again.';
+  if (status === 401) return 'Tu sesión ha expirado.';
+  if (status === 403) return 'No tienes autorización para eliminar esta cuenta.';
+  if (status === 404) return 'Cuenta no encontrada.';
+  if (status === 409) return 'La cuenta no se puede eliminar porque aún existen recursos dependientes.';
+  if (status === 500) return 'Error del servidor. Inténtalo de nuevo más tarde.';
+  return 'No se pudo eliminar la cuenta. Inténtalo de nuevo.';
 }
 
 export function useAccount() {
@@ -43,7 +43,7 @@ export function useAccount() {
         status: data.status || 'Active',
       };
     } catch (err) {
-      const msg = err.response?.data?.message || err.response?.data?.title || 'Failed to load account';
+      const msg = err.response?.data?.message || err.response?.data?.title || 'No se pudo cargar la cuenta';
       error.value = msg;
       if (window.__toast) window.__toast.error(msg);
     } finally {
@@ -74,22 +74,17 @@ export function useAccount() {
   async function deleteAccount() {
     if (deleting.value) return { success: false };
     if (!hasValidSession()) {
-      deleteError.value = 'Your session has expired. Please sign in again.';
+      deleteError.value = 'Tu sesión ha expirado. Inicia sesión nuevamente.';
       return { success: false, error: deleteError.value, code: 'session-expired' };
     }
 
     deleting.value = true;
     deleteError.value = '';
 
-    // TEMP LOGS (eliminar al confirmar que el flujo funciona)
-    console.log('Deleting account...');
-    console.log('Current user:', authStore.user);
-    console.log('JWT:', tokenService.getToken() ? 'Present' : 'Missing');
-
     try {
       await authService.deleteAccount();
       clearAuthState();
-      if (window.__toast) window.__toast.success('Your account has been deleted successfully.');
+      if (window.__toast) window.__toast.success('Tu cuenta ha sido eliminada exitosamente.');
       router.replace('/login');
       return { success: true };
     } catch (err) {

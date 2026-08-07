@@ -10,8 +10,8 @@
         </svg>
         <span class="login-brand-name">DiaMonitor</span>
       </div>
-      <h1 class="login-title">Welcome back</h1>
-      <p class="login-subtitle">Sign in to your account to continue</p>
+      <h1 class="login-title">{{ t('auth.welcomeBack') }}</h1>
+      <p class="login-subtitle">{{ t('auth.loginSubtitle') }}</p>
 
       <div v-if="showSuccess" class="success-banner">
         <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
@@ -19,8 +19,8 @@
           <path d="M6 10l2.5 2.5L14 7" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
         <div>
-          <p class="success-title">Login successful</p>
-          <p class="success-subtitle">Welcome back!</p>
+          <p class="success-title">{{ t('auth.loginSuccess') }}</p>
+          <p class="success-subtitle">{{ t('auth.welcomeBackShort') }}</p>
         </div>
       </div>
 
@@ -29,7 +29,7 @@
           <circle cx="10" cy="10" r="10" fill="#2563eb" />
           <path d="M10 6v4M10 13v1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" />
         </svg>
-        <span>Your session has expired. Please sign in again.</span>
+        <span>{{ t('auth.sessionExpired') }}</span>
       </div>
 
       <div v-if="authStore.error && !showSuccess" class="error-banner">
@@ -42,13 +42,13 @@
 
       <form class="login-form" @submit.prevent="handleLogin" novalidate>
         <div class="field">
-          <label class="field-label">Email</label>
+          <label class="field-label">{{ t('auth.email') }}</label>
           <input
             v-model.trim="email"
             type="email"
             class="field-input"
             :class="{ 'input-error': fieldErrors.email || authStore.fieldErrors?.email }"
-            placeholder="you@example.com"
+            :placeholder="t('auth.emailPlaceholder')"
             maxlength="254"
             autocomplete="email"
           />
@@ -56,7 +56,7 @@
           <p v-else-if="authStore.fieldErrors?.email" class="field-error">{{ authStore.fieldErrors.email }}</p>
         </div>
         <div class="field">
-          <label class="field-label">Password</label>
+          <label class="field-label">{{ t('auth.password') }}</label>
           <input
             v-model="password"
             type="password"
@@ -69,24 +69,24 @@
           <p v-if="fieldErrors.password" class="field-error">{{ fieldErrors.password }}</p>
           <p v-else-if="authStore.fieldErrors?.password" class="field-error">{{ authStore.fieldErrors.password }}</p>
         </div>
-        <router-link to="/forgot-password" class="forgot-link">Forgot your password?</router-link>
+        <router-link to="/forgot-password" class="forgot-link">{{ t('auth.forgotPassword') }}</router-link>
         <LoadingButton
           type="submit"
           :loading="authStore.loading"
-          loading-text="Signing in..."
+          :loading-text="t('auth.signingIn')"
         >
-          Sign In
+          {{ t('auth.signIn') }}
         </LoadingButton>
       </form>
       <p class="login-footer">
-        Don&apos;t have an account?
-        <router-link to="/register" class="login-link">Register</router-link>
+        {{ t('auth.noAccount') }}
+        <router-link to="/register" class="login-link">{{ t('auth.register') }}</router-link>
       </p>
       <router-link to="/" class="back-link">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
           <path d="M10 3L5 8L10 13" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
-        Back to Home
+        {{ t('auth.backToHome') }}
       </router-link>
     </div>
   </div>
@@ -95,10 +95,12 @@
 <script setup>
 import { ref, reactive } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '../stores/authStore';
 import LoadingButton from '../components/LoadingButton.vue';
 import { validateLoginForm, sanitizeEmail } from '../utils/validators';
 
+const { t } = useI18n();
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();

@@ -1,21 +1,21 @@
 <template>
   <header class="alerts-header">
     <div class="header-left">
-      <h1 class="page-title">Alerts</h1>
-      <p class="page-subtitle">Monitor and manage system alerts</p>
+      <h1 class="page-title">Alertas</h1>
+      <p class="page-subtitle">Monitorea y administra las alertas del sistema</p>
       <nav class="breadcrumb">
-        <router-link to="/dashboard" class="breadcrumb-link">Dashboard</router-link>
+        <router-link to="/dashboard" class="breadcrumb-link">Inicio</router-link>
         <svg class="breadcrumb-sep" width="12" height="12" viewBox="0 0 12 12" fill="none">
           <path d="M5 3L8 6L5 9" stroke="#9ca3af" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
-        <span class="breadcrumb-current">Alerts</span>
+        <span class="breadcrumb-current">Alertas</span>
       </nav>
     </div>
     <button class="mark-btn" @click="$emit('mark-all-read')">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <path d="M1 8H3L5 3L8 13L11 6L13 10H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
-      Mark all as read
+      Marcar todas como leídas
     </button>
   </header>
 </template>

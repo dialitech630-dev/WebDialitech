@@ -3,7 +3,7 @@
     <div v-if="visible" class="resolve-modal-overlay" @click.self="handleClose">
       <div class="resolve-modal-card">
         <div class="resolve-modal-header">
-          <h3 class="resolve-modal-title">Resolve Alert</h3>
+          <h3 class="resolve-modal-title">Resolver alerta</h3>
           <button class="resolve-modal-close" @click="handleClose">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
               <path d="M4 4l10 10M14 4l-10 10" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round" />
@@ -13,19 +13,19 @@
 
         <div class="resolve-modal-body">
           <p class="resolve-modal-text">
-            Are you sure you want to resolve the <strong>{{ displayType }}</strong> alert
-            <template v-if="alert?.patientName"> for <strong>{{ alert.patientName }}</strong></template>?
-            This will remove it from the alert list.
+            ¿Estás seguro de que quieres resolver la alerta <strong>{{ displayType }}</strong>
+            <template v-if="alert?.patientName">de <strong>{{ alert.patientName }}</strong></template>?
+            Esto la eliminará de la lista de alertas.
           </p>
         </div>
 
         <div class="resolve-modal-footer">
-          <button class="btn-cancel" :disabled="loading" @click="handleClose">Cancel</button>
+          <button class="btn-cancel" :disabled="loading" @click="handleClose">Cancelar</button>
           <button class="btn-confirm" :disabled="loading" @click="$emit('confirm')">
             <svg v-if="loading" class="spinner" width="16" height="16" viewBox="0 0 16 16" fill="none">
               <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5" stroke-dasharray="28" stroke-linecap="round"/>
             </svg>
-            {{ loading ? 'Resolving...' : 'Resolve Alert' }}
+            {{ loading ? 'Resolviendo...' : 'Resolver alerta' }}
           </button>
         </div>
       </div>
@@ -40,12 +40,12 @@ const props = defineProps({
   visible: { type: Boolean, default: false },
   loading: { type: Boolean, default: false },
   alert: { type: Object, default: null },
-  alertType: { type: String, default: 'Alert' },
+  alertType: { type: String, default: 'Alerta' },
 });
 
 const emit = defineEmits(['close', 'confirm']);
 
-const displayType = computed(() => props.alert?.type || props.alertType || 'Alert');
+const displayType = computed(() => props.alert?.type || props.alertType || 'Alerta');
 
 function handleClose() {
   if (!props.loading) emit('close');

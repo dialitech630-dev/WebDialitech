@@ -9,21 +9,21 @@
             <path d="M11 13v6M17 13v6" stroke="#dc2626" stroke-width="2" stroke-linecap="round" />
           </svg>
         </div>
-        <h3 class="delete-title">Delete Account</h3>
+        <h3 class="delete-title">Eliminar cuenta</h3>
         <p class="delete-desc">
-          This action is permanent and cannot be undone. Your account and all associated
-          <strong>patients, alerts, devices and data</strong> will be deleted. You will be signed out immediately.
+          Esta acción es permanente y no se puede deshacer. Tu cuenta y todos los
+          <strong>pacientes, alertas, dispositivos y datos</strong> asociados serán eliminados. Se cerrará tu sesión de inmediato.
         </p>
 
         <p v-if="error" class="delete-error">{{ error }}</p>
 
         <div class="delete-actions">
-          <button class="btn-cancel" :disabled="deleting" @click="handleClose">Cancel</button>
+          <button class="btn-cancel" :disabled="deleting" @click="handleClose">Cancelar</button>
           <button class="btn-delete" :disabled="deleting" @click="$emit('confirm')">
             <svg v-if="deleting" class="spinner" width="16" height="16" viewBox="0 0 16 16" fill="none">
               <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5" stroke-dasharray="28" stroke-linecap="round"/>
             </svg>
-            {{ deleting ? 'Deleting...' : 'Delete Account' }}
+            {{ deleting ? 'Eliminando...' : 'Eliminar cuenta' }}
           </button>
         </div>
       </div>

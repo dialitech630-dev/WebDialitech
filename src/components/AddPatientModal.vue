@@ -3,7 +3,7 @@
     <div v-if="visible" class="modal-overlay" @click.self="$emit('close')">
       <div class="modal-card">
         <div class="modal-header">
-          <h2 class="modal-title">Add Patient</h2>
+          <h2 class="modal-title">Agregar paciente</h2>
           <button class="modal-close" @click="$emit('close')">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
               <path d="M4 4l10 10M14 4l-10 10" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round" />
@@ -21,37 +21,37 @@
 
         <form class="modal-body" @submit.prevent="submit">
           <div class="field">
-            <label class="field-label">Full Name</label>
-            <input v-model="form.name" class="field-input" :class="{ 'input-error': fieldErrors?.name }" placeholder="Patient name" required />
+            <label class="field-label">Nombre completo</label>
+            <input v-model="form.name" class="field-input" :class="{ 'input-error': fieldErrors?.name }" placeholder="Nombre del paciente" required />
             <p v-if="fieldErrors?.name" class="field-error">{{ fieldErrors.name }}</p>
           </div>
           <div class="field-row">
             <div class="field">
-              <label class="field-label">Age</label>
-              <input v-model.number="form.age" type="number" class="field-input" :class="{ 'input-error': fieldErrors?.age }" placeholder="Age" min="0" max="150" required />
+              <label class="field-label">Edad</label>
+              <input v-model.number="form.age" type="number" class="field-input" :class="{ 'input-error': fieldErrors?.age }" placeholder="Edad" min="0" max="150" required />
               <p v-if="fieldErrors?.age" class="field-error">{{ fieldErrors.age }}</p>
             </div>
             <div class="field">
-              <label class="field-label">Gender</label>
+              <label class="field-label">Género</label>
               <select v-model="form.gender" class="field-input" required>
-                <option value="" disabled>Select</option>
-                <option>Male</option>
-                <option>Female</option>
-                <option>Non-binary</option>
-                <option>Prefer not to say</option>
+                <option value="" disabled>Seleccionar</option>
+                <option>Masculino</option>
+                <option>Femenino</option>
+                <option>No binario</option>
+                <option>Prefiero no decirlo</option>
               </select>
             </div>
           </div>
           <div class="field">
-            <label class="field-label">Notes</label>
-            <textarea v-model="form.notes" class="field-input field-textarea" placeholder="Optional notes about the patient" rows="3" />
+            <label class="field-label">Notas</label>
+            <textarea v-model="form.notes" class="field-input field-textarea" placeholder="Notas opcionales sobre el paciente" rows="3" />
           </div>
         </form>
 
         <div class="modal-footer">
-          <button class="btn-secondary" @click="$emit('close')">Cancel</button>
-          <LoadingButton :loading="submitting" loading-text="Saving..." @click="submit">
-            Save Patient
+          <button class="btn-secondary" @click="$emit('close')">Cancelar</button>
+          <LoadingButton :loading="submitting" loading-text="Guardando..." @click="submit">
+            Guardar paciente
           </LoadingButton>
         </div>
       </div>
@@ -90,15 +90,15 @@ async function submit() {
   const name = sanitizeString(form.name);
   const age = Number(form.age);
   if (!name) {
-    if (window.__toast) window.__toast.error('Patient name is required.');
+    if (window.__toast) window.__toast.error('El nombre del paciente es obligatorio.');
     return;
   }
   if (!form.gender) {
-    if (window.__toast) window.__toast.error('Select a gender.');
+    if (window.__toast) window.__toast.error('Selecciona un género.');
     return;
   }
   if (!Number.isFinite(age) || age < 0 || age > 150) {
-    if (window.__toast) window.__toast.error('Enter a valid age between 0 and 150.');
+    if (window.__toast) window.__toast.error('Ingresa una edad válida entre 0 y 150.');
     return;
   }
 
@@ -112,7 +112,7 @@ async function submit() {
       notes: sanitizeText(form.notes),
     });
     if (result.success) {
-      window.__toast?.success('Patient created successfully', '');
+      window.__toast?.success('Paciente creado exitosamente', '');
       emit('created');
       emit('close');
       form.name = '';

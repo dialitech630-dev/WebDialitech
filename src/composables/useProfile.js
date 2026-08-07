@@ -35,7 +35,7 @@ export function useProfile() {
       form.email = data.email || '';
       form.imageUrl = data.imageUrl || '';
     } catch (err) {
-      const msg = err.response?.data?.message || err.response?.data?.title || 'Failed to load profile';
+      const msg = err.response?.data?.message || err.response?.data?.title || 'No se pudo cargar el perfil';
       error.value = msg;
       if (window.__toast) window.__toast.error(msg);
     } finally {
@@ -67,10 +67,10 @@ export function useProfile() {
       const { data } = await profileService.update(payload);
       profile.value = data;
       authStore.updateUser(data);
-      if (window.__toast) window.__toast.success('Profile updated successfully.');
+      if (window.__toast) window.__toast.success('Perfil actualizado exitosamente.');
       return true;
     } catch (err) {
-      const msg = err.response?.data?.message || err.response?.data?.title || 'Failed to update profile';
+      const msg = err.response?.data?.message || err.response?.data?.title || 'No se pudo actualizar el perfil';
       error.value = msg;
       if (window.__toast) window.__toast.error(msg);
       return false;

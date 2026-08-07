@@ -9,13 +9,14 @@
         @click="$emit('select', item.key)"
       >
         <component :is="item.icon" class="menu-icon" />
-        <span class="menu-label">{{ item.label }}</span>
+        <span class="menu-label">{{ t(item.labelKey) }}</span>
       </li>
     </ul>
   </nav>
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n';
 import ProfileIcon from './icons/ProfileIcon.vue';
 import AccountIcon from './icons/AccountIcon.vue';
 import NotificationsIcon from './icons/NotificationsIcon.vue';
@@ -30,14 +31,16 @@ defineProps({
 
 defineEmits(['select']);
 
+const { t } = useI18n();
+
 const menuItems = [
-  { key: 'profile', label: 'Profile', icon: ProfileIcon },
-  { key: 'account', label: 'Account', icon: AccountIcon },
-  { key: 'notifications', label: 'Notifications', icon: NotificationsIcon },
-  { key: 'security', label: 'Security', icon: SecurityIcon },
-  { key: 'appearance', label: 'Appearance', icon: AppearanceIcon },
-  { key: 'subscription', label: 'Subscription / Plan', icon: SubscriptionIcon },
-  { key: 'system', label: 'System Information', icon: SystemIcon },
+  { key: 'profile', labelKey: 'settings.profile', icon: ProfileIcon },
+  { key: 'account', labelKey: 'settings.account', icon: AccountIcon },
+  { key: 'notifications', labelKey: 'settings.notifications', icon: NotificationsIcon },
+  { key: 'security', labelKey: 'settings.security', icon: SecurityIcon },
+  { key: 'appearance', labelKey: 'settings.appearance', icon: AppearanceIcon },
+  { key: 'subscription', labelKey: 'settings.subscription', icon: SubscriptionIcon },
+  { key: 'system', labelKey: 'settings.system', icon: SystemIcon },
 ];
 </script>
 

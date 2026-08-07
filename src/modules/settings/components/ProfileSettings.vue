@@ -1,5 +1,5 @@
 <template>
-  <SettingsSection title="Profile" description="Manage your personal information and photo">
+  <SettingsSection title="Perfil" description="Administra tu información personal y tu foto">
     <div v-if="loading" class="profile-skeleton">
       <div class="skeleton skeleton-avatar"></div>
       <div class="profile-fields">
@@ -13,12 +13,12 @@
         <circle cx="9" cy="12" r="0.75" fill="#ef4444"/>
       </svg>
       <span>{{ error }}</span>
-      <button class="retry-btn" @click="fetch">Retry</button>
+      <button class="retry-btn" @click="fetch">Reintentar</button>
     </div>
     <div v-else class="profile-layout">
       <div class="avatar-section">
         <div class="avatar-preview">
-          <img v-if="form.imageUrl" :src="form.imageUrl" alt="User avatar" class="avatar-img" />
+          <img v-if="form.imageUrl" :src="form.imageUrl" alt="Avatar de usuario" class="avatar-img" />
           <div v-else class="avatar-placeholder">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
               <circle cx="12" cy="8" r="4.5" stroke="#9ca3af" stroke-width="1.5" />
@@ -32,33 +32,33 @@
             <path d="M4 6L8 2L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
             <path d="M2 12V13.5C2 14.328 2.672 15 3.5 15H12.5C13.328 15 14 14.328 14 13.5V12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
           </svg>
-          Upload Photo
+          Subir foto
         </button>
         <input ref="avatarInput" type="file" accept="image/*" class="file-input" @change="onAvatarSelected" />
       </div>
       <div class="profile-fields">
         <div class="field-row">
-          <label class="field-label">First Name</label>
+          <label class="field-label">Nombre</label>
           <div class="field-wrap">
             <input class="field-input" v-model="form.name" :disabled="saving" maxlength="60" />
             <p v-if="fieldErrors.name" class="field-error">{{ fieldErrors.name }}</p>
           </div>
         </div>
         <div class="field-row">
-          <label class="field-label">Last Name</label>
+          <label class="field-label">Apellido</label>
           <div class="field-wrap">
             <input class="field-input" v-model="form.lastname" :disabled="saving" maxlength="60" />
             <p v-if="fieldErrors.lastname" class="field-error">{{ fieldErrors.lastname }}</p>
           </div>
         </div>
         <div class="field-row">
-          <label class="field-label">Email</label>
+          <label class="field-label">Correo electrónico</label>
           <div class="field-wrap">
             <input class="field-input" :value="form.email" readonly />
           </div>
         </div>
         <div class="field-row">
-          <label class="field-label">Phone</label>
+          <label class="field-label">Teléfono</label>
           <div class="field-wrap">
             <input class="field-input" v-model="form.phone" :disabled="saving" maxlength="20" />
             <p v-if="fieldErrors.phone" class="field-error">{{ fieldErrors.phone }}</p>
@@ -68,7 +68,7 @@
           <svg v-if="saving" class="spinner" width="16" height="16" viewBox="0 0 16 16" fill="none">
             <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5" stroke-dasharray="28" stroke-linecap="round"/>
           </svg>
-          {{ saving ? 'Saving...' : 'Save Changes' }}
+          {{ saving ? 'Guardando...' : 'Guardar cambios' }}
         </button>
       </div>
     </div>
@@ -89,12 +89,12 @@ function onAvatarSelected(e) {
   const file = e.target.files?.[0];
   if (!file) return;
   if (!file.type.startsWith('image/')) {
-    if (window.__toast) window.__toast.error('Please select a valid image file.');
+    if (window.__toast) window.__toast.error('Selecciona un archivo de imagen válido.');
     e.target.value = '';
     return;
   }
   if (file.size > MAX_AVATAR_SIZE) {
-    if (window.__toast) window.__toast.error('Image is too large. Maximum size is 1 MB.');
+    if (window.__toast) window.__toast.error('La imagen es demasiado grande. El tamaño máximo es 1 MB.');
     e.target.value = '';
     return;
   }

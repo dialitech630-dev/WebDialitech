@@ -3,7 +3,7 @@
     <SettingsHeader />
 
     <div class="settings-layout">
-      <SettingsSidebar :activeSection="activeSection" @select="activeSection = $event" />
+      <SettingsSidebar :activeSection="activeSection" @select="handleSelect" />
 
       <div class="settings-content">
         <ProfileSettings v-if="activeSection === 'profile'" />
@@ -11,7 +11,6 @@
         <NotificationSettingsCard v-if="activeSection === 'notifications'" />
         <SecuritySettingsCard v-if="activeSection === 'security'" />
         <AppearanceSettingsCard v-if="activeSection === 'appearance'" />
-        <SubscriptionSettings v-if="activeSection === 'subscription'" />
         <SystemInformationCard v-if="activeSection === 'system'" />
       </div>
     </div>
@@ -20,7 +19,7 @@
 
 <script setup>
 import { ref, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import SettingsHeader from '../components/SettingsHeader.vue';
 import SettingsSidebar from '../components/SettingsSidebar.vue';
 import ProfileSettings from '../components/ProfileSettings.vue';
@@ -28,15 +27,27 @@ import AccountSettings from '../components/AccountSettings.vue';
 import NotificationSettingsCard from '../components/NotificationSettingsCard.vue';
 import SecuritySettingsCard from '../components/SecuritySettingsCard.vue';
 import AppearanceSettingsCard from '../components/AppearanceSettingsCard.vue';
-import SubscriptionSettings from '../components/SubscriptionSettings.vue';
 import SystemInformationCard from '../components/SystemInformationCard.vue';
 
 const route = useRoute();
-const activeSection = ref(route.query.section || 'profile');
+const router = useRouter();
+const activeSection = ref(route.query.section === 'subscription' ? 'profile' : (route.query.section || 'profile'));
+
+function handleSelect(section) {
+  if (section === 'subscription') {
+    router.push('/pagos');
+    return;
+  }
+  activeSection.value = section;
+}
 
 watch(
   () => route.query.section,
   (section) => {
+    if (section === 'subscription') {
+      router.replace('/pagos');
+      return;
+    }
     if (section) activeSection.value = section;
   },
 );

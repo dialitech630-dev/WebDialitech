@@ -17,19 +17,19 @@
               <path d="M12 15v2" stroke="#7c3aed" stroke-width="1.6" stroke-linecap="round" />
             </svg>
           </div>
-          <h2 class="modal-title">Upgrade Required</h2>
+          <h2 class="modal-title">Requiere actualización</h2>
           <p class="modal-desc">
             {{ message }}
           </p>
           <p v-if="suggestedPlan" class="suggested">
-            This feature is included in the <strong>{{ suggestedPlan.name }}</strong> plan and above.
+            Esta función está incluida en el plan <strong>{{ suggestedPlan.name }}</strong> y superiores.
           </p>
-          <button class="view-plans-btn" @click="viewingPlans = true">View Plans</button>
+          <button class="view-plans-btn" @click="viewingPlans = true">Ver planes</button>
         </div>
 
         <div v-else class="modal-body">
-          <h2 class="modal-title">Choose Your Plan</h2>
-          <p class="modal-desc">Compare plans and pick the one that fits your needs.</p>
+          <h2 class="modal-title">Elegir plan</h2>
+          <p class="modal-desc">Compara los planes y elige el que se adapte a tus necesidades.</p>
           <div class="billing-toggle-wrap">
             <BillingToggle />
           </div>
@@ -41,15 +41,15 @@
               class="plan-card"
               :class="{ featured: plan.featured, current: plan.isCurrent }"
             >
-              <div v-if="plan.featured && !plan.isCurrent" class="popular-badge">Most Popular</div>
-              <div v-if="plan.isCurrent" class="popular-badge current-badge">Current</div>
+              <div v-if="plan.featured && !plan.isCurrent" class="popular-badge">Más popular</div>
+              <div v-if="plan.isCurrent" class="popular-badge current-badge">Actual</div>
               <h3 class="plan-name">{{ plan.name }}</h3>
               <div class="plan-price">
                 <span class="price">{{ planPriceLabel(plan) }}</span>
                 <span v-if="planPrice(plan) !== 0" class="period">{{ planPeriodLabel(plan) }}</span>
               </div>
               <div v-if="showsDiscount(plan)" class="plan-save">
-                <span class="save-badge">Save {{ plan.discount }}%</span>
+                <span class="save-badge">Ahorra {{ plan.discount }}%</span>
                 <span class="save-note">{{ plan.billingNote }}</span>
               </div>
               <ul class="plan-features">
@@ -65,7 +65,7 @@
                 :disabled="plan.isCurrent"
                 @click="$emit('select', plan.id)"
               >
-                {{ plan.isCurrent ? 'Current Plan' : `Choose ${plan.name}` }}
+                {{ plan.isCurrent ? 'Plan actual' : `Elegir ${plan.name}` }}
               </button>
             </div>
           </div>
@@ -88,7 +88,7 @@ const props = defineProps({
   feature: { type: String, default: '' },
   message: {
     type: String,
-    default: 'This feature is available in a higher subscription plan. Upgrade to unlock it.',
+    default: 'Esta función está disponible en un plan de suscripción superior. Actualiza para desbloquearla.',
   },
 });
 

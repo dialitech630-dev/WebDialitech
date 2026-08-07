@@ -8,7 +8,7 @@
       v-model="search"
       type="text"
       class="search-input"
-      placeholder="Search patients by name, doctor..."
+      placeholder="Buscar pacientes por nombre, médico..."
     />
   </div>
 </template>

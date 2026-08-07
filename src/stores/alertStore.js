@@ -14,7 +14,7 @@ export const useAlertStore = defineStore('alerts', () => {
       const { data } = await alertService.getAll();
       alerts.value = (data || []).map(mapApiAlertToFrontend);
     } catch (err) {
-      error.value = err.response?.data?.message || err.response?.data?.title || 'Failed to load alerts';
+      error.value = err.response?.data?.message || err.response?.data?.title || 'No se pudieron cargar las alertas';
     } finally {
       loading.value = false;
     }
@@ -22,7 +22,7 @@ export const useAlertStore = defineStore('alerts', () => {
 
   async function remove(alertId) {
     if (!alertId) {
-      return { success: false, error: 'Unable to resolve alert because the alert ID is invalid.' };
+      return { success: false, error: 'No se pudo resolver la alerta porque el ID de la alerta no es válido.' };
     }
     loading.value = true;
     error.value = '';
@@ -31,7 +31,7 @@ export const useAlertStore = defineStore('alerts', () => {
       alerts.value = alerts.value.filter((a) => a.id !== alertId);
       return { success: true };
     } catch (err) {
-      error.value = err.response?.data?.message || err.response?.data?.title || 'Failed to delete alert';
+      error.value = err.response?.data?.message || err.response?.data?.title || 'No se pudo eliminar la alerta';
       return { success: false, error: error.value };
     } finally {
       loading.value = false;

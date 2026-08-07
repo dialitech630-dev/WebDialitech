@@ -1,9 +1,9 @@
 <template>
   <span class="user-avatar" :class="sizeClass">
     <img
-      v-if="photo"
-      :src="photo"
-      :alt="name || 'User avatar'"
+      v-if="resolvedPhoto && !imageFailed"
+      :src="resolvedPhoto"
+      :alt="resolvedName || 'Avatar'"
       class="avatar-img"
       @error="onImageError"
     />
@@ -31,7 +31,7 @@ const authStore = useAuthStore();
 const imageFailed = ref(false);
 
 watch(
-  () => props.photo,
+  () => props.photo || authStore.photo,
   () => {
     imageFailed.value = false;
   },

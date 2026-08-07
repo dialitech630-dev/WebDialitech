@@ -1,5 +1,5 @@
 <template>
-  <SettingsSection title="Account" description="View your account information and status">
+  <SettingsSection title="Cuenta" description="Consulta la información y el estado de tu cuenta">
     <div v-if="loading" class="skeleton-grid">
       <div v-for="n in 4" :key="n" class="skeleton-row">
         <div class="skeleton skeleton-label"></div>
@@ -13,30 +13,30 @@
         <circle cx="9" cy="12" r="0.75" fill="#ef4444"/>
       </svg>
       <span>{{ error }}</span>
-      <button class="retry-btn" @click="fetch">Retry</button>
+      <button class="retry-btn" @click="fetch">Reintentar</button>
     </div>
     <div v-else class="account-wrap">
       <div class="account-grid">
         <div class="account-row">
-          <span class="account-label">Name</span>
+          <span class="account-label">Nombre</span>
           <span class="account-value">{{ account.name }} {{ account.lastname }}</span>
         </div>
         <div class="account-row">
-          <span class="account-label">Email</span>
+          <span class="account-label">Correo electrónico</span>
           <span class="account-value">{{ account.email }}</span>
         </div>
         <div class="account-row">
-          <span class="account-label">Phone</span>
+          <span class="account-label">Teléfono</span>
           <span class="account-value">{{ account.phone || '—' }}</span>
         </div>
         <div class="account-row">
-          <span class="account-label">Role</span>
+          <span class="account-label">Rol</span>
           <span class="account-value">
             <RoleBadge :role="account.role" />
           </span>
         </div>
         <div class="account-row">
-          <span class="account-label">Status</span>
+          <span class="account-label">Estado</span>
           <span class="account-value">
             <UserStatusBadge :status="account.status" />
           </span>
@@ -44,10 +44,10 @@
       </div>
 
       <div class="danger-zone">
-        <h4 class="danger-title">Danger Zone</h4>
-        <p class="danger-desc">Permanently deletes your account and all associated patients, devices and alerts. This action cannot be undone.</p>
+        <h4 class="danger-title">Zona de peligro</h4>
+        <p class="danger-desc">Elimina permanentemente tu cuenta y todos los pacientes, dispositivos y alertas asociados. Esta acción no se puede deshacer.</p>
         <button class="danger-btn" :disabled="deleting" @click="showDeleteModal = true">
-          {{ deleting ? 'Deleting...' : 'Delete Account' }}
+          {{ deleting ? 'Eliminando...' : 'Eliminar cuenta' }}
         </button>
       </div>
     </div>
@@ -77,7 +77,7 @@ async function confirmDelete() {
   if (deleting.value) return;
   if (!hasValidSession()) {
     showDeleteModal.value = false;
-    if (window.__toast) window.__toast.error('Your session has expired. Please sign in again.');
+    if (window.__toast) window.__toast.error('Tu sesión ha expirado. Inicia sesión nuevamente.');
     return;
   }
   const { success } = await deleteAccount();

@@ -1,14 +1,14 @@
 <template>
   <div class="readings-chart">
     <div v-if="loading" class="chart-state">
-      <p>Loading readings...</p>
+      <p>Cargando lecturas...</p>
     </div>
     <div v-else-if="error" class="chart-state error">
       <p>{{ error }}</p>
-      <button class="retry-btn" @click="$emit('retry')">Retry</button>
+      <button class="retry-btn" @click="$emit('retry')">Reintentar</button>
     </div>
     <div v-else-if="!readings.length" class="chart-state">
-      <p>No readings available for the selected period.</p>
+      <p>No hay lecturas disponibles para el período seleccionado.</p>
     </div>
     <div v-else class="chart-wrap">
       <v-chart :option="option" autoresize class="chart" />

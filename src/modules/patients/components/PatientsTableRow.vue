@@ -1,6 +1,6 @@
 <template>
   <tr class="table-row">
-    <td class="cell-patient" data-label="Patient">
+    <td class="cell-patient" data-label="Paciente">
       <div class="patient-info">
         <div class="avatar" :style="{ background: avatarColor }">
           {{ initials }}
@@ -8,15 +8,15 @@
         <router-link class="patient-name" :to="`/patients/${patient.id}`">{{ patient.name }}</router-link>
       </div>
     </td>
-    <td class="cell-data" data-label="Age">{{ patient.age }}</td>
-    <td class="cell-data" data-label="Gender">{{ patient.gender || '--' }}</td>
-    <td class="cell-data" data-label="Assigned Doctor">{{ patient.doctor || '--' }}</td>
-    <td class="cell-data" data-label="Last Session">{{ patient.lastSession || '--' }}</td>
-    <td class="cell-data" data-label="Next Session">{{ patient.nextSession || '--' }}</td>
-    <td class="cell-status" data-label="Status">
+    <td class="cell-data" data-label="Edad">{{ patient.age }}</td>
+    <td class="cell-data" data-label="Género">{{ patient.gender || '--' }}</td>
+    <td class="cell-data" data-label="Médico asignado">{{ patient.doctor || '--' }}</td>
+    <td class="cell-data" data-label="Última sesión">{{ patient.lastSession || '--' }}</td>
+    <td class="cell-data" data-label="Próxima sesión">{{ patient.nextSession || '--' }}</td>
+    <td class="cell-status" data-label="Estado">
       <StatusBadge :status="patient.status" />
     </td>
-    <td class="cell-actions" data-label="Actions">
+    <td class="cell-actions" data-label="Acciones">
       <PatientActions :patient-id="patient.id" @delete="$emit('delete', patient.id)" />
     </td>
   </tr>

@@ -32,8 +32,8 @@
             <rect x="114" y="220" width="20" height="20" rx="4" fill="#2563eb" fill-opacity="0.08" />
           </svg>
         </div>
-        <h2 class="left-title">Secure Password<br />Recovery</h2>
-        <p class="left-desc">Enter your email and a new password to regain access to your account.</p>
+        <h2 class="left-title">{{ t('auth.passwordRecovery') }}</h2>
+        <p class="left-desc">{{ t('auth.passwordRecoveryLeftDesc') }}</p>
       </div>
     </div>
 
@@ -49,8 +49,8 @@
           <span class="forgot-brand-name">DiaMonitor</span>
         </div>
 
-        <h1 class="forgot-title">Forgot Password</h1>
-        <p class="forgot-subtitle">Enter your email and choose a new password.</p>
+        <h1 class="forgot-title">{{ t('auth.forgotPasswordTitle') }}</h1>
+        <p class="forgot-subtitle">{{ t('auth.passwordRecoverySubtitle') }}</p>
 
         <p v-if="successMsg" class="success-msg">{{ successMsg }}</p>
 
@@ -66,7 +66,7 @@
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M10 3L5 8L10 13" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
-            Back to Login
+            {{ t('auth.backToLogin') }}
           </router-link>
         </div>
       </div>
@@ -77,9 +77,11 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { recoveryService } from '../../../services/auth/recovery.service';
 import RecoveryPasswordForm from '../components/RecoveryPasswordForm.vue';
 
+const { t } = useI18n();
 const router = useRouter();
 const loading = ref(false);
 const error = ref('');
@@ -102,8 +104,8 @@ async function handleReset() {
 
   try {
     await recoveryService.resetPassword(payload);
-    successMsg.value = 'Password updated successfully. Redirecting to login...';
-    if (window.__toast) window.__toast.success('Password updated successfully.');
+    successMsg.value = t('auth.passwordUpdatedRedirect');
+    if (window.__toast) window.__toast.success(t('auth.passwordUpdated'));
     setTimeout(() => router.push('/login'), 1800);
   } catch (err) {
     showError(recoveryService.extractError(err).message);

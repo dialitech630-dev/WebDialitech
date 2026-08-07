@@ -18,12 +18,12 @@
             <svg class="spinner" width="28" height="28" viewBox="0 0 28 28" fill="none">
               <circle cx="14" cy="14" r="11" stroke="currentColor" stroke-width="2" stroke-dasharray="40" stroke-linecap="round"/>
             </svg>
-            <p>Generating code...</p>
+            <p>Generando código...</p>
           </div>
 
           <div v-else-if="error" class="code-error">
             <p>{{ error }}</p>
-            <button class="retry-btn" @click="generate">Retry</button>
+            <button class="retry-btn" @click="generate">Reintentar</button>
           </div>
 
           <template v-else>
@@ -33,10 +33,10 @@
 
             <div class="code-expiry">
               <template v-if="expirySeconds !== null">
-                <p>Code expires in <strong>{{ formatExpiry }}</strong></p>
+                <p>El código expira en <strong>{{ formatExpiry }}</strong></p>
               </template>
               <template v-else>
-                <p>Share this code with the patient to link their device.</p>
+                <p>Comparte este código con el paciente para vincular su dispositivo.</p>
               </template>
             </div>
 
@@ -46,7 +46,7 @@
                   <rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3" />
                   <path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5" stroke="currentColor" stroke-width="1.3" />
                 </svg>
-                {{ copying ? 'Copied!' : 'Copy Code' }}
+                {{ copying ? '¡Copiado!' : 'Copiar código' }}
               </button>
               <button class="regenerate-btn" :disabled="regenerating" @click="generate">
                 <svg v-if="regenerating" class="spinner" width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -55,7 +55,7 @@
                 <svg v-else width="16" height="16" viewBox="0 0 16 16" fill="none">
                   <path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2v3.5H10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
-                Regenerate
+                Regenerar
               </button>
             </div>
           </template>
@@ -88,11 +88,11 @@ const now = ref(Date.now());
 
 const isWearable = computed(() => props.kind === 'wearable');
 
-const title = computed(() => (isWearable.value ? 'Wearable Device Code' : 'Mobile Device Code'));
+const title = computed(() => (isWearable.value ? 'Código de dispositivo portátil' : 'Código de dispositivo móvil'));
 const description = computed(() =>
   isWearable.value
-    ? 'Generate a code so the patient can pair their wearable device. The code is valid for a limited time.'
-    : 'Generate a 6-digit code so the patient can link their device to their profile. The code is valid for a limited time.',
+    ? 'Genera un código para que el paciente pueda vincular su dispositivo portátil. El código es válido por tiempo limitado.'
+    : 'Genera un código de 6 dígitos para que el paciente pueda vincular su dispositivo a su perfil. El código es válido por tiempo limitado.',
 );
 
 const codeDigits = computed(() => {
@@ -179,10 +179,10 @@ async function copyCode() {
       document.body.removeChild(textarea);
     }
     copying.value = true;
-    if (window.__toast) window.__toast.success('Code copied to clipboard.');
+    if (window.__toast) window.__toast.success('Código copiado al portapapeles.');
     setTimeout(() => { copying.value = false; }, 1600);
   } catch {
-    if (window.__toast) window.__toast.error('Unable to copy the code.');
+    if (window.__toast) window.__toast.error('No se pudo copiar el código.');
   }
 }
 

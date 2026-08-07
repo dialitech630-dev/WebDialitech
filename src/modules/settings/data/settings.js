@@ -1,11 +1,11 @@
-export const timeZones = ['(UTC-5) America/New_York', '(UTC-8) America/Los_Angeles', '(UTC+0) UTC', '(UTC+1) Europe/London', '(UTC+2) Europe/Berlin'];
-export const languages = ['English', 'Spanish', 'French', 'German'];
+export const timeZones = ['(UTC-5) América/Nueva York', '(UTC-8) América/Los Ángeles', '(UTC+0) UTC', '(UTC+1) Europa/Londres', '(UTC+2) Europa/Berlín'];
+export const languages = ['Español', 'Inglés', 'Francés', 'Alemán'];
 export const dateFormats = ['YYYY-MM-DD', 'DD/MM/YYYY', 'MM/DD/YYYY'];
-export const sessionTimeouts = ['15 minutes', '30 minutes', '1 hour', '2 hours', 'Never'];
-export const passwordPolicies = ['Weak', 'Medium', 'Strong', 'Very Strong'];
-export const themes = ['Light', 'Dark', 'System'];
-export const primaryColors = ['Blue', 'Green', 'Purple', 'Orange', 'Red'];
-export const fontSizes = ['Small', 'Medium', 'Large'];
+export const sessionTimeouts = ['15 minutos', '30 minutos', '1 hora', '2 horas', 'Nunca'];
+export const passwordPolicies = ['Débil', 'Media', 'Fuerte', 'Muy fuerte'];
+export const themes = ['Claro', 'Oscuro', 'Sistema'];
+export const primaryColors = ['Azul', 'Verde', 'Púrpura', 'Naranja', 'Rojo'];
+export const fontSizes = ['Pequeño', 'Mediano', 'Grande'];
 
 export const settings = {
   profile: {
@@ -18,8 +18,8 @@ export const settings = {
   account: {
     username: 'dr.mendoza',
     email: 'andres.mendoza@diahealth.com',
-    role: 'Administrator',
-    status: 'Active',
+    role: 'Administrador',
+    status: 'Activo',
   },
   notifications: {
     email: true,
@@ -29,23 +29,23 @@ export const settings = {
     weeklyReports: false,
   },
   security: {
-    sessionTimeout: '30 minutes',
-    passwordPolicy: 'Strong',
+    sessionTimeout: '30 minutos',
+    passwordPolicy: 'Fuerte',
     twoFactorAuth: true,
     autoLogout: false,
   },
   appearance: {
-    theme: 'Light',
-    language: 'English',
-    fontSize: 'Medium',
+    theme: 'Claro',
+    language: 'Español',
+    fontSize: 'Mediano',
     compactMode: false,
   },
   system: {
     appVersion: 'v2.1.0',
     apiVersion: 'v3.0.0',
     dbVersion: 'PostgreSQL 15.3',
-    environment: 'Production',
-    serverStatus: 'Online',
+    environment: 'Producción',
+    serverStatus: 'En línea',
     uptime: '99.98%',
     lastBackup: '2026-07-22 03:00 UTC',
   },

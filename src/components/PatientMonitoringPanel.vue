@@ -1,7 +1,7 @@
 <template>
   <section class="monitoring-panel">
     <header class="panel-header">
-      <h2 class="panel-title">Patient Status</h2>
+      <h2 class="panel-title">Estado del paciente</h2>
       <span v-if="store.patients.length" class="panel-count">{{ store.patients.length }}</span>
     </header>
 
@@ -11,16 +11,16 @@
 
     <div v-else-if="store.summaryError && !store.patients.length" class="panel-error">
       <p>{{ store.summaryError }}</p>
-      <button class="retry-btn" @click="retry">Retry</button>
+      <button class="retry-btn" @click="retry">Reintentar</button>
     </div>
 
     <div v-else-if="!store.patients.length" class="patients-empty">
-      <p>No patients registered yet.</p>
+      <p>Aún no hay pacientes registrados.</p>
       <button class="add-btn" @click="$emit('add-patient')">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
           <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
         </svg>
-        Add Patient
+        Agregar paciente
       </button>
     </div>
 
@@ -40,40 +40,40 @@
           <span
             class="device-dot"
             :class="patient.hasDevice ? 'online' : 'offline'"
-            :title="patient.hasDevice ? 'Device linked' : 'No device linked'"
+            :title="patient.hasDevice ? 'Dispositivo vinculado' : 'Sin dispositivo vinculado'"
           />
         </div>
         <p class="patient-name">{{ patient.name }}</p>
         <p class="patient-meta">
-          {{ patient.hasDevice ? 'Device linked' : 'No device' }} · {{ relativeTime(patient.lastReadingAt) }}
+          {{ patient.hasDevice ? 'Dispositivo vinculado' : 'Sin dispositivo' }} · {{ relativeTime(patient.lastReadingAt) }}
         </p>
 
         <div class="vitals">
           <div class="vital">
-            <span class="vital-label">HR</span>
-            <span class="vital-value">{{ fmt(patient.lastHeartRate) }}<small> bpm</small></span>
+            <span class="vital-label">FC</span>
+            <span class="vital-value">{{ fmt(patient.lastHeartRate) }}<small> lpm</small></span>
           </div>
           <div class="vital">
             <span class="vital-label">SpO₂</span>
             <span class="vital-value">{{ fmt(patient.lastOxygen) }}<small>%</small></span>
           </div>
           <div class="vital">
-            <span class="vital-label">Activity</span>
+            <span class="vital-label">Actividad</span>
             <span class="vital-value">{{ fmt(patient.lastActivity) }}</span>
           </div>
         </div>
 
         <div class="card-footer">
           <span v-if="patient.activeAlerts > 0" class="alert-badge">
-            {{ patient.activeAlerts }} alert{{ patient.activeAlerts > 1 ? 's' : '' }}
+            {{ patient.activeAlerts }} alerta{{ patient.activeAlerts > 1 ? 's' : '' }}
           </span>
-          <span v-else class="alert-ok">No alerts</span>
+          <span v-else class="alert-ok">Sin alertas</span>
           <router-link
             class="view-link"
             :to="`/patients/${patient.patientId}`"
             @click.stop
           >
-            View details
+            Ver detalles
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
               <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
@@ -108,16 +108,16 @@ function fmt(value) {
 }
 
 function relativeTime(ts) {
-  if (!ts) return 'no readings';
+  if (!ts) return 'sin lecturas';
   const d = new Date(ts);
-  if (Number.isNaN(d.getTime())) return 'no readings';
+  if (Number.isNaN(d.getTime())) return 'sin lecturas';
   const minutes = Math.floor((Date.now() - d.getTime()) / 60000);
-  if (minutes < 1) return 'just now';
-  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 1) return 'ahora mismo';
+  if (minutes < 60) return `hace ${minutes} min`;
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 24) return `hace ${hours} h`;
   const days = Math.floor(hours / 24);
-  return `${days}d ago`;
+  return `hace ${days} días`;
 }
 
 function retry() {

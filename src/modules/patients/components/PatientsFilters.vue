@@ -1,19 +1,19 @@
 <template>
   <div class="filters">
     <div class="filter-group">
-      <label class="filter-label">Status</label>
+      <label class="filter-label">Estado</label>
       <select v-model="status" class="filter-select">
         <option v-for="s in statusOptions" :key="s">{{ s }}</option>
       </select>
     </div>
     <div class="filter-group">
-      <label class="filter-label">Age</label>
+      <label class="filter-label">Edad</label>
       <select v-model="age" class="filter-select">
         <option v-for="a in ageOptions" :key="a">{{ a }}</option>
       </select>
     </div>
     <div class="filter-group">
-      <label class="filter-label">Doctor</label>
+      <label class="filter-label">Médico</label>
       <select v-model="doctor" class="filter-select">
         <option v-for="d in doctorOptions" :key="d">{{ d }}</option>
       </select>
@@ -28,14 +28,14 @@ const props = defineProps({
   patients: { type: Array, default: () => [] },
 });
 
-const status = defineModel('status', { type: String, default: 'All Status' });
-const age = defineModel('age', { type: String, default: 'All Ages' });
-const doctor = defineModel('doctor', { type: String, default: 'All Doctors' });
+const status = defineModel('status', { type: String, default: 'Todos los estados' });
+const age = defineModel('age', { type: String, default: 'Todas las edades' });
+const doctor = defineModel('doctor', { type: String, default: 'Todos los médicos' });
 
-const statusOptions = computed(() => ['All Status', ...new Set(props.patients.map((p) => p.status).filter(Boolean))]);
-const doctorOptions = computed(() => ['All Doctors', ...new Set(props.patients.map((p) => p.doctor).filter(Boolean))]);
+const statusOptions = computed(() => ['Todos los estados', ...new Set(props.patients.map((p) => p.status).filter(Boolean))]);
+const doctorOptions = computed(() => ['Todos los médicos', ...new Set(props.patients.map((p) => p.doctor).filter(Boolean))]);
 
-const ageOptions = ['All Ages', '18-30', '31-45', '46-60', '60+'];
+const ageOptions = ['Todas las edades', '18-30', '31-45', '46-60', '60+'];
 </script>
 
 <style scoped>

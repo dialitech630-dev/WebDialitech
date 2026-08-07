@@ -9,12 +9,12 @@
               <path d="M12 6.5V12l3.5 2" stroke="#d97706" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </div>
-          <h2 class="modal-title">Are you still there?</h2>
+          <h2 class="modal-title">¿Sigues ahí?</h2>
           <p class="modal-desc">
-            For security reasons, your session will expire due to inactivity in
-            <strong>{{ session.warningCountdown }} seconds</strong>.
+            Por razones de seguridad, tu sesión expirará por inactividad en
+            <strong>{{ session.warningCountdown }} segundos</strong>.
           </p>
-          <button class="continue-btn" @click="continueSession">Continue Session</button>
+          <button class="continue-btn" @click="continueSession">Continuar sesión</button>
         </div>
       </div>
     </Transition>

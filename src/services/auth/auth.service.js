@@ -9,16 +9,16 @@ function extractError(err) {
       for (const [key, msgs] of Object.entries(data.errors)) {
         fields[key.toLowerCase()] = Array.isArray(msgs) ? msgs[0] : msgs;
       }
-      return { message: data.title || 'Validation failed', fields };
+      return { message: data.title || 'Validación fallida', fields };
     }
     if (data.message) return { message: data.message, fields: {} };
     if (data.error) return { message: data.error, fields: {} };
-    return { message: data.title || 'Request failed', fields: {} };
+    return { message: data.title || 'La solicitud falló', fields: {} };
   }
   if (err.message === 'Network Error') {
-    return { message: 'Something went wrong. Please try again later.', fields: {} };
+    return { message: 'Algo salió mal. Inténtalo de nuevo más tarde.', fields: {} };
   }
-  return { message: err.message || 'Something went wrong. Please try again later.', fields: {} };
+  return { message: err.message || 'Algo salió mal. Inténtalo de nuevo más tarde.', fields: {} };
 }
 
 export const authService = {

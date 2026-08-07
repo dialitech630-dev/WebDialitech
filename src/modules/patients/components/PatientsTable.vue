@@ -4,14 +4,14 @@
       <table class="patients-table">
         <thead>
           <tr>
-            <th class="th-patient">Patient</th>
-            <th class="th-data">Age</th>
-            <th class="th-data">Gender</th>
-            <th class="th-data">Assigned Doctor</th>
-            <th class="th-data">Last Session</th>
-            <th class="th-data">Next Session</th>
-            <th class="th-status">Status</th>
-            <th class="th-actions">Actions</th>
+            <th class="th-patient">Paciente</th>
+            <th class="th-data">Edad</th>
+            <th class="th-data">Género</th>
+            <th class="th-data">Médico asignado</th>
+            <th class="th-data">Última sesión</th>
+            <th class="th-data">Próxima sesión</th>
+            <th class="th-status">Estado</th>
+            <th class="th-actions">Acciones</th>
           </tr>
         </thead>
         <tbody>

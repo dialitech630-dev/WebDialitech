@@ -12,7 +12,7 @@
         <button
           class="chart-btn"
           type="button"
-          title="Download chart as PNG image"
+          title="Descargar gráfica como imagen PNG"
           :disabled="!exportHandle || !exportHandle.getInstance"
           @click="onDownloadImage"
         >
@@ -27,7 +27,7 @@
         <button
           class="chart-btn"
           type="button"
-          title="Download chart data as CSV"
+          title="Descargar datos de la gráfica como CSV"
           :disabled="!exportHandle || !exportHandle.getCsv"
           @click="onDownloadCsv"
         >
