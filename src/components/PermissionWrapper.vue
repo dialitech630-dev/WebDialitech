@@ -4,6 +4,8 @@
     <FeatureLockedCard
       v-if="showLocked"
       :title="resolvedLockTitle"
+      :description="lockDescription || undefined"
+      :button-text="lockButtonText || undefined"
       @open-modal="$emit('openModal', feature)"
     />
   </slot>
@@ -18,6 +20,8 @@ const props = defineProps({
   feature: { type: String, required: true },
   showLocked: { type: Boolean, default: true },
   lockTitle: { type: String, default: '' },
+  lockDescription: { type: String, default: '' },
+  lockButtonText: { type: String, default: '' },
 });
 
 defineEmits(['openModal']);
@@ -35,6 +39,7 @@ const featureLabels = {
   administration: 'Gestión de usuarios',
   advancedMonitoring: 'Monitoreo avanzado',
   apiAccess: 'Acceso a la API',
+  ai: 'Análisis IA',
 };
 
 const resolvedLockTitle = computed(() => props.lockTitle || `${featureLabels[props.feature] || 'Esta función'} está bloqueada`);

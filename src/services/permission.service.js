@@ -45,6 +45,12 @@ function moduleStatus(module) {
  */
 export function hasFeature(planId, feature) {
   const plan = getPlanConfig(planId);
+  // Features declaradas únicamente en access.* (p. ej. 'ai') se resuelven
+  // desde la matriz de acceso del plan. Esto mantiene consistente
+  // hasFeature() con isFeatureUnlocked() sin duplicar la regla.
+  if (Object.prototype.hasOwnProperty.call(plan.access, feature)) {
+    return plan.access[feature] !== false;
+  }
   const module = plan.modules[feature];
   if (!module) return false;
   return moduleStatus(module) !== 'locked';

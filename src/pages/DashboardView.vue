@@ -61,6 +61,20 @@
       <PatientMonitoringSection />
     </PermissionWrapper>
 
+    <PermissionWrapper
+      feature="ai"
+      lock-title="Análisis IA no disponible"
+      lock-description="Actualiza tu plan a Pro o Premium para acceder al análisis clínico con IA."
+      lock-button-text="Actualizar plan"
+      @open-modal="showModal = true"
+    >
+      <AiInsightsPanel
+        :readings="store.readings"
+        :patient-id="store.selectedPatientId"
+        @retry="runMlAnalysis"
+      />
+    </PermissionWrapper>
+
     <div class="dashboard-grid">
       <PermissionWrapper feature="alerts" @open-modal="showModal = true">
         <CriticalAlertsPanel />
@@ -92,6 +106,7 @@ import { useAuthStore } from '../stores/authStore';
 import { useSubscriptionStore } from '../stores/subscriptionStore';
 import { useAlertStore } from '../stores/alertStore';
 import { useDashboardStore } from '../stores/dashboardStore';
+import { useMlStore } from '../stores/mlStore';
 import StatsCard from '../components/StatsCard.vue';
 import CriticalAlertsPanel from '../components/CriticalAlertsPanel.vue';
 import PatientMonitoringPanel from '../components/PatientMonitoringPanel.vue';
@@ -99,6 +114,7 @@ import SubscriptionBanner from '../components/SubscriptionBanner.vue';
 import PermissionWrapper from '../components/PermissionWrapper.vue';
 import UpgradePlanModal from '../components/UpgradePlanModal.vue';
 import AddPatientModal from '../components/AddPatientModal.vue';
+import AiInsightsPanel from '../components/dashboard/AiInsightsPanel.vue';
 
 const PatientMonitoringSection = defineAsyncComponent(() =>
   import('../modules/dashboard/components/PatientMonitoringSection.vue'),
@@ -110,11 +126,55 @@ const sub = useSubscriptionStore();
 const authStore = useAuthStore();
 const alertStore = useAlertStore();
 const store = useDashboardStore();
+const mlStore = useMlStore();
 
 const showModal = ref(false);
 const showAddModal = ref(false);
 const autoRefresh = ref(true);
 let refreshTimer = null;
+
+// IA: la restricción de plan también se aplica aquí (no solo visual), de modo
+// que los planes Standard jamás disparan POST /api/v1/analyze.
+const aiAllowed = computed(() => sub.can('ai'));
+let lastAnalysisSignature = '';
+
+function readingsSignature(rows) {
+  if (!rows?.length) return '';
+  const r = rows[rows.length - 1];
+  return [r.timestamp, r.heartRate, r.oxygen, r.activity].map((v) => String(v ?? '')).join('|');
+}
+
+async function runMlAnalysis() {
+  if (!aiAllowed.value) return;
+  if (!store.selectedPatientId) return;
+  // Evita lanzar análisis concurrentes: se descarta hasta que termine el actual.
+  if (mlStore.analyzing) return;
+  await mlStore.analyzePatient(store.selectedPatientId, store.readings);
+}
+
+watch(
+  () => store.selectedPatientId,
+  () => {
+    // Cambio de paciente: limpiar análisis anterior antes de ejecutar el nuevo.
+    mlStore.reset();
+    lastAnalysisSignature = '';
+    runMlAnalysis();
+  },
+  { immediate: true },
+);
+
+watch(
+  () => store.readings,
+  (rows) => {
+    if (!rows?.length || !store.selectedPatientId || !aiAllowed.value) return;
+    // Dedupe por firma: el auto-refresh de 30s no vuelve a analizar si las
+    // lecturas no cambiaron realmente, evitando llamadas innecesarias.
+    const signature = readingsSignature(rows);
+    if (signature === lastAnalysisSignature) return;
+    lastAnalysisSignature = signature;
+    runMlAnalysis();
+  },
+);
 
 const avgHrText = computed(() => (store.averageHeartRate ? `${store.averageHeartRate} lpm` : '--'));
 
@@ -165,6 +225,9 @@ onMounted(async () => {
   if (authStore.userId) {
     await alertStore.fetchAll();
   }
+  if (aiAllowed.value) {
+    mlStore.checkHealth();
+  }
   startAutoRefresh();
   document.addEventListener('visibilitychange', onVisibilityChange);
 });
@@ -173,6 +236,7 @@ onBeforeUnmount(() => {
   stopAutoRefresh();
   document.removeEventListener('visibilitychange', onVisibilityChange);
   store.reset();
+  mlStore.reset();
 });
 
 async function onSelectPlan(planId) {

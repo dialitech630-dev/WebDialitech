@@ -7,7 +7,7 @@ const PROD_CSP = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https:",
   "font-src 'self' data:",
-  "connect-src 'self' https://api-dialitech-core-v2.onrender.com",
+  "connect-src 'self' https://api-dialitech-core-v2.onrender.com https://dialitechmlservice-production.up.railway.app",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -58,6 +58,14 @@ export default defineConfig({
             res.end(JSON.stringify({ title: 'Gateway Error', message, status: 502 }));
           });
         },
+      },
+      '/ml': {
+        target: 'https://dialitechmlservice-production.up.railway.app',
+        changeOrigin: true,
+        secure: true,
+        timeout: 60000,
+        proxyTimeout: 60000,
+        rewrite: (path) => path.replace(/^\/ml/, ''),
       },
     },
   },

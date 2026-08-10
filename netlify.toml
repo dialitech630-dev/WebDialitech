@@ -11,6 +11,14 @@
   status = 200
   force = true
 
+# Proxy del servicio de Machine Learning (DiaMonitor). Mismo-origen opcional:
+# el cliente puede llamar a /ml/... y Netlify lo reenvía a Railway.
+[[redirects]]
+  from = "/ml/*"
+  to = "https://dialitechmlservice-production.up.railway.app/:splat"
+  status = 200
+  force = true
+
 # SPA fallback for history-mode routing
 [[redirects]]
   from = "/*"

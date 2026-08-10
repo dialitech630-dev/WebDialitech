@@ -3,7 +3,7 @@
     <div class="lock-icon">🔒</div>
     <h3 class="locked-title">{{ title }}</h3>
     <p class="locked-desc">{{ description }}</p>
-    <button class="view-plans-btn">Requiere actualización</button>
+    <button class="view-plans-btn">{{ buttonText }}</button>
   </div>
 </template>
 
@@ -11,6 +11,7 @@
 defineProps({
   title: { type: String, required: true },
   description: { type: String, default: 'Esta función está disponible en un plan de suscripción superior. Actualiza para desbloquearla.' },
+  buttonText: { type: String, default: 'Requiere actualización' },
 });
 
 defineEmits(['openModal']);
