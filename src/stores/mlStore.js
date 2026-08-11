@@ -31,6 +31,65 @@ function errorMessageFor(err) {
   return detail || 'No se pudo completar el análisis de IA.';
 }
 
+const MIN_READINGS = 12;
+
+/**
+ * Normaliza la respuesta del microservicio de ML a la estructura que consumen
+ * los componentes del dashboard. Soporta tanto el formato actual del backend
+ * (camelCase: riskPrediction, trendAnalysis, patternDetection, anomalyDetection)
+ * como versiones anteriores con snake_case.
+ */
+function normalizeMlResponse(data) {
+  if (!data || typeof data !== 'object') return null;
+
+  const riskPred = data.riskPrediction ?? data.risk_prediction ?? {};
+  const trendAnalysis = data.trendAnalysis ?? data.trends ?? {};
+  const patternDetection = data.patternDetection ?? {};
+  const anomalyDetection = data.anomalyDetection ?? {};
+
+  // Normaliza trends: extrae la dirección de los objetos del backend
+  // { direction, slope, confidence } -> "STABLE" | "ASCENDING" | "DESCENDING"
+  const trends = {};
+  Object.entries(trendAnalysis).forEach(([key, val]) => {
+    if (typeof val === 'object' && val !== null && val.direction) {
+      trends[key] = val.direction;
+    } else {
+      trends[key] = val;
+    }
+  });
+
+  // Normaliza patterns: extrae del array anidado patternDetection.patterns
+  const patterns = patternDetection.patterns ?? data.patterns ?? [];
+
+  // Normaliza anomalies: convierte anomalyDetection (objeto) a array
+  const anomalies = [];
+  if (Array.isArray(data.anomalies)) {
+    anomalies.push(...data.anomalies);
+  } else if (anomalyDetection.anomalyDetected) {
+    const indexes = anomalyDetection.affectedReadingsIndexes || [];
+    anomalies.push({
+      description: `Anomalía detectada en lecturas: ${indexes.length ? indexes.join(', ') : 'índices desconocidos'}`,
+      zScore: anomalyDetection.anomalyScore,
+    });
+  }
+
+  const predictions = data.predictions ?? [];
+
+  return {
+    patientId: data.patientId,
+    modelVersion: data.modelVersion,
+    risk_prediction: {
+      score: riskPred.riskScore ?? riskPred.score,
+      level: riskPred.riskLevel ?? riskPred.level,
+      recommendation: riskPred.recommendation,
+    },
+    trends,
+    patterns,
+    anomalies,
+    predictions,
+  };
+}
+
 export const useMlStore = defineStore('ml', () => {
   const analysis = ref(null);
   const analyzing = ref(false);
@@ -38,6 +97,7 @@ export const useMlStore = defineStore('ml', () => {
   const lastUpdated = ref(null);
   const insufficientData = ref(false);
   const serviceDown = ref(false);
+  const insufficientReason = ref('');
 
   // Contador de request: solo el análisis más reciente puede escribir su
   // resultado (evita race conditions al cambiar de paciente).
@@ -45,6 +105,7 @@ export const useMlStore = defineStore('ml', () => {
 
   const riskScore = computed(() => analysis.value?.risk_prediction?.score ?? null);
   const riskLevel = computed(() => analysis.value?.risk_prediction?.level ?? null);
+  const riskRecommendation = computed(() => analysis.value?.risk_prediction?.recommendation ?? null);
 
   const trends = computed(() => analysis.value?.trends ?? {});
   const patterns = computed(() => analysis.value?.patterns ?? []);
@@ -52,17 +113,27 @@ export const useMlStore = defineStore('ml', () => {
   const predictions = computed(() => analysis.value?.predictions ?? []);
 
   const hasAnalysis = computed(() => analysis.value !== null);
+  const modelVersion = computed(() => analysis.value?.modelVersion ?? null);
 
   async function analyzePatient(patientId, readings) {
     if (!patientId || !readings?.length) {
-      // Datos insuficientes: no es un error de servidor, solo se informa.
       insufficientData.value = true;
+      insufficientReason.value = 'Se necesitan al menos 12 lecturas para realizar el análisis de IA.';
+      analysis.value = null;
+      analysisError.value = '';
+      return;
+    }
+
+    if (readings.length < MIN_READINGS) {
+      insufficientData.value = true;
+      insufficientReason.value = `Se necesitan al menos ${MIN_READINGS} lecturas para realizar el análisis de IA. Actualmente hay ${readings.length}.`;
       analysis.value = null;
       analysisError.value = '';
       return;
     }
 
     insufficientData.value = false;
+    insufficientReason.value = '';
     analysisError.value = '';
 
     const myId = ++requestId;
@@ -81,13 +152,14 @@ export const useMlStore = defineStore('ml', () => {
       if (!mappedReadings.length) {
         if (myId === requestId) analyzing.value = false;
         insufficientData.value = true;
+        insufficientReason.value = 'Se necesitan al menos 12 lecturas para realizar el análisis de IA.';
         return;
       }
 
       const { data } = await mlService.analyze(patientId, mappedReadings);
 
       if (myId !== requestId) return;
-      analysis.value = data;
+      analysis.value = normalizeMlResponse(data);
       lastUpdated.value = new Date();
     } catch (err) {
       if (myId !== requestId) return;
@@ -114,6 +186,7 @@ export const useMlStore = defineStore('ml', () => {
     analysisError.value = '';
     lastUpdated.value = null;
     insufficientData.value = false;
+    insufficientReason.value = '';
   }
 
   return {
@@ -122,14 +195,17 @@ export const useMlStore = defineStore('ml', () => {
     analysisError,
     lastUpdated,
     insufficientData,
+    insufficientReason,
     serviceDown,
     riskScore,
     riskLevel,
+    riskRecommendation,
     trends,
     patterns,
     anomalies,
     predictions,
     hasAnalysis,
+    modelVersion,
     analyzePatient,
     checkHealth,
     reset,

@@ -22,7 +22,9 @@ export const useDashboardStore = defineStore('dashboard', () => {
   const readings = ref([]);
   const readingsLoading = ref(false);
   const readingsError = ref('');
-  const range = ref('7d');
+  const range = ref('30d');
+
+  const readingsCount = computed(() => readings.value.length);
 
   const patients = computed(() => summary.value?.patients ?? []);
   const totalPatients = computed(() => summary.value?.totalPatients ?? 0);
@@ -107,9 +109,16 @@ export const useDashboardStore = defineStore('dashboard', () => {
       const { data } = await dashboardService.getPatientReadings(id, {
         from: r.from,
         to: r.to,
-        limit: 200,
+        limit: 1000,
       });
-      readings.value = data?.readings ?? data ?? [];
+      let raw = data?.readings ?? data ?? [];
+      // Ordenar cronológicamente (la API puede devolver descendente)
+      raw = raw.slice().sort((a, b) => {
+        const ta = new Date(a?.timestamp);
+        const tb = new Date(b?.timestamp);
+        return ta - tb;
+      });
+      readings.value = raw;
     } catch {
       readingsError.value = 'No se pudieron cargar las lecturas.';
     } finally {
@@ -162,6 +171,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     patientDetailLoading,
     patientDetailError,
     readings,
+    readingsCount,
     readingsLoading,
     readingsError,
     range,

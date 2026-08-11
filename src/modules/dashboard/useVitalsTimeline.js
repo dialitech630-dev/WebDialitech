@@ -34,7 +34,14 @@ export function useVitalsTimeline(readings, range) {
   }
 
   const option = computed(() => {
-    const rows = readings.value || [];
+    const rows = (readings.value || [])
+      .slice()
+      .sort((a, b) => {
+        const ta = new Date(a?.timestamp);
+        const tb = new Date(b?.timestamp);
+        if (Number.isNaN(ta) || Number.isNaN(tb)) return 0;
+        return ta - tb;
+      });
     if (!rows.length) return {};
 
     return {
@@ -87,10 +94,20 @@ export function useVitalsTimeline(readings, range) {
     };
   });
 
-  const csvPayload = computed(() => ({
-    columns: ['Marca de tiempo', 'Frecuencia cardíaca (lpm)', 'SpO₂ (%)', 'Actividad'],
-    rows: (readings.value || []).map((r) => [r.timestamp, r.heartRate, r.oxygen, r.activity]),
-  }));
+  const csvPayload = computed(() => {
+    const rows = (readings.value || [])
+      .slice()
+      .sort((a, b) => {
+        const ta = new Date(a?.timestamp);
+        const tb = new Date(b?.timestamp);
+        if (Number.isNaN(ta) || Number.isNaN(tb)) return 0;
+        return ta - tb;
+      });
+    return {
+      columns: ['Marca de tiempo', 'Frecuencia cardíaca (lpm)', 'SpO₂ (%)', 'Actividad'],
+      rows: rows.map((r) => [r.timestamp, r.heartRate, r.oxygen, r.activity]),
+    };
+  });
 
   return { option, csvPayload, seriesMeta };
 }

@@ -165,11 +165,15 @@ async function runMlAnalysis(force = false) {
   if (!store.selectedPatientId) return;
   const rows = store.readings;
   if (!rows?.length) return;
+
+  if (rows.length < 12) {
+    mlStore.insufficientData.value = true;
+    mlStore.insufficientReason.value = `Se necesitan al menos 12 lecturas para realizar el análisis de IA. Actualmente hay ${rows.length}.`;
+    return;
+  }
+
   const signature = analysisSignature();
-  // Dedupe por firma: mismo paciente + mismos readings => no se re-analiza.
   if (!force && signature === lastAnalysisSignature) return;
-  // Evita análisis concurrentes: si hay uno en curso, el watcher de
-  // mlStore.analyzing re-ejecuta el análisis al terminar si hizo falta.
   if (mlStore.analyzing) return;
   lastAnalysisSignature = signature;
   await mlStore.analyzePatient(store.selectedPatientId, rows);

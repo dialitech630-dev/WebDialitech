@@ -17,24 +17,30 @@
       <p class="state-desc">El servicio de análisis IA no está disponible en este momento. El resto del panel sigue funcionando.</p>
     </div>
 
-    <div v-else-if="!hasReadings && !mlStore.analyzing" class="state-block">
-      <span class="state-icon" aria-hidden="true">📊</span>
-      <p class="state-title">Sin datos suficientes</p>
-      <p class="state-desc">No hay suficientes datos para realizar un análisis de IA.</p>
-    </div>
-
-    <div v-else-if="mlStore.analyzing" class="state-block">
-      <div class="spinner" aria-label="Cargando análisis" />
-      <p class="state-title">Analizando signos vitales…</p>
-      <p class="state-desc">El modelo está procesando las lecturas del paciente.</p>
-    </div>
-
     <div v-else-if="mlStore.analysisError" class="error-banner">
       <div class="error-text">
         <strong>No se pudo completar el análisis</strong>
         <span>{{ mlStore.analysisError }}</span>
       </div>
       <button class="retry-btn" @click="$emit('retry')">Reintentar</button>
+    </div>
+
+    <div v-else-if="mlStore.analyzing" class="state-block">
+      <div class="spinner" aria-label="Cargando análisis" />
+      <p class="state-title">Analizando datos…</p>
+      <p class="state-desc">El modelo está procesando las lecturas del paciente.</p>
+    </div>
+
+    <div v-else-if="!hasReadings" class="state-block">
+      <span class="state-icon" aria-hidden="true">📊</span>
+      <p class="state-title">Esperando suficientes lecturas…</p>
+      <p class="state-desc">Selecciona un paciente con lecturas históricas para comenzar el análisis de IA.</p>
+    </div>
+
+    <div v-else-if="mlStore.insufficientData" class="state-block">
+      <span class="state-icon" aria-hidden="true">🔢</span>
+      <p class="state-title">Se necesitan al menos 12 lecturas</p>
+      <p class="state-desc">{{ mlStore.insufficientReason || `Actualmente hay ${readingsCount} lecturas. Recarga con un rango más amplio.` }}</p>
     </div>
 
     <div v-else-if="!mlStore.hasAnalysis" class="state-block">
@@ -67,6 +73,8 @@
           <span class="risk-label">Risk Score</span>
           <strong class="risk-value">{{ scoreText }}</strong>
           <span class="risk-level" :class="riskState">{{ mlStore.riskLevel || 'Sin nivel' }}</span>
+          <span v-if="mlStore.riskRecommendation" class="risk-recommendation">{{ mlStore.riskRecommendation }}</span>
+          <span v-if="mlStore.modelVersion" class="model-version">Modelo: {{ mlStore.modelVersion }}</span>
         </div>
       </div>
 
@@ -121,6 +129,7 @@ defineEmits(['retry']);
 const mlStore = useMlStore();
 
 const hasReadings = computed(() => props.readings.length > 0);
+const readingsCount = computed(() => props.readings.length);
 
 const scoreText = computed(() => {
   const score = mlStore.riskScore;
@@ -182,7 +191,10 @@ const trendEntries = computed(() => {
 function patternText(p) {
   if (typeof p === 'string') return p;
   if (!p) return 'Patrón detectado';
-  return p.pattern ?? p.name ?? p.label ?? p.description ?? String(p);
+  const text = p.description ?? p.pattern ?? p.name ?? p.label ?? String(p);
+  return typeof p === 'object' && 'confidence' in p && Number.isFinite(Number(p.confidence))
+    ? `${text} (${Math.round(Number(p.confidence) * 100)}%)`
+    : text;
 }
 
 const normalizedPatterns = computed(() => mlStore.patterns.map(patternText).filter(Boolean));
@@ -274,8 +286,10 @@ const needle = computed(() => {
 const statusText = computed(() => {
   if (mlStore.analyzing) return 'Analizando…';
   if (mlStore.serviceDown) return 'IA no disponible';
-  if (mlStore.hasAnalysis) return 'Actualizado';
   if (mlStore.analysisError) return 'Error';
+  if (mlStore.insufficientData) return 'Insuficiente';
+  if (mlStore.hasAnalysis) return 'Actualizado';
+  if (!hasReadings.value) return 'Esperando';
   return 'En espera';
 });
 
@@ -537,6 +551,20 @@ const statusClass = computed(() => {
   border-radius: 999px;
 }
 
+.risk-recommendation {
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.4;
+  max-width: 100%;
+  word-break: break-word;
+}
+
+.model-version {
+  font-size: 10px;
+  color: #9ca3af;
+  opacity: 0.7;
+}
+
 .risk-level.risk-low {
   color: #15803d;
   background: #f0fdf4;
@@ -685,6 +713,10 @@ const statusClass = computed(() => {
 }
 
 :global(:root.theme-dark) .state-desc {
+  color: #94a3b8;
+}
+
+:global(:root.theme-dark) .risk-recommendation {
   color: #94a3b8;
 }
 

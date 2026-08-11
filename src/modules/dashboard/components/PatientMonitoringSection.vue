@@ -41,7 +41,7 @@
 
     <ChartCard
       title="Línea de tiempo de signos vitales"
-      subtitle="Frecuencia cardíaca · SpO₂ · Actividad"
+      :subtitle="chartSubtitle"
       :height="340"
       :loading="store.readingsLoading && !store.readings.length"
       :error="readingsErrorText"
@@ -66,9 +66,9 @@ const store = useDashboardStore();
 
 const ranges = [
   { value: 'today', label: 'Hoy' },
-  { value: '24h', label: '24h' },
-  { value: '7d', label: '7d' },
-  { value: '30d', label: '30d' },
+  { value: '24h', label: 'Últimas 24 h' },
+  { value: '7d', label: 'Últimos 7 días' },
+  { value: '30d', label: 'Últimos 30 días' },
 ];
 
 function fmt(value, unit = '') {
@@ -92,6 +92,12 @@ const chips = computed(() => {
 });
 
 const readingsErrorText = computed(() => (store.readingsError ? 'No se pudieron cargar las lecturas de este paciente.' : ''));
+
+const chartSubtitle = computed(() => {
+  if (store.readingsLoading) return 'Cargando lecturas...';
+  if (store.readings.length) return `Frecuencia cardíaca · SpO₂ · Actividad · ${store.readingsCount} lecturas`;
+  return 'Frecuencia cardíaca · SpO₂ · Actividad';
+});
 
 function toCount(value) {
   const n = Number(value);
