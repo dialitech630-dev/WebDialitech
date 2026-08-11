@@ -3,6 +3,10 @@ import { ref, computed } from 'vue';
 import { mlService } from '../services/ml/ml.service';
 
 function errorMessageFor(err) {
+  if (err?.isMlConfigError) {
+    return 'No se pudo configurar el servicio de IA.';
+  }
+
   const status = err?.response?.status;
   const detail = err?.response?.data?.detail || err?.response?.data?.message;
 

@@ -71,7 +71,7 @@
       <AiInsightsPanel
         :readings="store.readings"
         :patient-id="store.selectedPatientId"
-        @retry="runMlAnalysis"
+        @retry="runMlAnalysis(true)"
       />
     </PermissionWrapper>
 
@@ -138,18 +138,41 @@ let refreshTimer = null;
 const aiAllowed = computed(() => sub.can('ai'));
 let lastAnalysisSignature = '';
 
+// Firma basada en TODAS las lecturas (no solo la última) para que el
+// auto-refresh de 30s no vuelva a analizar datos idénticos (sin llamadas
+// duplicadas por el mismo conjunto de readings).
 function readingsSignature(rows) {
   if (!rows?.length) return '';
-  const r = rows[rows.length - 1];
-  return [r.timestamp, r.heartRate, r.oxygen, r.activity].map((v) => String(v ?? '')).join('|');
+  let hash = 5381;
+  for (const r of rows) {
+    const line = [r.timestamp, r.heartRate, r.oxygen, r.activity]
+      .map((v) => String(v ?? ''))
+      .join('|');
+    for (let i = 0; i < line.length; i += 1) {
+      hash = ((hash << 5) + hash) ^ line.charCodeAt(i);
+    }
+  }
+  return String(hash >>> 0);
 }
 
-async function runMlAnalysis() {
+function analysisSignature() {
+  if (!store.selectedPatientId) return '';
+  return `${store.selectedPatientId}|${readingsSignature(store.readings)}`;
+}
+
+async function runMlAnalysis(force = false) {
   if (!aiAllowed.value) return;
   if (!store.selectedPatientId) return;
-  // Evita lanzar análisis concurrentes: se descarta hasta que termine el actual.
+  const rows = store.readings;
+  if (!rows?.length) return;
+  const signature = analysisSignature();
+  // Dedupe por firma: mismo paciente + mismos readings => no se re-analiza.
+  if (!force && signature === lastAnalysisSignature) return;
+  // Evita análisis concurrentes: si hay uno en curso, el watcher de
+  // mlStore.analyzing re-ejecuta el análisis al terminar si hizo falta.
   if (mlStore.analyzing) return;
-  await mlStore.analyzePatient(store.selectedPatientId, store.readings);
+  lastAnalysisSignature = signature;
+  await mlStore.analyzePatient(store.selectedPatientId, rows);
 }
 
 watch(
@@ -165,14 +188,15 @@ watch(
 
 watch(
   () => store.readings,
-  (rows) => {
-    if (!rows?.length || !store.selectedPatientId || !aiAllowed.value) return;
-    // Dedupe por firma: el auto-refresh de 30s no vuelve a analizar si las
-    // lecturas no cambiaron realmente, evitando llamadas innecesarias.
-    const signature = readingsSignature(rows);
-    if (signature === lastAnalysisSignature) return;
-    lastAnalysisSignature = signature;
-    runMlAnalysis();
+  () => runMlAnalysis(),
+);
+
+// Cuando un análisis en curso termina, se re-evalúa por si las lecturas
+// cambiaron mientras estaba en vuelo (la firma impide crear un loop).
+watch(
+  () => mlStore.analyzing,
+  (now, was) => {
+    if (was && !now) runMlAnalysis();
   },
 );
 

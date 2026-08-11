@@ -23,9 +23,41 @@ import axios from 'axios';
  * sabiendas (ver README / .env.example).
  */
 
-const mlBaseURL = import.meta.env.DEV
+const DEFAULT_ML_BASE_URL = 'https://dialitechmlservice-production.up.railway.app';
+
+// Normaliza la URL base: elimina la "/" final y un sufijo "/api" que
+// duplicaría el endpoint (…/api + /api/v1/analyze = …/api/api/v1/analyze).
+function normalizeBaseURL(raw) {
+  if (!raw) return '';
+  let url = String(raw).trim().replace(/\/+$/, '');
+  if (url.endsWith('/api')) url = url.slice(0, -4);
+  return url;
+}
+
+// Solo se aceptan rutas relativas tipo "/ml" (dev) o URLs absolutas http(s).
+// "undefined"/"null" jamás deben convertirse en una baseURL válida.
+function isUsableBaseURL(url) {
+  if (!url) return false;
+  if (url === 'undefined' || url === 'null') return false;
+  return /^\/[^/]/.test(url) || /^https?:\/\//i.test(url);
+}
+
+const configuredBaseURL = normalizeBaseURL(import.meta.env.VITE_ML_API_URL);
+
+// Dev: siempre por el proxy de Vite (/ml -> Railway). En producción se usa la
+// URL absoluta y, si VITE_ML_API_URL no se definió en el build, se cae a la
+// URL conocida del servicio ML. Así nunca se genera "undefined/api/v1/analyze".
+let mlBaseURL = import.meta.env.DEV
   ? '/ml'
-  : `${import.meta.env.VITE_ML_API_URL}`;
+  : configuredBaseURL || DEFAULT_ML_BASE_URL;
+
+if (import.meta.env.DEV && !configuredBaseURL) {
+  console.warn('[ml.service] VITE_ML_API_URL no está configurada.');
+}
+
+if (!isUsableBaseURL(mlBaseURL)) {
+  mlBaseURL = '/ml';
+}
 
 const mlApi = axios.create({
   baseURL: mlBaseURL,
@@ -34,6 +66,18 @@ const mlApi = axios.create({
     'X-API-Key': import.meta.env.VITE_ML_API_KEY || '',
   },
   timeout: 30000,
+});
+
+// Barrera de seguridad: rechaza de forma controlada cualquier petición que
+// terminaría en una URL inválida (p. ej. "undefined/api/v1/analyze").
+mlApi.interceptors.request.use((config) => {
+  const target = config.baseURL || mlBaseURL;
+  if (!isUsableBaseURL(target)) {
+    const err = new Error('No se pudo configurar el servicio de IA.');
+    err.isMlConfigError = true;
+    return Promise.reject(err);
+  }
+  return config;
 });
 
 export const mlService = {
