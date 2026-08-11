@@ -10,17 +10,20 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { storeToRefs } from 'pinia';
 import { VChart } from '../../echarts';
 import { useChartExportSink } from '../../exportBridge';
 import { useVitalsTimeline } from '../../useVitalsTimeline';
 import { useDashboardStore } from '../../../../stores/dashboardStore';
 
 const store = useDashboardStore();
+const { readings, range } = storeToRefs(store);
+
 const chartEl = ref(null);
 const { register, unregister } = useChartExportSink();
-const { option, csvPayload } = useVitalsTimeline(store.readings, store.range);
+const { option, csvPayload } = useVitalsTimeline(readings, range);
 
-const show = computed(() => store.readings.length > 0);
+const show = computed(() => readings.value.length > 0);
 
 function getInstance() {
   return chartEl.value?.chart || null;
