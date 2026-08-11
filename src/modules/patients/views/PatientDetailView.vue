@@ -135,6 +135,25 @@
       </div>
 
       <div class="full-width-section">
+        <PatientInfoCard :title="t('ai.title')">
+          <PermissionWrapper
+            feature="ai"
+            show-locked
+            lock-title="Análisis IA no disponible"
+            lock-description="Actualiza tu plan a Pro o Premium para acceder al análisis clínico con IA."
+            lock-button-text="Actualizar plan"
+            @open-modal="showModal = true"
+          >
+            <AiInsightsPanel
+              :readings="readings"
+              :patient-id="route.params.id"
+              @retry="runMlAnalysis(true)"
+            />
+          </PermissionWrapper>
+        </PatientInfoCard>
+      </div>
+
+      <div class="full-width-section">
         <PatientInfoCard :title="t('patients.patientAlerts')">
           <div v-if="alertsLoading" class="info-loading">{{ t('patients.loadingAlerts') }}</div>
           <div v-else-if="patientAlerts.length" class="patient-alerts">
@@ -173,14 +192,23 @@
       @close="resolveModalVisible = false"
       @confirm="confirmResolve"
     />
+
+    <UpgradePlanModal
+      :visible="showModal"
+      :current-plan="sub.planId"
+      @close="showModal = false"
+      @select="onSelectPlan"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { usePatientStore } from '../../../stores/patientStore';
+import { useMlStore } from '../../../stores/mlStore';
+import { useSubscriptionStore } from '../../../stores/subscriptionStore';
 import { dashboardService } from '../../../services/dashboardService';
 import { alertService } from '../../../services/alertService';
 import { patientService } from '../../../services/patients/patient.service';
@@ -189,6 +217,9 @@ import PatientProfileCard from '../components/detail/PatientProfileCard.vue';
 import PatientInfoCard from '../components/detail/PatientInfoCard.vue';
 import PatientCodeModal from '../components/detail/PatientCodeModal.vue';
 import ReadingsChart from '../components/detail/ReadingsChart.vue';
+import AiInsightsPanel from '../../../components/dashboard/AiInsightsPanel.vue';
+import PermissionWrapper from '../../../components/PermissionWrapper.vue';
+import UpgradePlanModal from '../../../components/UpgradePlanModal.vue';
 import StatusBadge from '../../../components/StatusBadge.vue';
 import PriorityBadge from '../../alerts/components/PriorityBadge.vue';
 import ResolveAlertModal from '../../alerts/components/ResolveAlertModal.vue';
@@ -196,6 +227,9 @@ import ResolveAlertModal from '../../alerts/components/ResolveAlertModal.vue';
 const { t } = useI18n();
 const route = useRoute();
 const store = usePatientStore();
+const mlStore = useMlStore();
+const sub = useSubscriptionStore();
+const showModal = ref(false);
 
 const status = ref(null);
 const statusLoading = ref(false);
@@ -213,6 +247,56 @@ const codeModalKind = ref('mobile');
 const resolveModalVisible = ref(false);
 const resolving = ref(false);
 const resolveAlertTarget = ref(null);
+
+const aiAllowed = computed(() => sub.can('ai'));
+let lastAnalysisSignature = '';
+
+function readingsSignature(rows) {
+  if (!rows?.length) return '';
+  let hash = 5381;
+  for (const r of rows) {
+    const line = [r.timestamp, r.heartRate, r.oxygen, r.activity]
+      .map((v) => String(v ?? ''))
+      .join('|');
+    for (let i = 0; i < line.length; i += 1) {
+      hash = ((hash << 5) + hash) ^ line.charCodeAt(i);
+    }
+  }
+  return String(hash >>> 0);
+}
+
+function analysisSignature() {
+  if (!patientId.value) return '';
+  return `${patientId.value}|${readingsSignature(readings.value)}`;
+}
+
+async function runMlAnalysis(force = false) {
+  if (!aiAllowed.value) return;
+  if (!patientId.value) return;
+  const rows = readings.value;
+  if (!rows?.length) return;
+
+  if (rows.length < 12) {
+    mlStore.insufficientData.value = true;
+    mlStore.insufficientReason.value = `Se necesitan al menos 12 lecturas para realizar el análisis de IA. Actualmente hay ${rows.length}.`;
+    return;
+  }
+
+  const signature = analysisSignature();
+  if (!force && signature === lastAnalysisSignature) return;
+  if (mlStore.analyzing) return;
+  lastAnalysisSignature = signature;
+  await mlStore.analyzePatient(patientId.value, rows);
+}
+
+watch(() => readings.value, () => runMlAnalysis());
+
+watch(
+  () => mlStore.analyzing,
+  (now, was) => {
+    if (was && !now) runMlAnalysis();
+  },
+);
 
 const readingFilters = [
   { label: t('patients.filterToday'), value: 'today' },
@@ -359,6 +443,12 @@ async function confirmResolve() {
   }
 }
 
+async function onSelectPlan(planId) {
+  showModal.value = false;
+  const { success } = await sub.changePlan(planId);
+  if (!success) showModal.value = true;
+}
+
 onMounted(() => {
   if (route.params.id) {
     store.fetchById(route.params.id);
@@ -366,6 +456,10 @@ onMounted(() => {
     loadReadings();
     loadPatientAlerts();
   }
+});
+
+onBeforeUnmount(() => {
+  mlStore.reset();
 });
 </script>
 
