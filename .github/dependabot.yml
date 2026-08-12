@@ -1,0 +1,76 @@
+# Dependabot Configuration
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Mexico_City"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "dialitech630-dev"
+    assignees:
+      - "dialitech630-dev"
+    labels:
+      - "dependencies"
+      - "npm"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    groups:
+      development-dependencies:
+        patterns:
+          - "@vitejs/*"
+          - "vite*"
+          - "@types/*"
+          - "typescript*"
+          - "eslint*"
+          - "prettier*"
+        update-types:
+          - "minor"
+          - "patch"
+      production-dependencies:
+        patterns:
+          - "vue*"
+          - "pinia*"
+          - "vue-router*"
+          - "vue-i18n*"
+          - "axios*"
+          - "echarts*"
+          - "vue-echarts*"
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      # Ignore major updates for Vue ecosystem until tested
+      - dependency-name: "vue*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "pinia*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "vue-router*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "vue-i18n*"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Mexico_City"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "dialitech630-dev"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci(deps)"
+      include: "scope"

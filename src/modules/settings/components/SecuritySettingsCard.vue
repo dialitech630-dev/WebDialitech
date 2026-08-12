@@ -86,7 +86,7 @@ const form = reactive({
 });
 
 const passwordError = computed(() => {
-  if (form.newPassword && !isStrongPassword(form.newPassword)) return `La contraseña debe tener entre ${PASSWORD_POLICY.MIN_LENGTH} y ${PASSWORD_POLICY.MAX_LENGTH} caracteres sin espacios`;
+  if (form.newPassword && !isStrongPassword(form.newPassword)) return `La contraseña debe tener ${PASSWORD_POLICY.MIN_LENGTH}-${PASSWORD_POLICY.MAX_LENGTH} caracteres, incluir mayúscula, minúscula, número y carácter especial (sin espacios)`;
   if (form.confirmPassword && form.newPassword !== form.confirmPassword) return 'Las contraseñas no coinciden';
   return '';
 });

@@ -4,10 +4,10 @@ import vue from '@vitejs/plugin-vue';
 const PROD_CSP = [
   "default-src 'self'",
   "script-src 'self'",
-  "style-src 'self' 'unsafe-inline'",
+  "style-src 'self'",
   "img-src 'self' data: https:",
   "font-src 'self' data:",
-  "connect-src 'self' https://api-dialitech-core-v2.onrender.com https://dialitechmlservice-production.up.railway.app",
+  "connect-src 'self'",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -22,10 +22,10 @@ function securityHeadersPlugin() {
         res.setHeader('Content-Security-Policy', PROD_CSP);
         res.setHeader('X-Content-Type-Options', 'nosniff');
         res.setHeader('X-Frame-Options', 'DENY');
-        res.setHeader('Referrer-Policy', 'no-referrer');
+        res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
         res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
         res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-        res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
+        res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
         next();
       });
     },
@@ -60,12 +60,23 @@ export default defineConfig({
         },
       },
       '/ml': {
-        target: 'https://dialitechmlservice-production.up.railway.app',
+        target: 'http://localhost:8888',
         changeOrigin: true,
-        secure: true,
+        secure: false,
         timeout: 60000,
         proxyTimeout: 60000,
-        rewrite: (path) => path.replace(/^\/ml/, ''),
+        rewrite: (path) => path.replace(/^\/ml/, '/.netlify/functions/ml-proxy'),
+        configure(proxy) {
+          proxy.on('error', (err, req, res) => {
+            if (res.headersSent) {
+              res.destroy();
+              return;
+            }
+            console.warn('[vite:ml-proxy] ML proxy not available. Run `netlify dev` for local functions.');
+            res.writeHead(502, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ title: 'Gateway Error', message: 'ML proxy not running. Use `netlify dev`.', status: 502 }));
+          });
+        },
       },
     },
   },

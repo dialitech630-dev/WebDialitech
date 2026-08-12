@@ -547,8 +547,8 @@ export const messages = {
       firstNamePlaceholder: 'Juan',
       lastNamePlaceholder: 'Pérez',
       phonePlaceholder: '+52 (55) 0000-0000',
-      passwordPolicy: 'La contraseña debe tener de {min}-{max} caracteres sin espacios.',
-      passwordLengthHint: 'Debe tener al menos {length} caracteres sin espacios.',
+      passwordPolicy: 'La contraseña debe tener {min}-{max} caracteres, incluir mayúscula, minúscula, número y carácter especial.',
+      passwordLengthHint: 'Mínimo {length} caracteres.',
     },
     ai: {
       title: 'Análisis IA',
@@ -1118,8 +1118,8 @@ export const messages = {
       firstNamePlaceholder: 'John',
       lastNamePlaceholder: 'Doe',
       phonePlaceholder: '+1 (555) 000-0000',
-      passwordPolicy: 'Password must be {min}-{max} characters without spaces.',
-      passwordLengthHint: 'Must be at least {length} characters without spaces.',
+      passwordPolicy: 'Password must be {min}-{max} characters, include uppercase, lowercase, number, and special character.',
+      passwordLengthHint: 'Minimum {length} characters.',
     },
     ai: {
       title: 'AI Analysis',

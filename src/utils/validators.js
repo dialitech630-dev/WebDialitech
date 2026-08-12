@@ -91,7 +91,7 @@ export function validateRegisterForm(form) {
   else if (!isPhone(form.phone)) errors.phone = 'Ingresa un teléfono válido.';
 
   if (!required(form.password)) errors.password = 'La contraseña es obligatoria.';
-  else if (!isStrongPassword(form.password)) errors.password = `La contraseña debe tener entre ${PASSWORD_POLICY.MIN_LENGTH} y ${PASSWORD_POLICY.MAX_LENGTH} caracteres sin espacios.`;
+  else if (!isStrongPassword(form.password)) errors.password = `La contraseña debe tener ${PASSWORD_POLICY.MIN_LENGTH}-${PASSWORD_POLICY.MAX_LENGTH} caracteres, incluir mayúscula, minúscula, número y carácter especial (sin espacios).`;
 
   if (!required(form.confirmPassword)) errors.confirmPassword = 'Confirma tu contraseña.';
   else if (!matches(form.password, form.confirmPassword)) errors.confirmPassword = 'Las contraseñas no coinciden.';
