@@ -16,7 +16,7 @@ export const SESSION_CONFIG = Object.freeze({
 });
 
 export const PASSWORD_POLICY = Object.freeze({
-  MIN_LENGTH: 7,
+  MIN_LENGTH: 6,
   MAX_LENGTH: 128,
   REQUIRE_UPPERCASE: true,
   REQUIRE_LOWERCASE: true,

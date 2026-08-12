@@ -28,7 +28,7 @@ export function useChartPresets() {
     axisLabel: { color: colors.value.textMuted, fontSize: 11, fontFamily },
   }));
 
-  const grid = { left: 8, right: 12, top: 16, bottom: 8, containLabel: true };
+  const grid = { left: 8, right: 12, top: 16, bottom: 8 };
 
   const legend = computed(() => ({
     textStyle: { color: colors.value.textSecondary, fontSize: 12, fontFamily },

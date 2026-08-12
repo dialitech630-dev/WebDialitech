@@ -154,48 +154,8 @@ function stopPolling() {
 }
 
 function trySSE() {
-  if (eventSource) return false;
-
-  try {
-    const baseUrl = '/api/v1';
-    const url = `${baseUrl}/dashboard/${patientId}/readings/stream?range=${range}`;
-
-    eventSource = new EventSource(url, { withCredentials: false });
-
-    eventSource.onopen = () => {
-      setConnectionStatus('connected');
-      stopPolling();
-    };
-
-    eventSource.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (data.readings?.length) {
-          const s = getStore();
-          const existing = new Set(s.readings.map((r) => r.timestamp));
-          const newReadings = data.readings.filter((r) => r.timestamp && !existing.has(r.timestamp));
-          if (newReadings.length) {
-            s.readings.push(...newReadings);
-            notifySubscribers('readings', { newReadings, allReadings: s.readings });
-          }
-        }
-      } catch (e) {
-        console.error('[Realtime] SSE parse error:', e);
-      }
-    };
-
-    eventSource.onerror = () => {
-      eventSource.close();
-      eventSource = null;
-      setConnectionStatus('disconnected');
-      startPolling();
-    };
-
-    return true;
-  } catch (e) {
-    console.warn('[Realtime] SSE not available:', e);
-    return false;
-  }
+  // Backend does not provide a SSE /stream endpoint; skip to polling directly.
+  return false;
 }
 
 export function useRealtimeReadings() {

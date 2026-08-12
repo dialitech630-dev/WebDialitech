@@ -89,10 +89,17 @@ mlApi.interceptors.response.use(
 
 export const mlService = {
   analyze(patientId, readings, windowSize = 12) {
+    // Transform readings to snake_case as expected by ML service
+    const payloadReadings = readings.map(r => ({
+      heart_rate: r.heartRate,
+      spo2: r.oxygen,
+      activity: r.activity,
+      timestamp: r.timestamp,
+    }));
     return mlApi.post('/api/v1/analyze', {
-      patientId,
-      windowSize,
-      readings,
+      patient_id: patientId,
+      window_size: windowSize,
+      readings: payloadReadings,
     });
   },
 

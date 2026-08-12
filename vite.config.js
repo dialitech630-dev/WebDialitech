@@ -60,6 +60,9 @@ export default defineConfig({
         },
       },
       '/ml': {
+        // En desarrollo: proxy a Netlify Functions local (netlify dev) para inyectar X-API-Key.
+        // netlify dev expone functions en http://localhost:8888/.netlify/functions/*
+        // En producción: Netlify redirect /ml/* -> /.netlify/functions/ml-proxy/*
         target: 'http://localhost:8888',
         changeOrigin: true,
         secure: false,
@@ -72,7 +75,7 @@ export default defineConfig({
               res.destroy();
               return;
             }
-            console.warn('[vite:ml-proxy] ML proxy not available. Run `netlify dev` for local functions.');
+            console.warn('[vite:ml-proxy] Netlify Functions no disponible. Ejecuta `netlify dev`.', err.message);
             res.writeHead(502, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ title: 'Gateway Error', message: 'ML proxy not running. Use `netlify dev`.', status: 502 }));
           });
