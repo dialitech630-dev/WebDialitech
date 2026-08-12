@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 import { dashboardService } from '../services/dashboardService';
+import { useRealtimeReadings } from '../services/realtimeService';
 
 function toNumber(value, fallback = 0) {
   const n = Number(value);
@@ -26,6 +27,10 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
   const readingsCount = computed(() => readings.value.length);
 
+  let realtimeUnsubscribe = null;
+  let realtimeStarted = false;
+  let realtimeService = null;
+
   const patients = computed(() => summary.value?.patients ?? []);
   const totalPatients = computed(() => summary.value?.totalPatients ?? 0);
   const activeAlerts = computed(() => summary.value?.activeAlerts ?? 0);
@@ -42,6 +47,52 @@ export const useDashboardStore = defineStore('dashboard', () => {
     const key = String(selectedPatientId.value);
     return patients.value.find((p) => String(p.patientId) === key) ?? null;
   });
+
+  function appendReadings(newReadings) {
+    if (!newReadings?.length) return;
+    const existing = new Set(readings.value.map((r) => r.timestamp));
+    const unique = newReadings.filter((r) => r.timestamp && !existing.has(r.timestamp));
+    if (unique.length) {
+      readings.value.push(...unique);
+      readings.value.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+    }
+  }
+
+  function startRealtime(patientId, activeRange) {
+    if (realtimeStarted) return;
+    const rt = useRealtimeReadings();
+    realtimeService = rt;
+    rt.setPatient(patientId, activeRange);
+    realtimeUnsubscribe = rt.subscribe((event, data) => {
+      if (event === 'readings' && data?.newReadings?.length) {
+        appendReadings(data.newReadings);
+        lastUpdated.value = new Date();
+      }
+    });
+    rt.start();
+    realtimeStarted = true;
+  }
+
+  function stopRealtime() {
+    if (realtimeUnsubscribe) {
+      realtimeUnsubscribe();
+      realtimeUnsubscribe = null;
+    }
+    if (realtimeService) {
+      realtimeService.stop();
+      realtimeService = null;
+    }
+    realtimeStarted = false;
+  }
+
+  const connectionStatus = computed(() => realtimeService?.connectionStatus?.value ?? 'disconnected');
+
+  function forceRealtimeRefresh() {
+    if (realtimeService) {
+      return realtimeService.forceRefresh();
+    }
+    return Promise.resolve();
+  }
 
   async function fetchSummary({ force = false } = {}) {
     if (!force && (summaryLoading.value || summaryRequest)) return summaryRequest;
@@ -137,14 +188,21 @@ export const useDashboardStore = defineStore('dashboard', () => {
       fetchPatientDetail(id, true),
       fetchReadings(id, range.value, true),
     ]);
+    startRealtime(id, range.value);
   }
 
   function setRange(value) {
     range.value = value;
-    return fetchReadings(selectedPatientId.value, value, true);
+    const promise = fetchReadings(selectedPatientId.value, value, true);
+    if (selectedPatientId.value) {
+      stopRealtime();
+      startRealtime(selectedPatientId.value, value);
+    }
+    return promise;
   }
 
   function reset() {
+    stopRealtime();
     summary.value = null;
     summaryError.value = '';
     lastUpdated.value = null;
@@ -160,6 +218,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     summaryLoading,
     summaryError,
     lastUpdated,
+    connectionStatus,
     patients,
     totalPatients,
     activeAlerts,
@@ -182,5 +241,9 @@ export const useDashboardStore = defineStore('dashboard', () => {
     selectPatient,
     setRange,
     reset,
+    appendReadings,
+    startRealtime,
+    stopRealtime,
+    forceRealtimeRefresh,
   };
 });

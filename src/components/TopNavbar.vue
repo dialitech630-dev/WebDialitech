@@ -33,11 +33,6 @@
             <path d="M10 2a6 6 0 0 0-6 6v4l-2 2v1h16v-1l-2-2V8a6 6 0 0 0-6-6Z" stroke="#6b7280" stroke-width="1.5" />
             <path d="M8 17a2 2 0 0 0 4 0" stroke="#6b7280" stroke-width="1.5" />
           </svg>
-          <Transition name="badge">
-            <span v-if="hasUnread" class="notification-badge" :class="{ 'badge-dot': unreadCount > 9 }">
-              {{ unreadCount > 9 ? '9+' : unreadCount }}
-            </span>
-          </Transition>
         </button>
 
         <Transition name="dropdown">
@@ -337,44 +332,6 @@ const userRoleLabel = computed(() => {
 
 .notification-btn:hover {
   background: #e5e7eb;
-}
-
-.notification-badge {
-  position: absolute;
-  top: -3px;
-  right: -3px;
-  min-width: 18px;
-  height: 18px;
-  background: #dc2626;
-  color: #ffffff;
-  font-size: 10px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 9px;
-  padding: 0 4px;
-  border: 2px solid #ffffff;
-  pointer-events: none;
-}
-
-.badge-dot {
-  min-width: 18px;
-  padding: 0 4px;
-}
-
-.badge-enter-active {
-  animation: badgePop 0.3s ease;
-}
-
-.badge-leave-active {
-  animation: badgePop 0.2s ease reverse;
-}
-
-@keyframes badgePop {
-  0% { transform: scale(0); opacity: 0; }
-  60% { transform: scale(1.2); }
-  100% { transform: scale(1); opacity: 1; }
 }
 
 .notification-dropdown {

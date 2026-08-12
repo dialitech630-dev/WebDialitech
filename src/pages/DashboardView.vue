@@ -15,10 +15,9 @@
         <span v-if="store.lastUpdated" class="last-updated">
           Última actualización {{ formatTime(store.lastUpdated) }}
         </span>
-        <label class="auto-refresh" title="Actualiza los datos automáticamente cada 30 segundos">
-          <input v-model="autoRefresh" type="checkbox" />
-          <span>Actualización automática</span>
-        </label>
+        <span v-if="store.connectionStatus" class="connection-status" :class="store.connectionStatus">
+          {{ connectionStatusText }}
+        </span>
         <button class="refresh-btn" :disabled="store.summaryLoading" @click="refreshAll">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path d="M11.5 7a4.5 4.5 0 1 1-1.4-3.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
@@ -120,8 +119,6 @@ const PatientMonitoringSection = defineAsyncComponent(() =>
   import('../modules/dashboard/components/PatientMonitoringSection.vue'),
 );
 
-const REFRESH_INTERVAL = 30 * 1000;
-
 const sub = useSubscriptionStore();
 const authStore = useAuthStore();
 const alertStore = useAlertStore();
@@ -130,8 +127,6 @@ const mlStore = useMlStore();
 
 const showModal = ref(false);
 const showAddModal = ref(false);
-const autoRefresh = ref(true);
-let refreshTimer = null;
 
 // IA: la restricción de plan también se aplica aquí (no solo visual), de modo
 // que los planes Standard jamás disparan POST /api/v1/analyze.
@@ -139,8 +134,7 @@ const aiAllowed = computed(() => sub.can('ai'));
 let lastAnalysisSignature = '';
 
 // Firma basada en TODAS las lecturas (no solo la última) para que el
-// auto-refresh de 30s no vuelva a analizar datos idénticos (sin llamadas
-// duplicadas por el mismo conjunto de readings).
+// auto-refresh no vuelva a analizar datos idénticos.
 function readingsSignature(rows) {
   if (!rows?.length) return '';
   let hash = 5381;
@@ -206,6 +200,15 @@ watch(
 
 const avgHrText = computed(() => (store.averageHeartRate ? `${store.averageHeartRate} lpm` : '--'));
 
+const connectionStatusText = computed(() => {
+  switch (store.connectionStatus) {
+    case 'connected': return 'Conectado';
+    case 'connecting': return 'Conectando...';
+    case 'error': return 'Error de conexión';
+    default: return 'Desconectado';
+  }
+});
+
 function formatTime(date) {
   return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }
@@ -213,39 +216,17 @@ function formatTime(date) {
 async function refreshAll() {
   await store.fetchSummary({ force: true });
   if (store.selectedPatientId) {
-    store.fetchPatientDetail(store.selectedPatientId, true);
-    store.fetchReadings(store.selectedPatientId, store.range, true);
+    await Promise.all([
+      store.fetchPatientDetail(store.selectedPatientId, true),
+      store.fetchReadings(store.selectedPatientId, store.range, true),
+    ]);
   }
-}
-
-function startAutoRefresh() {
-  stopAutoRefresh();
-  refreshTimer = setInterval(() => {
-    if (!document.hidden) refreshAll();
-  }, REFRESH_INTERVAL);
-}
-
-function stopAutoRefresh() {
-  if (refreshTimer) {
-    clearInterval(refreshTimer);
-    refreshTimer = null;
-  }
-}
-
-function onVisibilityChange() {
-  if (document.hidden) stopAutoRefresh();
-  else if (autoRefresh.value) startAutoRefresh();
 }
 
 function onPatientCreated() {
   showAddModal.value = false;
   refreshAll();
 }
-
-watch(autoRefresh, (enabled) => {
-  if (enabled) startAutoRefresh();
-  else stopAutoRefresh();
-});
 
 onMounted(async () => {
   await store.fetchSummary();
@@ -256,13 +237,19 @@ onMounted(async () => {
   if (aiAllowed.value) {
     mlStore.checkHealth();
   }
-  startAutoRefresh();
-  document.addEventListener('visibilitychange', onVisibilityChange);
+  // Iniciar realtime para el paciente seleccionado
+  if (store.selectedPatientId) {
+    store.startRealtime(store.selectedPatientId, store.range);
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && store.selectedPatientId) {
+      store.forceRealtimeRefresh?.();
+    }
+  });
 });
 
 onBeforeUnmount(() => {
-  stopAutoRefresh();
-  document.removeEventListener('visibilitychange', onVisibilityChange);
+  store.stopRealtime();
   store.reset();
   mlStore.reset();
 });
@@ -344,6 +331,42 @@ async function onSelectPlan(planId) {
 .refresh-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.connection-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.connection-status::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.connection-status.connected {
+  color: #16a34a;
+}
+
+.connection-status.connecting {
+  color: #d97706;
+}
+
+.connection-status.error {
+  color: #dc2626;
+}
+
+.connection-status.disconnected {
+  color: #9ca3af;
 }
 
 .error-banner {
