@@ -2,9 +2,7 @@ import axios from 'axios';
 import tokenService from './token.service';
 import authEvents from './authEvents';
 
-const baseURL = import.meta.env.DEV
-  ? '/api/v1'
-  : `${import.meta.env.VITE_API_URL}/api/v1`;
+const baseURL = '/api/v1';
 
 const api = axios.create({
   baseURL,

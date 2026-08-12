@@ -157,7 +157,7 @@ function trySSE() {
   if (eventSource) return false;
 
   try {
-    const baseUrl = import.meta.env.DEV ? '/api/v1' : `${import.meta.env.VITE_API_URL}/api/v1`;
+    const baseUrl = '/api/v1';
     const url = `${baseUrl}/dashboard/${patientId}/readings/stream?range=${range}`;
 
     eventSource = new EventSource(url, { withCredentials: false });
