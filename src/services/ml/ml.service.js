@@ -21,7 +21,7 @@ import axios from 'axios';
  */
 
 // En desarrollo usamos el proxy de Vite configurado en vite.config.js
-// En producción usamos el redirect de Netlify /ml/* -> /.netlify/functions/ml-proxy/*
+// En producción usamos el redirect de Netlify /api/ml/* -> /.netlify/functions/ml-proxy/*
 const ML_BASE_URL = '/ml';
 
 const mlApi = axios.create({

@@ -59,16 +59,16 @@ export default defineConfig({
           });
         },
       },
-      '/ml': {
+      '/api/ml': {
         // En desarrollo: proxy a Netlify Functions local (netlify dev) para inyectar X-API-Key.
         // netlify dev expone functions en http://localhost:8888/.netlify/functions/*
-        // En producción: Netlify redirect /ml/* -> /.netlify/functions/ml-proxy/*
+        // En producción: Netlify redirect /api/ml/* -> /.netlify/functions/ml-proxy/*
         target: 'http://localhost:8888',
         changeOrigin: true,
         secure: false,
         timeout: 60000,
         proxyTimeout: 60000,
-        rewrite: (path) => path.replace(/^\/ml/, '/.netlify/functions/ml-proxy'),
+        rewrite: (path) => path.replace(/^\/api\/ml/, '/.netlify/functions/ml-proxy'),
         configure(proxy) {
           proxy.on('error', (err, req, res) => {
             if (res.headersSent) {

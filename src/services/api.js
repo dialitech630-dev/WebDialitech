@@ -2,7 +2,22 @@ import axios from 'axios';
 import tokenService from './token.service';
 import authEvents from './authEvents';
 
-const baseURL = '/api/v1';
+function resolveBaseURL() {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl && envUrl.trim() !== '') {
+    return envUrl.replace(/\/+$/, '');
+  }
+  if (import.meta.env.DEV) {
+    return '/api/v1';
+  }
+  throw new Error(
+    'Configuración de API faltante: VITE_API_URL no está definida. ' +
+    'En producción, configura VITE_API_URL=https://api-dialitech-core-v2.onrender.com en las variables de entorno de Netlify. ' +
+    'En desarrollo, usa `netlify dev` o define VITE_API_URL en .env.local'
+  );
+}
+
+const baseURL = resolveBaseURL();
 
 const api = axios.create({
   baseURL,

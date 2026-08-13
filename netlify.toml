@@ -32,6 +32,14 @@
     X-Frame-Options = "DENY"
 
 # ML Service proxy via Netlify Function (server-side API key injection)
+# Nueva ruta /api/ml/* (consistente con /api/v1/*)
+[[redirects]]
+  from = "/api/ml/*"
+  to = "/.netlify/functions/ml-proxy/:splat"
+  status = 200
+  force = true
+
+# Ruta legacy /ml/* (mantener compatibilidad temporal)
 [[redirects]]
   from = "/ml/*"
   to = "/.netlify/functions/ml-proxy/:splat"
