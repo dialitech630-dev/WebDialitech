@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import vue from '@vitejs/plugin-vue';
 
 const PROD_CSP = [
@@ -32,34 +32,65 @@ function securityHeadersPlugin() {
   };
 }
 
-export default defineConfig({
-  plugins: [vue(), securityHeadersPlugin()],
-  css: {
-    transformer: 'postcss',
-  },
-  server: {
-    proxy: {
-      '/api': {
-        target: 'https://api-dialitech-core-v2.onrender.com',
-        changeOrigin: true,
-        secure: true,
-        timeout: 120000,
-        proxyTimeout: 120000,
-        configure(proxy) {
-          proxy.on('error', (err, req, res) => {
-            if (res.headersSent) {
-              res.destroy();
-              return;
-            }
-            const message = err.code === 'ECONNRESET' || /TLS|socket hang up/i.test(err.message)
-              ? 'Server is starting up, please retry.'
-              : 'Could not reach the server.';
-            res.writeHead(502, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ title: 'Gateway Error', message, status: 502 }));
-          });
+export default defineConfig(({ mode }) => {
+  // SOLO entorno de desarrollo: carga ML_API_KEY desde .env (gitignored) para
+  // inyectarla server-side en el proxy /ml. Nunca llega al bundle del navegador.
+  // En producción la inyecta la Netlify Function ml-proxy.
+  const env = loadEnv(mode, process.cwd(), '');
+  const ML_API_KEY = env.ML_API_KEY || '';
+
+  return {
+    plugins: [vue(), securityHeadersPlugin()],
+    css: {
+      transformer: 'postcss',
+    },
+    server: {
+      proxy: {
+        '/api': {
+          target: 'https://api-dialitech-core-v2.onrender.com',
+          changeOrigin: true,
+          secure: true,
+          timeout: 120000,
+          proxyTimeout: 120000,
+          configure(proxy) {
+            proxy.on('error', (err, req, res) => {
+              if (res.headersSent) {
+                res.destroy();
+                return;
+              }
+              const message = err.code === 'ECONNRESET' || /TLS|socket hang up/i.test(err.message)
+                ? 'Server is starting up, please retry.'
+                : 'Could not reach the server.';
+              res.writeHead(502, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ title: 'Gateway Error', message, status: 502 }));
+            });
+          },
         },
-      },
-      '/api/ml': {
+        '/ml': {
+          target: 'https://dialitechmlservice-production.up.railway.app',
+          changeOrigin: true,
+          secure: true,
+          timeout: 60000,
+          proxyTimeout: 60000,
+          rewrite: (path) => path.replace(/^\/ml/, ''),
+          configure(proxy) {
+            proxy.on('proxyReq', (proxyReq) => {
+              // Inyección server-side de la key solo en el dev server de Vite.
+              if (ML_API_KEY) {
+                proxyReq.setHeader('X-API-Key', ML_API_KEY);
+              }
+            });
+            proxy.on('error', (err, req, res) => {
+              if (res.headersSent) {
+                res.destroy();
+                return;
+              }
+              res.writeHead(502, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ title: 'Gateway Error', message: 'ML service unavailable', status: 502 }));
+            });
+          },
+        },
+        '/api/ml': {
         // En desarrollo: proxy a Netlify Functions local (netlify dev) para inyectar X-API-Key.
         // netlify dev expone functions en http://localhost:8888/.netlify/functions/*
         // En producción: Netlify redirect /api/ml/* -> /.netlify/functions/ml-proxy/*
@@ -82,5 +113,6 @@ export default defineConfig({
         },
       },
     },
-  },
+    },
+  };
 });

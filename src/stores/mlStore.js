@@ -22,6 +22,21 @@ function errorMessageFor(err) {
   if (status === 429) {
     return 'Se alcanzó el límite de solicitudes. Intenta nuevamente más tarde.';
   }
+  if (status === 422) {
+    // No ocultar el error real de validación de FastAPI/Pydantic.
+    if (Array.isArray(detail) && detail.length) {
+      const first = detail[0];
+      const loc = Array.isArray(first?.loc)
+        ? first.loc.filter((p) => p !== 'body').join('.')
+        : '';
+      const msg = first?.msg || '';
+      return loc
+        ? `La solicitud de IA fue rechazada: campo "${loc}" — ${msg}.`
+        : `La solicitud de IA fue rechazada: ${msg}.`;
+    }
+    if (typeof detail === 'string' && detail) return detail;
+    return 'La solicitud de análisis de IA no cumple el formato esperado.';
+  }
   if (status >= 500) {
     return 'El servicio de IA no está disponible temporalmente.';
   }
@@ -32,6 +47,58 @@ function errorMessageFor(err) {
 }
 
 const MIN_READINGS = 12;
+
+// Ventana de análisis que se envía al ML Service. El Dashboard conserva todas
+// las lecturas históricas; solo el análisis IA usa esta ventana (las últimas
+// lecturas cronológicamente), que es lo que el modelo interpreta con windowSize.
+const ANALYSIS_WINDOW = 12;
+
+// Aliases aceptados por lectura. El dashboard puede devolver nombres en
+// camelCase o snake_case; el ML Service solo acepta camelCase.
+const READING_FIELDS = {
+  heartRate: ['heartRate', 'heart_rate', 'hr'],
+  oxygen: ['oxygen', 'spo2', 'spo_2', 'o2'],
+  activity: ['activity'],
+  timestamp: ['timestamp', 'recordedAt', 'recorded_at', 'date'],
+};
+
+function pickField(reading, keys) {
+  if (!reading || typeof reading !== 'object') return undefined;
+  for (const key of keys) {
+    const value = reading[key];
+    if (value !== undefined && value !== null && value !== '') return value;
+  }
+  return undefined;
+}
+
+function toFiniteNumber(value) {
+  if (value === undefined || value === null || value === '') return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
+function toIsoTimestamp(value) {
+  if (value === undefined || value === null || value === '') return null;
+  const d = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(d.getTime()) ? null : d.toISOString();
+}
+
+/**
+ * Mapper explícito lectura -> payload del ML Service.
+ * Valida y normaliza cada campo; devuelve null si la lectura es inválida.
+ * Nunca inventa valores: no sustituye heartRate/oxygen/activity ausentes.
+ */
+function toMlReading(reading) {
+  const heartRate = toFiniteNumber(pickField(reading, READING_FIELDS.heartRate));
+  const oxygen = toFiniteNumber(pickField(reading, READING_FIELDS.oxygen));
+  const activity = toFiniteNumber(pickField(reading, READING_FIELDS.activity));
+  const timestamp = toIsoTimestamp(pickField(reading, READING_FIELDS.timestamp));
+
+  if (heartRate === null || oxygen === null || activity === null || timestamp === null) {
+    return null;
+  }
+  return { heartRate, oxygen, activity, timestamp };
+}
 
 /**
  * Normaliza la respuesta del microservicio de ML a la estructura que consumen
@@ -140,23 +207,57 @@ export const useMlStore = defineStore('ml', () => {
     analyzing.value = true;
 
     try {
-      const mappedReadings = readings
-        .map((r) => ({
-          heartRate: r.heartRate,
-          oxygen: r.oxygen,
-          activity: r.activity,
-          timestamp: r.timestamp,
-        }))
-        .filter((r) => r.timestamp || r.heartRate !== undefined);
+      // Mapper + validación: descarta lecturas inválidas (campos ausentes,
+      // no numéricos o timestamps inválidos). NO se inventan valores.
+      const validReadings = [];
+      let missingActivity = 0;
+      let invalidCount = 0;
+      for (const r of readings) {
+        const mapped = toMlReading(r);
+        if (mapped) {
+          validReadings.push(mapped);
+        } else {
+          invalidCount += 1;
+          if (pickField(r, READING_FIELDS.activity) === undefined) missingActivity += 1;
+        }
+      }
 
-      if (!mappedReadings.length) {
+      if (validReadings.length < MIN_READINGS) {
         if (myId === requestId) analyzing.value = false;
         insufficientData.value = true;
-        insufficientReason.value = 'Se necesitan al menos 12 lecturas para realizar el análisis de IA.';
+        if (missingActivity > 0) {
+          insufficientReason.value = `No hay suficientes lecturas completas para el análisis de IA. ${missingActivity} lectura(s) no incluyen el dato de actividad requerido por el modelo.`;
+        } else if (invalidCount > 0) {
+          insufficientReason.value = `No hay suficientes lecturas válidas para el análisis de IA. Se descartaron ${invalidCount} lectura(s) con datos incompletos.`;
+        } else {
+          insufficientReason.value = `Se necesitan al menos ${MIN_READINGS} lecturas para realizar el análisis de IA. Actualmente hay ${readings.length}.`;
+        }
+        analysis.value = null;
+        analysisError.value = '';
         return;
       }
 
-      const { data } = await mlService.analyze(patientId, mappedReadings);
+      // Ventana de análisis: las últimas `ANALYSIS_WINDOW` lecturas válidas
+      // ordenadas cronológicamente (estado actual). Las 783 del dashboard
+      // permanecen intactas para gráficas y línea del tiempo.
+      const sortedReadings = validReadings
+        .slice()
+        .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+      const windowReadings = sortedReadings.slice(-ANALYSIS_WINDOW);
+
+      if (import.meta.env.DEV) {
+        const safePayload = {
+          patientId,
+          windowSize: ANALYSIS_WINDOW,
+          readingsCount: windowReadings.length,
+          totalValidReadings: validReadings.length,
+          firstReading: windowReadings[0] ?? null,
+          lastReading: windowReadings[windowReadings.length - 1] ?? null,
+        };
+        console.info('[ml] analyze request (debug seguro, sin secretos):', safePayload);
+      }
+
+      const { data } = await mlService.analyze(patientId, windowReadings);
 
       if (myId !== requestId) return;
       analysis.value = normalizeMlResponse(data);

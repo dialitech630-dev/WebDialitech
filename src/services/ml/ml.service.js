@@ -89,17 +89,15 @@ mlApi.interceptors.response.use(
 
 export const mlService = {
   analyze(patientId, readings, windowSize = 12) {
-    // Transform readings to snake_case as expected by ML service
-    const payloadReadings = readings.map(r => ({
-      heart_rate: r.heartRate,
-      spo2: r.oxygen,
-      activity: r.activity,
-      timestamp: r.timestamp,
-    }));
+    // El ML Service (FastAPI/Pydantic) espera camelCase:
+    // { patientId, windowSize, readings: [{ heartRate, oxygen, activity, timestamp }] }.
+    // patientId es REQUERIDO y windowSize es opcional (default 12).
+    // Enviar patient_id/window_size en snake_case deja el campo requerido
+    // patientId ausente y Pydantic responde 422.
     return mlApi.post('/api/v1/analyze', {
-      patient_id: patientId,
-      window_size: windowSize,
-      readings: payloadReadings,
+      patientId,
+      windowSize,
+      readings,
     });
   },
 
